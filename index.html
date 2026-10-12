@@ -133,6 +133,17 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 .dtable input[type=text],.dtable input[type=number]{font:14px var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:100%;min-width:160px}
 .dtable input[type=number]{min-width:0;width:64px}
 .meter{height:8px;background:var(--line);border-radius:4px;overflow:hidden;min-width:80px}.meter i{display:block;height:100%;background:var(--new)}.meter.over i{background:#c0392b}
+.sim{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:6px;display:grid;gap:10px}
+.simtop{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.simtop label{display:grid;gap:2px}.simtop label span{font-size:13px}
+.simtop output{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
+.simtop output small{font-family:var(--body);font-weight:500;font-size:13px;color:var(--muted);margin-left:4px}
+#simN{width:100%;accent-color:var(--accent);height:28px}
+.simres{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:14px}
+.simres b{font-variant-numeric:tabular-nums}
+.simres .good{color:var(--new)}.simres .bad{color:#c0392b}
+#simChart{width:100%;height:auto;max-width:100%}
+#simChart text{fill:var(--muted);font:12px var(--body)}
 .bh{font-family:var(--display);font-weight:800;font-size:1.1rem;margin:18px 0 8px}
 .binputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .bin{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px}
@@ -180,6 +191,15 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   <section id="p-budget" class="page" hidden>
     <div class="phead"><div><h2>Budget</h2><p class="muted">Même calcul que l'onglet Budget de la Check list. Change une hypothèse, tout se recalcule.</p></div><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></div>
     <div class="kpis" id="bKpi"></div>
+    <div class="sim" id="bSim">
+      <div class="simtop">
+        <label for="simN"><b>Et si on est moins nombreux ?</b><span class="muted">Fais glisser pour changer le nombre total de participants, au prix de base fixé.</span></label>
+        <output id="simOut" for="simN"></output>
+      </div>
+      <input type="range" id="simN" min="6" max="50" step="1" value="50">
+      <div class="simres" id="simRes"></div>
+      <svg id="simChart" viewBox="0 0 1100 170" role="img" aria-label="Solde selon le nombre de participants"></svg>
+    </div>
     <h3 class="bh">Hypothèses</h3>
     <div class="binputs" id="bInputs"></div>
     <div class="bgrid">
@@ -453,7 +473,43 @@ function renderBudget(){
    <tr class="sub"><td>Sous-total</td><td class="num">${eur(r.sous,2)}</td><td></td></tr><tr><td>Imprévus (${b.imp} %)</td><td class="num">${eur(r.imp,2)}</td><td></td></tr></tbody>
    <tfoot><tr><td>Total dépenses</td><td class="num">${eur(r.totDep,2)}</td><td></td></tr></tfoot>`;
   document.getElementById("bRec").innerHTML=`<tbody><tr><td>Inscriptions</td><td class="num">${eur(r.insc,2)}</td></tr><tr><td>Majorations tardives</td><td class="num">${eur(r.majo,2)}</td></tr><tr><td>Dons des églises</td><td class="num">${eur(b.donsEgl,2)}</td></tr><tr><td>Dons libres</td><td class="num">${eur(b.donsPart,2)}</td></tr></tbody><tfoot><tr><td>Total recettes</td><td class="num">${eur(r.totRec,2)}</td></tr></tfoot>`;
+  renderSim();
 }
+
+function soldeAt(N,r){
+  const b=S._b, nonpay=r.rows.filter(x=>!x.pay).reduce((a,x)=>a+x.n,0), payBase=r.rows.filter(x=>x.pay).reduce((a,x)=>a+x.n,0);
+  const f=payBase?Math.max(0,N-nonpay)/payBase:0;
+  const insc=r.insc*f, perPers=3*b.repas+2*b.pdj+b.gout;
+  const fixed=b.lieu+b.orateur+(+b.eff["Équipe cuisine"]||0)*b.cad+b.entretien+b.sono+b.com;
+  const dep=(fixed+perPers*N)*(1+b.imp/100);
+  return {dep,rec:insc+r.majo+b.donsEgl+b.donsPart,solde:insc+r.majo+b.donsEgl+b.donsPart-dep,pay:Math.max(0,N-nonpay)};
+}
+function renderSim(){
+  const r=calc(), sl=document.getElementById("simN"), max=Math.max(r.part,6);
+  sl.max=max; let N=Math.min(+(S._b.nSim??max),max); if(!(N>=6))N=max; sl.value=N;
+  const x=soldeAt(N,r);
+  let seuil=null; for(let n=6;n<=200;n++){if(soldeAt(n,r).solde>=0){seuil=n;break}}
+  document.getElementById("simOut").innerHTML=`${N}<small>participants</small>`;
+  document.getElementById("simRes").innerHTML=`<span>Payants : <b>${x.pay}</b></span><span>Dépenses : <b>${eur(x.dep)}</b></span><span>Recettes : <b>${eur(x.rec)}</b></span>
+    <span>Solde : <b class="${x.solde<0?"bad":"good"}">${x.solde>=0?"+":""}${eur(x.solde)}</b></span>
+    <span>Seuil à ${eur(S._b.prix)} : <b>${seuil===null?"jamais atteint, augmente le prix":"au moins "+seuil+" participants"}</b></span>`;
+  // chart
+  const W=1100,H=170,L=58,R=12,T=12,B=24, pts=[];for(let n=6;n<=max;n++)pts.push([n,soldeAt(n,r).solde]);
+  const ys=pts.map(p=>p[1]), lo=Math.min(0,...ys), hi=Math.max(0,...ys), span=(hi-lo)||1;
+  const X=n=>L+(n-6)/Math.max(1,max-6)*(W-L-R), Y=v=>T+(hi-v)/span*(H-T-B);
+  const path=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
+  const acc=getComputedStyle(document.documentElement).getPropertyValue("--accent");
+  document.getElementById("simChart").innerHTML=`
+    <line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-width="1.5"/>
+    <text x="${L-6}" y="${Y(0)+4}" text-anchor="end">0 €</text>
+    <text x="${L-6}" y="${Y(hi)+4}" text-anchor="end">${hi>0&&Y(0)-Y(hi)>16?"+"+Math.round(hi)+" €":""}</text>
+    <text x="${L-6}" y="${Y(lo)+4}" text-anchor="end">${lo<0&&Y(lo)-Y(0)>16?Math.round(lo)+" €":""}</text>
+    ${seuil!==null&&seuil<=max?`<line x1="${X(seuil)}" x2="${X(seuil)}" y1="${T}" y2="${H-B}" stroke="var(--new)" stroke-dasharray="4 3"/><text x="${X(seuil)}" y="${H-6}" text-anchor="middle" style="fill:var(--new)">${seuil}</text>`:""}
+    <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
+    <circle cx="${X(N)}" cy="${Y(x.solde)}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+    <text x="${L}" y="${H-6}">6</text>${seuil!==null&&Math.abs(seuil-max)<4?"":`<text x="${W-R}" y="${H-6}" text-anchor="end">${max}</text>`}`;
+}
+document.getElementById("simN").oninput=e=>{S._b.nSim=+e.target.value;save();renderSim()};
 document.getElementById("bReset").onclick=()=>{S._b=JSON.parse(JSON.stringify(BDEF));save();renderBudget()};
 
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
