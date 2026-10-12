@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Orga Week-end Régional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: radial mind map on the left, sliding detail panel (questions + notes) on the right */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#1b2433; --muted:#5c6779; --line:#c9d1dd;
+  --accent:#d98a14; --accent-soft:#fbecd2; --core:#23395b; --core-ink:#ffffff; --new:#2f7d62; --new-soft:#dcefe7;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Figtree",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121821; --surface:#1b2330; --ink:#e7ecf3; --muted:#9aa6b8; --line:#344154;
+  --accent:#f0a83a; --accent-soft:#3a2c14; --core:#e7ecf3; --core-ink:#121821; --new:#5cc29c; --new-soft:#173229; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121821; --surface:#1b2330; --ink:#e7ecf3; --muted:#9aa6b8; --line:#344154;
+  --accent:#f0a83a; --accent-soft:#3a2c14; --core:#e7ecf3; --core-ink:#121821; --new:#5cc29c; --new-soft:#173229; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
+header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3.2vw,2.2rem);margin:0;text-wrap:balance;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:2px 0 0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;border:2px solid var(--accent);background:var(--surface)}
+.sw.n{border-color:var(--new);background:var(--new-soft)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.btn{font:600 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible,.node:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+.map{position:relative;width:100%;aspect-ratio:1.25/1;max-width:100%}
+.map svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.map line{stroke:var(--line);stroke-width:2}
+.map line.on{stroke:var(--accent);stroke-width:3}
+.node{position:absolute;transform:translate(-50%,-50%);font:600 14px var(--body);color:var(--ink);background:var(--surface);
+  border:2px solid var(--accent);border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:transform .15s}
+.node:hover{transform:translate(-50%,-50%) scale(1.06)}
+.node.new{border-color:var(--new);background:var(--new-soft)}
+.node.active{background:var(--accent);color:#1b2433;border-color:var(--accent)}
+.node .dot{display:none}.node.has .dot{display:inline-block}
+.node.active .dot{background:#1b2433}
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--core);color:var(--core-ink);
+  font-family:var(--display);font-weight:800;font-size:clamp(1rem,2vw,1.35rem);text-align:center;padding:18px 22px;border-radius:50%;
+  width:clamp(120px,17%,170px);aspect-ratio:1;display:grid;place-items:center;line-height:1.1}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 32px);overflow:auto}
+.panel h2{font-family:var(--display);font-weight:800;font-size:1.5rem;margin:0 0 2px}
+.tag{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--new);background:var(--new-soft);padding:2px 8px;border-radius:4px;margin-bottom:6px}
+.why{color:var(--muted);margin:0 0 14px}
+.panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 8px}
+.qs{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.qs label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.qs input{margin-top:4px;accent-color:var(--accent);flex:none}
+.qs input:checked + span{color:var(--muted);text-decoration:line-through}
+textarea{width:100%;min-height:150px;font:15px/1.5 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;resize:vertical}
+textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+.sched{font-size:13px;border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.sched td{padding:2px 6px 2px 0;vertical-align:top}.sched td:first-child{color:var(--muted);white-space:nowrap}
+.sched .day td{font-weight:600;color:var(--ink);padding-top:8px}
+.empty{color:var(--muted)}
+.info{background:var(--accent-soft);border-radius:10px;padding:4px 14px 10px;margin-bottom:4px}
+.todo{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:16px}
+.todo h2{font-family:var(--display);font-weight:800;font-size:1.1rem;margin:0 0 8px}
+.who-line{font:500 13px var(--body);color:var(--muted);margin-left:6px}
+#todo{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 20px}
+#todo label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+#todo input{margin-top:4px;accent-color:var(--accent);flex:none}
+#todo input:checked + span{color:var(--muted);text-decoration:line-through}
+.owner{display:inline-block;font-size:12px;font-weight:600;color:var(--ink);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:4px}
+.info h3{margin-top:10px}.info ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.saved{font-size:12px;color:var(--muted);margin-top:4px;min-height:1em}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--core);color:var(--core-ink);padding:10px 16px;border-radius:8px;font-weight:600}
+@media (max-width:960px){
+  .layout{grid-template-columns:1fr}
+  .panel{position:static;max-height:none}
+  .map{aspect-ratio:auto;display:flex;flex-wrap:wrap;gap:8px}
+  .map svg{display:none}
+  .center{position:static;transform:none;width:100%;aspect-ratio:auto;border-radius:12px;padding:12px}
+  .node,.node:hover{position:static;transform:none}
+}
+@media (prefers-reduced-motion:reduce){.node{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Week-end régional Grand Est · orga</h1>
+      <p class="sub">Rencontré · Appelé · Envoyé · 27–29 novembre 2026 · Plan A Onville, plan B Metz. Clique sur une branche pour voir les questions et prendre des notes.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="legend"><span><i class="dot"></i>Notes prises</span></div>
+      <button class="btn" id="copyAll" type="button">Copier toutes les notes</button>
+    </div>
+  </header>
+
+  <section class="todo" aria-labelledby="todo-h">
+    <h2 id="todo-h">À faire · mis à jour le 12 octobre <span class="who-line">d'après le quiz</span></h2>
+    <ul id="todo"></ul>
+  </section>
+
+  <div class="layout">
+    <div class="map" id="map"><svg id="lines" aria-hidden="true"></svg><div class="center">Week-end<br>Grand Est</div></div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const PROG = [
+ ["Vendredi 27 nov · équipe et premiers arrivants"],["17h00","Prise des locaux"],["18h00","Installation sono"],["19h00–21h00","Répétition louange (si besoin)"],["20h00","Installation des chaises dans la salle"],["20h30","Point d'équipe, prière, accueil des premiers arrivants"],
+ ["Samedi 28 nov"],["08h00–08h30","Petit-déjeuner"],["08h30–09h00","Finalisation & prière"],["09h00–09h45","Accueil au stand & répartition des chambres"],["09h45–11h20","Louange / sketch + Message 1 « Viens et vois » en DAB (Jean 4)"],["11h20–11h45","Présentation des ateliers (inscription par QR code)"],["12h00","Repas"],
+ ["14h00–15h30","Sports & balade"],["15h30–16h00","Douches & quatre-heures"],["16h20–17h45","Témoignage & Ateliers"],["18h20","Repas"],
+ ["19h45–20h50","Message 2 « Suis-moi »"],["21h05–22h30","Soirée louange, témoignages, prière"],["22h30–23h30","Libre"],
+ ["Dimanche 29 nov"],["08h00–09h00","Petit-déjeuner"],["10h00","Culte à l'Église de Borny + Message 3 « Va et deviens » (Jean 17)"],["12h20","Repas tous ensemble à l'église"],["14h00","Fin du week-end"],["14h00–16h00","Nettoyage (équipe)"]
+];
+const TODO = [
+ {t:"Appeler Elisabeth Leuba : Onville dispo du 27 au 29 nov. + salle du village (réponse avant le 17 oct.)",who:"Edmond"},
+ {t:"Confirmer l'orateur : Louis-Maël Jean (sinon Bertrand, Timothée ou quelqu'un d'Algrange)",who:"Edmond"},
+ {t:"Envoyer le save the date aux villes (15 oct.)",who:""},
+ {t:"Vidéo teaser avec lien et QR code d'inscription",who:"Eléa, Elisa"},
+ {t:"Site d'inscription prêt, envoi des inscriptions du 20 au 22 oct.",who:"Edmond"},
+ {t:"Prochaine réunion d'équipe, au plus tard le 20 oct.",who:"Edmond, Marion, Eléa + équipe"},
+ {t:"Faire le budget et fixer le prix de base",who:"Marion, Joël"},
+ {t:"Demander des cuisiniers à l'église de Metz (chaque responsable à son église)",who:"Edmond + responsables"},
+ {t:"Plan B : liste des familles d'accueil",who:"Edmond"},
+ {t:"Plan B : trouver une église de Metz avec cuisine (ADD, église chinoise, Grange-aux-Bois)",who:"Agirla"},
+ {t:"Emprunter la sono (S&Metz) et un projecteur",who:"Edmond, Marion"},
+ {t:"Demander des témoignages aux jeunes, en lien avec le thème",who:""},
+ {t:"Trouver les ateliers du samedi : sujets et intervenants",who:"Équipe orga"},
+ {t:"Relancer les responsables de chaque ville par appel",who:"Edmond, Eléa"},
+ {t:"Demander aux églises de soutenir le week-end (ex. Borny, pour l'orateur)",who:""}
+];
+const N = [
+ {id:"date",t:"Date",why:"Dates fixées, calendrier de com et d'inscription.",
+  info:["Arrivée possible vendredi 27 nov. ; accueil des premiers arrivants à 20h30","Accueil samedi 28 nov. à 9h · fin dimanche 29 nov. à 14h","Save the date envoyé le 15 octobre","Inscriptions envoyées du 20 au 22 octobre","+10 € pour une inscription après le 23 novembre","Prochaine réunion d'équipe au plus tard le 20 octobre"],
+  q:[["Prochaine réunion : quelle date exacte ? (en attente des réponses d'Elisabeth Leuba et de Louis-Maël Jean)","Edmond, Marion, Eléa + équipe"],["Les bénévoles peuvent-ils être là dès vendredi 17h ?",""]]},
+ {id:"villes",t:"Mobiliser les villes",why:"Faire venir 50 personnes de 5 villes.",
+  info:["Objectifs : Metz 14 · Nancy 9 · Strasbourg 12 · Belfort 4 · Mulhouse 2 · cuisine 4 · orateur 2 · externes 3 = 50","Relais : Metz (Emma, Tigran, Lena) · Nancy (Sacha, Madelaine) · Strasbourg (Elea, Elisa, Etienne, Luc, Leo, Manoah) · Mulhouse (Ines) · Belfort (Timothée)","Com : save the date, vidéo teaser avec lien et QR code, messages dans les groupes WhatsApp des GBU et des églises","Vidéo : Eléa et Elisa","Covoiturage : une voiture commune Mulhouse + Belfort, une pour Strasbourg","−10 % dès 5 inscrits d'une même ville","Relances : Edmond et Eléa, par appel aux responsables"],
+  q:[["Qui organise la voiture de Strasbourg et celle de Mulhouse + Belfort ? Partage des frais d'essence ?",""]]},
+ {id:"lieu",t:"Lieu",why:"Plan A Onville, plan B Metz. Culte du dimanche à Borny dans tous les cas.",
+  info:["Plan A, Onville chez les Leuba : grand salon (50 personnes, ça passe), 5 salles pour les ateliers, cuisine sur place","Onville : grande salle du village de 100 places, à demander","Plan B, Metz : Église de Borny (5 salles pour les ateliers) ; sinon église baptiste, qui a de la place mais pas de cuisine adaptée","Culte de dimanche à l'Église de Borny, qu'on soit à Onville ou pas","Budget lieu : 1 000 € maximum","Clés dès vendredi 17h · équipe de nettoyage dimanche 14h–16h"],
+  q:[["Onville disponible du 27 au 29 nov. ? Confirmé par écrit ? (Edmond appelle, réponse avant le 17 oct.)","Elisabeth Leuba"],["Salle du village d'Onville : disponible ? Quel prix ?","Edmond"],["Sport possible à Onville, ou seulement une balade ?","Romane"],["Plan B : quelle église de Metz a une cuisine (ADD, église chinoise, Grange-aux-Bois) ?","Agirla"],["Coût exact, acompte et annulation du lieu retenu",""],["Qui fait partie de l'équipe de nettoyage dimanche 14h–16h ?",""]]},
+ {id:"theme",t:"Thème",why:"Le fil rouge des prédications, de la com et du visuel.",
+  info:["Titre : Rencontré · Appelé · Envoyé","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte à Borny","Pas de 4e message, le week-end finit à 14h","Save the date : 4 versions prêtes"],
+  q:[["Quelle version du save the date envoyer le 15 octobre ?","Équipe orga"]]},
+ {id:"orateur",t:"Orateur & ateliers",why:"3 prédications, témoignages, DAB et ateliers du samedi.",
+  info:["Orateur pressenti : Louis-Maël Jean (réponse attendue)","Défraiement : un don de 100 à 200 €","DAB sur la 1re prédication","Un seul créneau d'ateliers, le samedi après-midi, avec plusieurs ateliers au choix","Inscription aux ateliers sur place, avec QR code"],
+  q:[["Orateur confirmé ? Sinon Bertrand, Timothée ou quelqu'un d'Algrange","Louis-Maël Jean"],["Témoignages samedi après-midi et soir : qui ?","Les jeunes"],["Combien d'ateliers, sur quels sujets ? (ou demander aux gens ce qu'ils pourraient aborder)","Équipe orga"]]},
+ {id:"louange",t:"Louange & technique",why:"Louange du week-end, culte du dimanche, son et image.",
+  info:["Louange du week-end : Cynthia et Romuald, organisation déléguée à Ichtus","Répétition vendredi 19h–21h si besoin","Samedi : louange et sketch à 9h45 ; soirée louange, témoignages et prière de 21h05 à 22h30","Louange du culte de dimanche : à proposer avec Elisabeth pour Metz-Borny","Sono (S&Metz) et projecteur : Edmond et Marion s'en occupent"],
+  q:[["Combien de temps de louange, et à quels moments ?","Cynthia et Romuald"],["Écran pour les paroles et présentations","Edmond, Marion"],["Louange du culte de dimanche à Borny : confirmer","Elisabeth"],["Sono S&Metz : quand la récupérer et la rendre ?","Edmond, Marion"]]},
+ {id:"repas",t:"Repas & cuisine",why:"Repas de l'équipe vendredi et samedi matin, repas participants, quatre-heures.",
+  info:["Respo cuisine : Elisa (à confirmer)","Cuisiniers : Edmond demande à l'église de Metz, chaque responsable à son église ; 4 personnes en cuisine prévues dans l'effectif","Courses : les gens de Metz","Allergies et régimes : demandés sur le site d'inscription","Samedi : petit-déjeuner 8h–8h30, repas 12h et 18h20, quatre-heures 15h30","Dimanche : petit-déjeuner 8h–9h, repas 12h20 tous ensemble à l'église"],
+  q:[["Cuisiniers confirmés ?","Edmond + responsables"],["Planning des cuisiniers par repas","Elisa"],["Repas de dimanche midi à Borny : préparé où et comment ? Cuisine proche ?",""]]},
+ {id:"couchage",t:"Couchage",why:"Nuits de vendredi et samedi.",
+  info:["Plan A : Onville, chez les Leuba","Plan B : chez l'habitant ; familles possibles : Emma, Edmond, Agirla, Aline, Marine, Potvin, Johannes…","Autre piste : auberge de jeunesse Metz-Plage (voir le comparatif d'hébergement)","À apporter : sac de couchage ou drap, linge, et un matelas selon le lieu"],
+  q:[["Plan B : liste des familles et nombre de places","Edmond"],["Plan B : trajets entre les familles et l'église",""],["Si on dort à Onville : trajet jusqu'à Borny dimanche matin pour le culte de 10h",""]]},
+ {id:"budget",t:"Budget & inscriptions",why:"Équilibrer le budget, inscrire tout le monde.",
+  info:["Dépenses : lieu (1 000 € max), repas, don à l'orateur (100–200 €)","Tarif de base · −10 % dès 5 inscrits d'une même ville · +10 € après le 23 novembre","Don libre possible en plus de l'inscription","Paiement : virement ou sur place","Site d'inscription : Edmond","Infos demandées : nom, prénom, date de naissance, e-mail, téléphone, ville, jour d'arrivée, allergies, besoin de covoiturage","Soutien possible des églises (ex. Borny), par exemple pour l'orateur"],
+  q:[["Prix de base de l'inscription ?","Marion, Joël"],["Seuil minimum de participants pour équilibrer le budget","Marion, Joël"],["Qui demande le soutien des églises ?",""]]},
+ {id:"planning",t:"Planning",why:"Le programme du week-end, créneau par créneau.",
+  info:["Programme validé le 12 octobre","Fin dimanche à 14h","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 au culte dimanche à Borny (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h20 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h05 à 22h30, puis temps libre jusqu'à 23h30"],
+  q:[["Témoignage de 16h20 : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
+ {id:"equipe",t:"Équipe & rôles",why:"Qui fait quoi.",
+  info:["Orga : Edmond, Eléa, Marion ; on décide du planning et on pilote","Équipe opérationnelle : Léna, Emma, Elisa","Pôles : Cuisine (Elisa) · Louange et témoignages (Cynthia, Romuald) · Ateliers · Jeux, brise-glace et sport · Hébergement, trajets, inscriptions et comptes · Prédication et sketch"],
+  q:[["Un responsable pour chacun des pôles Ateliers · Jeux, brise-glace et sport · Hébergement, trajets, inscriptions et comptes · Prédication et sketch","Équipe orga"]]}
+];
+
+const KEY="weRegional.v1"; let S={};
+try{S=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){S={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+if(!S._v2){Object.keys(S).forEach(k=>{if(S[k]&&S[k].c)S[k].c={}});S._todo={};S._v2=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const st=id=>(S[id]=S[id]||{n:"",c:{}});
+
+const map=document.getElementById("map"),svg=document.getElementById("lines"),panel=document.getElementById("panel");
+let active=null;
+N.forEach((n,i)=>{
+  const a=(i/N.length)*Math.PI*2-Math.PI/2, rx=40, ry=42;
+  n.x=50+rx*Math.cos(a); n.y=50+ry*Math.sin(a);
+  const b=document.createElement("button");
+  b.type="button"; b.className="node"+(n.nw?" new":""); b.id="node-"+n.id;
+  b.style.left=n.x+"%"; b.style.top=n.y+"%";
+  b.innerHTML=`<span>${n.t}</span><i class="dot"></i>`;
+  b.onclick=()=>open(n.id);
+  map.appendChild(b);
+  const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1","50%");l.setAttribute("y1","50%");l.setAttribute("x2",n.x+"%");l.setAttribute("y2",n.y+"%");l.id="line-"+n.id;
+  svg.appendChild(l);
+});
+function refreshDots(){N.forEach(n=>document.getElementById("node-"+n.id).classList.toggle("has",!!(S[n.id]&&S[n.id].n.trim())))}
+
+function open(id){
+  const n=N.find(x=>x.id===id); active=id; const s=st(id);
+  document.querySelectorAll(".node").forEach(e=>e.classList.toggle("active",e.id==="node-"+id));
+  document.querySelectorAll("#lines line").forEach(e=>e.classList.toggle("on",e.id==="line-"+id));
+  const done=n.q.filter((_,i)=>s.c[i]).length;
+  panel.innerHTML=`${n.nw?'<span class="tag">Point ajouté</span>':''}<h2>${n.t}</h2><p class="why">${n.why}</p>
+   ${n.info?`<div class="info"><h3>Ce qu'on sait déjà</h3><ul>${n.info.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
+   <h3>Reste à régler · <span id="cnt">${done}/${n.q.length}</span></h3>
+   ${n.q.length?`<ul class="qs">${n.q.map((q,i)=>`<li><label><input type="checkbox" id="q-${id}-${i}" data-i="${i}" ${s.c[i]?"checked":""}><span>${q[0]}${q[1]?`<span class="owner">${q[1]}</span>`:""}</span></label></li>`).join("")}</ul>`:`<p class="empty">Tout est réglé sur ce sujet.</p>`}
+   ${n.prog?`<h3>Programme actuel</h3><div style="overflow-x:auto"><table class="sched">${PROG.map(r=>r.length===1?`<tr class="day"><td colspan="2">${r[0]}</td></tr>`:`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table></div>`:""}
+   <h3><label for="notes-${id}">Notes de l'appel</label></h3>
+   <textarea id="notes-${id}" placeholder="Décisions, qui s'en occupe, prochaines étapes…">${esc(s.n)}</textarea>
+   <div class="saved" id="saved"></div>`;
+  panel.querySelectorAll(".qs input").forEach(cb=>cb.onchange=()=>{s.c[cb.dataset.i]=cb.checked;save();
+    document.getElementById("cnt").textContent=n.q.filter((_,i)=>s.c[i]).length+"/"+n.q.length});
+  const ta=panel.querySelector("textarea"); let t;
+  ta.oninput=()=>{s.n=ta.value;save();refreshDots();clearTimeout(t);document.getElementById("saved").textContent="Enregistré dans ce navigateur";t=setTimeout(()=>document.getElementById("saved").textContent="",1500)};
+  try{localStorage.setItem(KEY+".last",id)}catch(e){}
+  if(window.innerWidth<=960) panel.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function esc(s){return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+
+document.getElementById("copyAll").onclick=()=>{
+  let out="# Notes – Week-end régional\n\n## À faire (réunion du 9 octobre)\n";
+  TODO.forEach((x,i)=>{out+=`- [${S._todo&&S._todo[x.t]?"x":" "}] ${x.t}${x.who?" ("+x.who+")":""}\n`});
+  N.forEach(n=>{const s=S[n.id]; if(s&&s.n.trim()) out+=`\n## ${n.t}\n${s.n.trim()}\n`});
+  const toast=m=>{const e=document.getElementById("toast");e.textContent=m;e.hidden=false;setTimeout(()=>e.hidden=true,1800)};
+  navigator.clipboard.writeText(out).then(()=>toast("Notes copiées"),()=>{
+    panel.innerHTML=`<h2>Toutes les notes</h2><p class="why">Sélectionne le texte puis copie-le.</p><textarea id="allnotes" style="min-height:360px">${esc(out)}</textarea>`;
+    panel.querySelector("textarea").select();
+  });
+};
+
+S._todo=S._todo||{};
+document.getElementById("todo").innerHTML=TODO.map((x,i)=>`<li><label><input type="checkbox" id="todo-${i}" data-i="${i}" ${S._todo[x.t]?"checked":""}><span>${x.t}${x.who?`<span class="owner">${x.who}</span>`:""}</span></label></li>`).join("");
+document.querySelectorAll("#todo input").forEach(cb=>cb.onchange=()=>{S._todo[TODO[cb.dataset.i].t]=cb.checked;save()});
+refreshDots();
+let last="planning"; try{last=localStorage.getItem(KEY+".last")||"planning"}catch(e){}
+open(N.some(n=>n.id===last)?last:"planning");
+</script>
+
+</body>
+</html>
