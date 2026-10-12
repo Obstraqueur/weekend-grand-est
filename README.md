@@ -6,4 +6,4 @@
 - `inscription/` : le site public d'inscription (lien à partager). Le formulaire est hébergé sur Jotform.
 - `assets/` : affiche et logo.
 
-Pour changer le prix de base affiché sur le site, cherche « Prix de base : à confirmer » dans `inscription/index.html`.
+Pour changer le prix de base affiché sur le site, remplace « à confirmer » sur la ligne Prix dans `inscription/index.html`.
