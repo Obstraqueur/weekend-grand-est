@@ -153,6 +153,26 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 :root[data-theme="dark"] .bv input{background:#4a4520}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bv input{background:#4a4520}}
 .bgrid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+.hgauge{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:grid;gap:8px}
+.hbar{display:grid;grid-template-columns:110px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:14px}
+.hbar .tr2{height:14px;background:var(--bg);border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.hbar .tr2 i{display:block;height:100%;border-radius:7px;transition:width .2s}
+.hbar b{text-align:right;font-variant-numeric:tabular-nums}
+.lgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-bottom:6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.cities{display:grid;gap:6px}
+.crow{display:grid;grid-template-columns:120px minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:14px}
+.crow input[type=range]{width:100%;accent-color:var(--accent)}
+.crow output{font-family:var(--display);font-weight:800;font-size:1.15rem;text-align:right;font-variant-numeric:tabular-nums}
+.crow.tot{border-top:1px solid var(--line);padding-top:6px;font-weight:700}
+.pl{display:flex;align-items:center;gap:8px;min-width:150px}
+.pl input[type=range]{flex:1;min-width:70px;accent-color:var(--new)}
+.pl output{font-weight:700;min-width:22px;text-align:right;font-variant-numeric:tabular-nums}
+.dtable input.hname{min-width:110px;font-weight:600}
+.dtable input.hnote{min-width:110px;font-size:12px;margin-top:4px;padding:3px 8px;color:var(--muted)}
+.xbtn{font:600 13px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:6px;padding:4px 8px;cursor:pointer;white-space:nowrap}
+.xbtn:hover,.xbtn.sure{border-color:#c0392b;color:#c0392b}
+@media (max-width:860px){.lgrid{grid-template-columns:1fr}.crow{grid-template-columns:96px minmax(0,1fr) 44px}.hbar{grid-template-columns:90px minmax(0,1fr) 40px}}
 @media (max-width:860px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.binputs{grid-template-columns:1fr}.bgrid{grid-template-columns:1fr}.task{grid-template-columns:auto minmax(0,1fr)}.task .who,.task .st{grid-column:2;justify-self:start}}
 @media (prefers-reduced-motion:reduce){.node{transition:none}}
 </style>
@@ -184,8 +204,15 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   </section>
 
   <section id="p-logement" class="page" hidden>
-    <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Note qui dort où au fur et à mesure.</p></div></div>
+    <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Change les places avec les jauges, ajoute ou retire un foyer, et fais varier le nombre de personnes par ville.</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="hAdd" style="background:var(--accent);border-color:var(--accent);color:#1b2433">+ Ajouter un foyer</button><span id="hResetZone"><button class="btn" type="button" id="hReset">Revenir aux valeurs de départ</button></span></div></div>
     <div class="kpis" id="hostKpi"></div>
+    <div class="hgauge" id="hostGauge"></div>
+    <div class="lgrid">
+      <div class="card"><h3 class="bh" style="margin-top:4px">Participants par ville</h3><p class="muted" style="margin:0 0 10px;font-size:13px">Les mêmes chiffres que dans l'onglet Budget : changer ici change aussi le budget.</p><div id="cities" class="cities"></div></div>
+      <div class="card"><h3 class="bh" style="margin-top:4px">Qui n'a pas besoin de lit ?</h3><div id="locals"></div></div>
+    </div>
+    <h3 class="bh">Foyers d'accueil</h3>
     <div class="tbox"><table id="hosts" class="dtable"></table></div>
   </section>
 
@@ -413,22 +440,66 @@ function renderTasks(){
 /* ---------- Logement ---------- */
 const HOSTS=[["Mattias",10],["Edmond",8],["Emma",6],["Agirla",4],["Romuald",4],["Leuba (Onville)",4,"4 adultes · à 30 min de Metz"],["Lydie",4],["Marine",2],["Aline",2],["Terence",2],["Benoit",2],["Tigran",2]];
 S._host=S._host||{}; S._metzLoc=S._metzLoc??14;
-function renderHosts(){
-  const places=HOSTS.reduce((a,h)=>a+h[1],0), need=Math.max(0,50-(+S._metzLoc||0)), marge=places-need;
-  let assigned=0; HOSTS.forEach(h=>{const v=(S._host[h[0]]||"").split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).length;assigned+=v});
-  document.getElementById("hostKpi").innerHTML=`
-   <div class="kpi"><span>Places chez l'habitant</span><b>${places}</b><small>${HOSTS.length} foyers</small></div>
-   <div class="kpi"><span>Personnes à loger</span><b>${need}</b><small>50 participants − <label for="metzLoc">Messins logés chez eux</label> <input id="metzLoc" type="number" min="0" max="50" value="${S._metzLoc}"></small></div>
-   <div class="kpi ${marge<0?"bad":"good"}"><span>Marge</span><b>${marge>=0?"+":""}${marge}</b><small>${marge<0?"Il manque des places":"places de réserve"}</small></div>
-   <div class="kpi"><span>Déjà répartis</span><b>${assigned}</b><small>noms saisis ci-dessous</small></div>`;
-  document.getElementById("metzLoc").onchange=e=>{S._metzLoc=+e.target.value||0;save();renderHosts()};
-  document.getElementById("hosts").innerHTML=`<thead><tr><th>Hôte</th><th>Places</th><th>Remplissage</th><th>Personnes logées (séparées par des virgules)</th></tr></thead><tbody>${HOSTS.map((h,i)=>{
-    const n=(S._host[h[0]]||"").split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).length, pct=Math.min(100,n/h[1]*100);
-    return `<tr><td><b>${h[0]}</b>${h[2]?`<small>${h[2]}</small>`:""}</td><td class="num">${h[1]}</td><td><div class="meter ${n>h[1]?"over":""}"><i style="width:${pct}%"></i></div><small>${n} / ${h[1]}</small></td>
-    <td><input type="text" id="host-${i}" data-h="${h[0]}" value="${esc(S._host[h[0]]||"")}" placeholder="Prénoms des invités" aria-label="Personnes logées chez ${h[0]}"></td></tr>`}).join("")}</tbody>
-    <tfoot><tr><td>Total</td><td class="num">${places}</td><td colspan="2"></td></tr></tfoot>`;
-  document.querySelectorAll("#hosts input").forEach(inp=>inp.onchange=()=>{S._host[inp.dataset.h]=inp.value;save();renderHosts()});
+const hostDefaults=()=>HOSTS.map((h,i)=>({id:"h"+i,name:h[0],places:h[1],note:h[2]||"",guests:S._host[h[0]]||""}));
+if(!Array.isArray(S._hosts)) S._hosts=hostDefaults();
+const countGuests=g=>(g||"").split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).length;
+const HMAX=15;
+function hostStats(){
+  const eff=S._b.eff, total=Object.values(eff).reduce((a,x)=>a+(+x||0),0);
+  const loc=Math.min(+S._metzLoc||0,total), places=S._hosts.reduce((a,h)=>a+(+h.places||0),0);
+  const need=Math.max(0,total-loc), assigned=S._hosts.reduce((a,h)=>a+countGuests(h.guests),0);
+  return {total,loc,places,need,marge:places-need,assigned};
 }
+function renderHostSummary(){
+  const x=hostStats();
+  document.getElementById("hostKpi").innerHTML=`
+   <div class="kpi"><span>Places chez l'habitant</span><b>${x.places}</b><small>${S._hosts.length} foyers</small></div>
+   <div class="kpi"><span>Personnes à loger</span><b>${x.need}</b><small>${x.total} participants − ${x.loc} logés chez eux</small></div>
+   <div class="kpi ${x.marge<0?"bad":"good"}"><span>Marge</span><b>${x.marge>=0?"+":""}${x.marge}</b><small>${x.marge<0?"Il manque des places":"places de réserve"}</small></div>
+   <div class="kpi"><span>Déjà répartis</span><b>${x.assigned}</b><small>sur ${x.need} à loger</small></div>`;
+  const top=Math.max(x.places,x.need,1), bad=x.need>x.places;
+  document.getElementById("hostGauge").innerHTML=`
+   <div class="hbar"><span>Places</span><span class="tr2"><i style="width:${x.places/top*100}%;background:var(--new)"></i></span><b>${x.places}</b></div>
+   <div class="hbar"><span>À loger</span><span class="tr2"><i style="width:${x.need/top*100}%;background:${bad?"#c0392b":"var(--accent)"}"></i></span><b>${x.need}</b></div>
+   <div class="hbar"><span>Répartis</span><span class="tr2"><i style="width:${x.assigned/top*100}%;background:var(--core)"></i></span><b>${x.assigned}</b></div>`;
+  const tot=document.getElementById("cityTot"); if(tot) tot.textContent=x.total;
+  const ls=document.getElementById("locSl"); if(ls){ls.max=x.total; if(+ls.value>x.total) ls.value=x.total; document.getElementById("locOut").textContent=Math.min(+S._metzLoc||0,x.total)}
+  const pt=document.getElementById("placesTot"); if(pt) pt.textContent=x.places;
+}
+function renderHosts(){
+  const eff=S._b.eff, x=hostStats();
+  document.getElementById("cities").innerHTML=Object.keys(eff).map((g,i)=>{const mx=Math.max(30,+eff[g]||0);return `<div class="crow"><label for="city-${i}">${g}</label><input type="range" id="city-${i}" data-g="${g}" min="0" max="${mx}" step="1" value="${+eff[g]||0}"><output id="cityOut-${i}" for="city-${i}">${+eff[g]||0}</output></div>`}).join("")
+    +`<div class="crow tot"><span>Total</span><span class="muted" style="font-weight:400;font-size:13px">participants attendus</span><output id="cityTot">${x.total}</output></div>`;
+  document.querySelectorAll("#cities input").forEach((sl,i)=>sl.oninput=()=>{S._b.eff[sl.dataset.g]=+sl.value;document.getElementById("cityOut-"+i).textContent=sl.value;save();renderHostSummary()});
+  document.getElementById("locals").innerHTML=`<div class="crow" style="grid-template-columns:minmax(0,1fr) 54px"><label for="locSl">Logés chez eux<small class="muted" style="display:block;font-size:12px;font-weight:400">Messins, cuisiniers, orateur s'il rentre…</small></label><output id="locOut" for="locSl">${x.loc}</output></div>
+    <input type="range" id="locSl" min="0" max="${x.total}" step="1" value="${x.loc}" style="width:100%;accent-color:var(--accent)">
+    <p class="muted" style="font-size:13px;margin:8px 0 0">Personnes à loger = participants − logés chez eux.</p>`;
+  document.getElementById("locSl").oninput=e=>{S._metzLoc=+e.target.value;save();renderHostSummary()};
+  document.getElementById("hosts").innerHTML=`<thead><tr><th>Foyer</th><th>Places</th><th>Remplissage</th><th>Personnes logées (séparées par des virgules)</th><th></th></tr></thead><tbody>${S._hosts.map((h,i)=>{
+    const n=countGuests(h.guests), p=+h.places||0, pct=p?Math.min(100,n/p*100):(n?100:0);
+    return `<tr data-i="${i}"><td><input type="text" class="hname" id="hn-${h.id}" value="${esc(h.name)}" placeholder="Nom du foyer" aria-label="Nom du foyer"><input type="text" class="hnote" id="hno-${h.id}" value="${esc(h.note)}" placeholder="Remarque (adresse, distance…)" aria-label="Remarque"></td>
+    <td><div class="pl"><input type="range" id="hp-${h.id}" min="0" max="${Math.max(HMAX,p)}" step="1" value="${p}" aria-label="Places chez ${esc(h.name)}"><output id="hpo-${h.id}">${p}</output></div></td>
+    <td><div class="meter ${n>p?"over":""}" id="hm-${h.id}"><i style="width:${pct}%"></i></div><small id="hmt-${h.id}">${n} / ${p}</small></td>
+    <td><input type="text" id="hg-${h.id}" value="${esc(h.guests)}" placeholder="Prénoms des invités" aria-label="Personnes logées chez ${esc(h.name)}"></td>
+    <td><button type="button" class="xbtn" id="hx-${h.id}" aria-label="Retirer ${esc(h.name)}">Retirer</button></td></tr>`}).join("")}</tbody>
+    <tfoot><tr><td>Total</td><td><b id="placesTot">${x.places}</b></td><td colspan="3"></td></tr></tfoot>`;
+  S._hosts.forEach(h=>{
+    const meter=()=>{const n=countGuests(h.guests),p=+h.places||0;const m=document.getElementById("hm-"+h.id);m.classList.toggle("over",n>p);m.firstElementChild.style.width=(p?Math.min(100,n/p*100):(n?100:0))+"%";document.getElementById("hmt-"+h.id).textContent=n+" / "+p};
+    document.getElementById("hn-"+h.id).onchange=e=>{h.name=e.target.value.trim()||"Foyer";save()};
+    document.getElementById("hno-"+h.id).onchange=e=>{h.note=e.target.value;save()};
+    document.getElementById("hp-"+h.id).oninput=e=>{h.places=+e.target.value;document.getElementById("hpo-"+h.id).textContent=h.places;meter();save();renderHostSummary()};
+    document.getElementById("hg-"+h.id).oninput=e=>{h.guests=e.target.value;meter();save();renderHostSummary()};
+    const xb=document.getElementById("hx-"+h.id); let tm;
+    xb.onclick=()=>{if(!xb.classList.contains("sure")){xb.classList.add("sure");xb.textContent="Confirmer";tm=setTimeout(()=>{xb.classList.remove("sure");xb.textContent="Retirer"},3000);return}
+      clearTimeout(tm);S._hosts=S._hosts.filter(o=>o.id!==h.id);save();renderHosts()};
+  });
+  renderHostSummary();
+}
+document.getElementById("hAdd").onclick=()=>{const id="h"+Date.now().toString(36);S._hosts.push({id,name:"Nouveau foyer",places:2,note:"",guests:""});save();renderHosts();const el=document.getElementById("hn-"+id);if(el){el.focus();el.select()}};
+document.getElementById("hResetZone").onclick=e=>{const z=document.getElementById("hResetZone");
+  if(e.target.id==="hReset") z.innerHTML='<span style="font-size:13px">Remettre les 12 foyers et les chiffres par ville ? <button class="btn" type="button" id="hYes">Oui</button> <button class="btn" type="button" id="hNo">Non</button></span>';
+  else if(e.target.id==="hYes"){S._hosts=HOSTS.map((h,i)=>({id:"h"+i,name:h[0],places:h[1],note:h[2]||"",guests:""}));S._metzLoc=14;S._b.eff=Object.assign({},BDEF.eff);save();z.innerHTML='<button class="btn" type="button" id="hReset">Revenir aux valeurs de départ</button>';renderHosts()}
+  else if(e.target.id==="hNo") z.innerHTML='<button class="btn" type="button" id="hReset">Revenir aux valeurs de départ</button>'};
 
 /* ---------- Budget ---------- */
 const BDEF={prix:45,red:10,min:5,maj:10,ntard:0,repas:1.8,pdj:1,gout:0.8,cad:7,imp:10,lieu:1000,orateur:150,entretien:25,sono:0,com:0,donsEgl:0,donsPart:0,
@@ -516,6 +587,5 @@ document.getElementById("bReset").onclick=()=>{S._b=JSON.parse(JSON.stringify(BD
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
 showPage(startPage);
 </script>
-
 </body>
 </html>
