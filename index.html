@@ -235,8 +235,8 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   </section>
 
   <section id="p-ateliers" class="page" hidden>
-    <div class="phead"><div><h2>Ateliers</h2><p class="muted">La sélection d'ateliers retenue par l'équipe. Chacun vote pour ses 10 préférés.</p></div>
-      <a class="btn" id="voteBtn" href="https://form.jotform.com/262924244743056" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Voter pour mes 10 ateliers</a></div>
+    <div class="phead"><div><h2>Ateliers</h2><p class="muted">La sélection d'ateliers retenue par l'équipe. Chacun vote pour ses 12 préférés.</p></div>
+      <a class="btn" id="voteBtn" href="https://form.jotform.com/262924244743056" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Voter pour mes 12 ateliers</a></div>
     <div class="kpis" id="aKpi"></div>
     <div class="agrid">
       <div><h3 class="bh" style="margin-top:0">Classement</h3><div class="card" id="aRank"></div></div>
@@ -390,12 +390,12 @@ function renderAteliers(){
   const ranked=ATELIERS.map(a=>({...a,v:counts[a.id]||0})).sort((x,y)=>y.v-x.v||x.t.localeCompare(y.t,"fr"));
   document.getElementById("aKpi").innerHTML=`
    <div class="kpi"><span>Ateliers proposés</span><b>${ATELIERS.length}</b><small>sélection de l'équipe</small></div>
-   <div class="kpi"><span>Votants</span><b>${nv}</b><small>10 ateliers chacun</small></div>
+   <div class="kpi"><span>Votants</span><b>${nv}</b><small>12 ateliers chacun</small></div>
    <div class="kpi"><span>Créneaux</span><b>2</b><small>samedi 16h50 · dimanche matin</small></div>
    <div class="kpi"><span>Dernière mise à jour</span><b style="font-size:1.2rem">${VOTES.updated||"–"}</b><small>des votes</small></div>`;
   const max=Math.max(1,...ranked.map(a=>a.v));
-  document.getElementById("aRank").innerHTML=nv?ranked.filter(a=>a.v>0).map((a,i)=>`<div class="rk${i<10?" top":""}"><span class="n">${i+1}</span><span><span class="cdot" style="background:${ACATS[a.c][1]}"></span>${a.t}<span class="bar"><i style="width:${a.v/max*100}%"></i></span></span><b>${a.v}</b></div>`).join("")+`<p class="muted" style="font-size:13px;margin:10px 0 0">Votants : ${VOTES.voters.join(", ")}</p>`
-    :`<p style="margin:4px 0 8px"><b>Pas encore de votes.</b></p><p class="muted" style="margin:0;font-size:14px">Chacun vote avec son prénom et son nom via le bouton « Voter pour mes 10 ateliers ». Le classement s'affiche ici, du plus voté au moins voté, dès que les votes sont récupérés.</p>`;
+  document.getElementById("aRank").innerHTML=nv?ranked.filter(a=>a.v>0).map((a,i)=>`<div class="rk${i<12?" top":""}"><span class="n">${i+1}</span><span><span class="cdot" style="background:${ACATS[a.c][1]}"></span>${a.t}<span class="bar"><i style="width:${a.v/max*100}%"></i></span></span><b>${a.v}</b></div>`).join("")+`<p class="muted" style="font-size:13px;margin:10px 0 0">Votants : ${VOTES.voters.join(", ")}</p>`
+    :`<p style="margin:4px 0 8px"><b>Pas encore de votes.</b></p><p class="muted" style="margin:0;font-size:14px">Chacun vote avec son prénom et son nom via le bouton « Voter pour mes 12 ateliers ». Le classement s'affiche ici, du plus voté au moins voté, dès que les votes sont récupérés.</p>`;
   const all=ATELIERS.length;
   document.getElementById("aCats").innerHTML=`<button type="button" class="fchip${aCat==="tout"?" on":""}" data-c="tout">Tout <b>${all}</b></button>`+Object.entries(ACATS).map(([k,[n,c]])=>`<button type="button" class="fchip${aCat===k?" on":""}" data-c="${k}"><i class="cdot" style="background:${c};margin:0"></i>${n} <b>${ATELIERS.filter(a=>a.c===k).length}</b></button>`).join("");
   document.querySelectorAll("#aCats .fchip").forEach(b=>b.onclick=()=>{aCat=b.dataset.c;renderAteliers()});
