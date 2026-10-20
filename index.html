@@ -153,6 +153,23 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 :root[data-theme="dark"] .bv input{background:#4a4520}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bv input{background:#4a4520}}
 .bgrid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+.agrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+.asearch{width:100%;font:15px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:12px}
+.alist{display:grid;gap:14px}
+.acat h4{font-family:var(--display);font-weight:800;font-size:1rem;margin:0 0 6px;display:flex;gap:8px;align-items:baseline}
+.acat h4 small{font-family:var(--body);font-weight:500;color:var(--muted);font-size:13px}
+.acat ul{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.acat li{padding:8px 12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.acat li:first-child{border-top:0}
+.acat li small{display:block;color:var(--muted);font-size:12px}
+.acat li .vc{font-variant-numeric:tabular-nums;font-weight:700;color:var(--muted);white-space:nowrap;font-size:13px}
+.rk{display:grid;grid-template-columns:28px minmax(0,1fr) 38px;gap:8px;align-items:center;padding:5px 0;font-size:14px}
+.rk b{font-variant-numeric:tabular-nums;text-align:right}
+.rk .n{font-family:var(--display);font-weight:800;color:var(--muted);text-align:right}
+.rk .bar{display:block;height:6px;background:var(--bg);border-radius:3px;margin-top:3px;overflow:hidden}.rk .bar i{display:block;height:100%;background:var(--accent)}
+.rk.top .n{color:var(--accent)}
+.cdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+@media (max-width:860px){.agrid{grid-template-columns:1fr}}
 .hgauge{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:grid;gap:8px}
 .hbar{display:grid;grid-template-columns:110px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:14px}
 .hbar .tr2{height:14px;background:var(--bg);border:1px solid var(--line);border-radius:7px;overflow:hidden}
@@ -195,6 +212,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <button type="button" class="tab" role="tab" id="t-taches" data-p="taches">À faire</button>
     <button type="button" class="tab" role="tab" id="t-logement" data-p="logement">Logement</button>
     <button type="button" class="tab" role="tab" id="t-budget" data-p="budget">Budget</button>
+    <button type="button" class="tab" role="tab" id="t-ateliers" data-p="ateliers">Ateliers</button>
   </nav>
 
   <section id="p-taches" class="page" hidden>
@@ -216,6 +234,18 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <div class="tbox"><table id="hosts" class="dtable"></table></div>
   </section>
 
+  <section id="p-ateliers" class="page" hidden>
+    <div class="phead"><div><h2>Ateliers</h2><p class="muted">Toutes les idées d'ateliers réunies (vos listes, celles du samedi et du dimanche, les commentaires du planning et ZeRencontre 2026), doublons fusionnés. Chacun vote pour ses 10 préférés.</p></div>
+      <a class="btn" id="voteBtn" href="https://form.jotform.com/262924244743056" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Voter pour mes 10 ateliers</a></div>
+    <div class="kpis" id="aKpi"></div>
+    <div class="agrid">
+      <div><h3 class="bh" style="margin-top:0">Classement</h3><div class="card" id="aRank"></div></div>
+      <div><h3 class="bh" style="margin-top:0">Toutes les idées</h3>
+        <div class="fchips" id="aCats"></div>
+        <input type="search" id="aSearch" class="asearch" placeholder="Chercher un atelier…" aria-label="Chercher un atelier">
+        <div id="aList" class="alist"></div></div>
+    </div>
+  </section>
   <section id="p-budget" class="page" hidden>
     <div class="phead"><div><h2>Budget</h2><p class="muted">Même calcul que l'onglet Budget de la Check list. Change une hypothèse, tout se recalcule.</p></div><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></div>
     <div class="kpis" id="bKpi"></div>
@@ -348,12 +378,40 @@ refreshDots();
 let last="planning"; try{last=localStorage.getItem(KEY+".last")||"planning"}catch(e){}
 open(N.some(n=>n.id===last)?last:"planning");
 /* ---------- Pages: tabs ---------- */
-const PAGES=["carte","taches","logement","budget"];
+
+/* ---------- Ateliers ---------- */
+const ACATS={fond:["Fondamentaux de la foi","#2f7d62"],actu:["Sujets d'actualité","#3e78b5"],moi:["Dieu et moi","#d98a14"],hot:["Hot topics","#c0392b"]};
+const ATELIERS=[{"id": "a01", "t": "Le Saint-Esprit : comment il me conduit et me transforme", "c": "fond", "aka": ["Comment le Saint-Esprit me transforme ?", "Un souffle qui conduit… Parlons du St-Esprit !", "Le Saint-Esprit", "La marche par l'Esprit"]}, {"id": "a02", "t": "Raconter son témoignage simplement : quel style de témoin es-tu ?", "c": "fond", "aka": ["Quel style de témoin es-tu ? Raconter son témoignage simplement", "Comment donner son témoignage"]}, {"id": "a03", "t": "Témoigner par des relations intentionnelles : comment faire ?", "c": "fond", "aka": ["Témoigner intentionnellement"]}, {"id": "a04", "t": "Partager l'Évangile en milieu étudiant", "c": "fond", "aka": []}, {"id": "a05", "t": "Être témoin au travail : par où commencer ?", "c": "fond", "aka": []}, {"id": "a06", "t": "La mission", "c": "fond", "aka": []}, {"id": "a07", "t": "L'Église, à quoi ça sert et comment j'y trouve ma place ?", "c": "fond", "aka": []}, {"id": "a08", "t": "Découvrir et utiliser ses dons : par quoi commencer ?", "c": "fond", "aka": []}, {"id": "a09", "t": "Servir Dieu : par où ou par quoi commencer ?", "c": "fond", "aka": []}, {"id": "a10", "t": "L'héritage spirituel : comment transmettre sa foi ?", "c": "fond", "aka": []}, {"id": "a11", "t": "Comment lire la Bible ?", "c": "fond", "aka": []}, {"id": "a12", "t": "L'intercession", "c": "fond", "aka": []}, {"id": "a13", "t": "Louange, adoration", "c": "fond", "aka": []}, {"id": "a14", "t": "Le baptême", "c": "fond", "aka": []}, {"id": "a15", "t": "Vivre avec Jésus dans le ciel", "c": "fond", "aka": []}, {"id": "a16", "t": "Intelligence artificielle : assistant, thérapeute ou ennemi ?", "c": "actu", "aka": []}, {"id": "a17", "t": "Les réseaux sociaux", "c": "actu", "aka": ["Gestion des réseaux sociaux"]}, {"id": "a18", "t": "Qui sont mes influenceurs ?", "c": "actu", "aka": []}, {"id": "a19", "t": "Manipulation de la jeunesse : ouvre les yeux !", "c": "actu", "aka": []}, {"id": "a20", "t": "Comment répondre aux questions de nos contemporains ?", "c": "actu", "aka": ["Les questions dures de notre époque", "Défendre sa foi dans son contexte"]}, {"id": "a21", "t": "La raison et la foi", "c": "actu", "aka": []}, {"id": "a22", "t": "Toutes les religions mènent-elles à Dieu ?", "c": "actu", "aka": []}, {"id": "a23", "t": "Face à l'incertitude de l'avenir : comment vivre avec espérance ?", "c": "actu", "aka": []}, {"id": "a24", "t": "Gérer son argent par Dieu et pour Dieu : comment faire ?", "c": "actu", "aka": []}, {"id": "a25", "t": "Foi et entrepreneuriat", "c": "actu", "aka": []}, {"id": "a26", "t": "Éthique et foi dans mon quotidien", "c": "actu", "aka": []}, {"id": "a27", "t": "Briller en tant qu'étudiant", "c": "actu", "aka": []}, {"id": "a28", "t": "Le repos selon Dieu", "c": "actu", "aka": []}, {"id": "a29", "t": "Porter sa croix", "c": "actu", "aka": []}, {"id": "a30", "t": "Où en suis-je dans ma relation avec Dieu ? (idoles du cœur)", "c": "moi", "aka": []}, {"id": "a31", "t": "Quelle stratégie pour mettre à mort un péché tenace ?", "c": "moi", "aka": []}, {"id": "a32", "t": "Vraiment libre ?", "c": "moi", "aka": []}, {"id": "a33", "t": "Choisir le pardon : un chemin de liberté ?", "c": "moi", "aka": []}, {"id": "a34", "t": "Avancer dans les épreuves : vivre sa foi malgré la souffrance", "c": "moi", "aka": ["Avancer avec des épreuves", "Vivre sa foi malgré la souffrance"]}, {"id": "a35", "t": "Tes plans Seigneur, pas les miens : ton timing, pas le mien !", "c": "moi", "aka": []}, {"id": "a36", "t": "Que veut Dieu pour moi ?", "c": "moi", "aka": []}, {"id": "a37", "t": "La foi dans les choix", "c": "moi", "aka": []}, {"id": "a38", "t": "Qui suis-je ?", "c": "moi", "aka": []}, {"id": "a39", "t": "Guérir des blessures du passé", "c": "moi", "aka": []}, {"id": "a40", "t": "Mes pensées : un champ de bataille !", "c": "moi", "aka": []}, {"id": "a41", "t": "Cultiver sa foi jour après jour", "c": "moi", "aka": []}, {"id": "a42", "t": "Soyez toujours joyeux", "c": "moi", "aka": []}, {"id": "a43", "t": "Un homme selon le cœur de Dieu", "c": "moi", "aka": []}, {"id": "a44", "t": "Une femme selon le cœur de Dieu", "c": "moi", "aka": []}, {"id": "a45", "t": "S'engager pour Dieu en famille : comment y réfléchir ?", "c": "moi", "aka": []}, {"id": "a46", "t": "Genre et sexualité : quels repères aujourd'hui ?", "c": "hot", "aka": []}, {"id": "a47", "t": "L'idée de Dieu sur le sexe", "c": "hot", "aka": []}, {"id": "a48", "t": "Homosexualité : Dieu a-t-il un avis si tranché ?", "c": "hot", "aka": []}, {"id": "a49", "t": "Je croyais être un homme (témoignage de Janick Christen)", "c": "hot", "aka": []}, {"id": "a50", "t": "La pornographie", "c": "hot", "aka": []}, {"id": "a51", "t": "Le couple : se mettre en couple, fréquentations et amitiés", "c": "hot", "aka": ["Le couple – fréquentations & amitiés", "Se mettre en couple"]}, {"id": "a52", "t": "Comment choisir lorsque mon cœur s'emballe ?", "c": "hot", "aka": []}, {"id": "a53", "t": "Le célibat", "c": "hot", "aka": []}, {"id": "a54", "t": "Le mariage", "c": "hot", "aka": []}];
+/* Votes récupérés depuis le formulaire de vote (mis à jour par Claude à la demande) */
+const VOTES={updated:null,voters:[],counts:{}};
+let aCat="tout",aQ="";
+function renderAteliers(){
+  const counts=VOTES.counts, nv=VOTES.voters.length;
+  const ranked=ATELIERS.map(a=>({...a,v:counts[a.id]||0})).sort((x,y)=>y.v-x.v||x.t.localeCompare(y.t,"fr"));
+  document.getElementById("aKpi").innerHTML=`
+   <div class="kpi"><span>Idées d'ateliers</span><b>${ATELIERS.length}</b><small>doublons fusionnés</small></div>
+   <div class="kpi"><span>Votants</span><b>${nv}</b><small>10 ateliers chacun</small></div>
+   <div class="kpi"><span>Créneaux</span><b>2</b><small>samedi 16h50 · dimanche matin</small></div>
+   <div class="kpi"><span>Dernière mise à jour</span><b style="font-size:1.2rem">${VOTES.updated||"–"}</b><small>des votes</small></div>`;
+  const max=Math.max(1,...ranked.map(a=>a.v));
+  document.getElementById("aRank").innerHTML=nv?ranked.filter(a=>a.v>0).map((a,i)=>`<div class="rk${i<10?" top":""}"><span class="n">${i+1}</span><span><span class="cdot" style="background:${ACATS[a.c][1]}"></span>${a.t}<span class="bar"><i style="width:${a.v/max*100}%"></i></span></span><b>${a.v}</b></div>`).join("")+`<p class="muted" style="font-size:13px;margin:10px 0 0">Votants : ${VOTES.voters.join(", ")}</p>`
+    :`<p style="margin:4px 0 8px"><b>Pas encore de votes.</b></p><p class="muted" style="margin:0;font-size:14px">Chacun vote avec son prénom et son nom via le bouton « Voter pour mes 10 ateliers ». Le classement s'affiche ici, du plus voté au moins voté, dès que les votes sont récupérés.</p>`;
+  const all=ATELIERS.length;
+  document.getElementById("aCats").innerHTML=`<button type="button" class="fchip${aCat==="tout"?" on":""}" data-c="tout">Tout <b>${all}</b></button>`+Object.entries(ACATS).map(([k,[n,c]])=>`<button type="button" class="fchip${aCat===k?" on":""}" data-c="${k}"><i class="cdot" style="background:${c};margin:0"></i>${n} <b>${ATELIERS.filter(a=>a.c===k).length}</b></button>`).join("");
+  document.querySelectorAll("#aCats .fchip").forEach(b=>b.onclick=()=>{aCat=b.dataset.c;renderAteliers()});
+  const q=aQ.trim().toLowerCase();
+  document.getElementById("aList").innerHTML=Object.entries(ACATS).filter(([k])=>aCat==="tout"||aCat===k).map(([k,[n,c]])=>{
+    const items=ATELIERS.filter(a=>a.c===k&&(!q||(a.t+" "+a.aka.join(" ")).toLowerCase().includes(q)));
+    if(!items.length) return "";
+    return `<div class="acat"><h4><span class="cdot" style="background:${c}"></span>${n}<small>${items.length}</small></h4><ul>${items.map(a=>`<li><span>${a.t}${a.aka.length?`<small>Aussi proposé : ${a.aka.join(" · ")}</small>`:""}</span>${nv?`<span class="vc">${counts[a.id]||0} vote${(counts[a.id]||0)>1?"s":""}</span>`:""}</li>`).join("")}</ul></div>`}).join("")||`<p class="muted">Aucun atelier ne correspond.</p>`;
+}
+document.getElementById("aSearch").oninput=e=>{aQ=e.target.value;renderAteliers()};
+const PAGES=["carte","taches","logement","budget","ateliers"];
 function showPage(id){
   if(!PAGES.includes(id)) id="carte";
   PAGES.forEach(p=>{document.getElementById("p-"+p).hidden=p!==id;const t=document.getElementById("t-"+p);t.classList.toggle("on",p===id);t.setAttribute("aria-selected",p===id)});
   try{localStorage.setItem(KEY+".page",id)}catch(e){}
-  if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget();
+  if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget(); if(id==="ateliers")renderAteliers();
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showPage(t.dataset.p));
 
