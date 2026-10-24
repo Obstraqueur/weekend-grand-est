@@ -68,7 +68,7 @@ h1{font-family:var(--display);font-weight:850;font-stretch:72%;font-size:clamp(3
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend b{width:12px;height:12px;border-radius:3px;border-left:3px solid;display:inline-block}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:1100px){.layout{grid-template-columns:minmax(0,1fr)}}
 .cal-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
 .cal{min-width:620px;position:relative;user-select:none;-webkit-user-select:none}
@@ -183,7 +183,7 @@ form.ed h2{margin:0;font-family:var(--display);font-weight:850;font-stretch:80%;
       <span class="save" id="save"><i></i><span id="saveTxt">Chargement…</span></span>
       <button class="btn primary" id="addBtn" type="button">+ Ajouter un bloc</button>
       <button class="btn" id="copyBtn" type="button">Copier en texte</button>
-      <span id="resetZone"><button class="btn ghost" id="resetBtn" type="button">Revenir au planning de départ</button></span>
+      <span id="resetZone" hidden></span>
     </div>
   </header>
   <nav class="vtabs" role="tablist" aria-label="Vues">
@@ -196,11 +196,6 @@ form.ed h2{margin:0;font-family:var(--display);font-weight:850;font-stretch:80%;
     <div>
       <div class="cal-scroll"><div class="cal" id="cal"></div></div>
     </div>
-    <aside>
-      <div class="aside-head"><h2>Choix à trancher</h2><span class="count" id="decCount"></span></div>
-      <p class="hint">Tirés des commentaires du Google Doc. Chaque réponse modifie le planning tout de suite ; les blocs touchés clignotent.</p>
-      <div id="decs" style="display:flex;flex-direction:column;gap:12px"></div>
-    </aside>
   </div>
   </section>
   <section id="v-detail" hidden>
@@ -418,11 +413,11 @@ function render(){
       const top=(b.start-START)*PPM,h=Math.max(16,(b.end-b.start)*PPM-2);
       const w=100/b._n,left=w*b._col;
       const open=blockDecisions(b.id).filter(id=>!state.decisions[id]);
-      const chip=open.length?`<span class="chip" data-goto="${open[0]}" title="Choix à trancher">C${DEC_NUM[open[0]]}</span>`:'';
+      const chip=false&&open.length?`<span class="chip" data-goto="${open[0]}" title="Choix à trancher">C${DEC_NUM[open[0]]}</span>`:'';
       const short=(b.end-b.start)<=30;
       html+=`<div class="block${(b.end-b.start)<=20?' tiny':''}${flashIds.has(b.id)?' flash':''}" tabindex="0" role="button" aria-label="${esc(b.title)}, ${DAYS[b.day].n}, ${fmt(b.start)} à ${fmt(b.end)}" data-id="${b.id}" style="top:${top}px;height:${h}px;left:calc(${left}% + 3px);width:calc(${w}% - 6px);background:var(--c-${b.cat});border-color:var(--b-${b.cat})">
         <span class="rz top" data-rz="top"></span>${chip}
-        <span class="t" style="${open.length?'padding-right:26px':''}">${short?`<span style="font-weight:400;opacity:.8">${fmt(b.start)}</span> `:''}${esc(b.title)}</span>
+        <span class="t">${short?`<span style="font-weight:400;opacity:.8">${fmt(b.start)}</span> `:''}${esc(b.title)}</span>
         ${short?'':`<span class="tm">${fmt(b.start)} – ${fmt(b.end)}</span>`}
         ${b.note&&(b.end-b.start)>=60?`<span class="nt">${esc(b.note)}</span>`:''}
         <span class="rz bot" data-rz="bot"></span></div>`;
@@ -437,7 +432,7 @@ function render(){
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
 const decsEl=document.getElementById('decs');
-function renderDecisions(){
+function renderDecisions(){if(!document.getElementById('decCount'))return;
   const done=DECISIONS.filter(d=>state.decisions[d.id]).length;
   document.getElementById('decCount').textContent=`${done} / ${DECISIONS.length} tranchés`;
   decsEl.innerHTML=DECISIONS.map(d=>{
@@ -467,7 +462,7 @@ function chooseDecision(did,k){
   const n=changed.size;
   toast(n?`${n} bloc${n>1?'s':''} mis à jour${cleared?' (tes retouches manuelles sur ces blocs ont été remplacées)':''}`:'Planning inchangé');
 }
-decsEl.addEventListener('click',e=>{
+decsEl&&decsEl.addEventListener('click',e=>{
   const o=e.target.closest('.opt');if(o){chooseDecision(o.dataset.dec,o.dataset.opt);return}
   const c=e.target.closest('[data-clear]');if(c)chooseDecision(c.dataset.clear,null);
 });
@@ -594,7 +589,7 @@ document.getElementById('legend').innerHTML=Object.entries(CATS).map(([k,v])=>`<
 /* ---------- vues ---------- */
 const vAg=document.getElementById('v-agenda'),vDe=document.getElementById('v-detail');
 function showView(v){vAg.hidden=v!=='agenda';vDe.hidden=v!=='detail';document.querySelectorAll('.vtab').forEach(b=>{const on=b.dataset.v===v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
-  document.getElementById('addBtn').hidden=v!=='agenda';document.getElementById('copyBtn').hidden=v!=='agenda';document.getElementById('resetZone').hidden=v!=='agenda';
+  document.getElementById('addBtn').hidden=v!=='agenda';document.getElementById('copyBtn').hidden=v!=='agenda';
   document.getElementById('subTxt').textContent=v==='agenda'?"Glisse un bloc pour le déplacer, tire son bord haut ou bas pour changer l'horaire, clique dessus pour le modifier. Double-clic sur une case vide pour ajouter un bloc.":"Le déroulé détaillé pour l'équipe, partagé et modifiable par tous.";try{localStorage.setItem('we-planning-view',v)}catch(e){} if(v==='detail')renderDetail()}
 document.querySelectorAll('.vtab').forEach(b=>b.onclick=()=>showView(b.dataset.v));
 
