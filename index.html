@@ -13,16 +13,16 @@
 /* Layout: radial mind map on the left, sliding detail panel (questions + notes) on the right */
 :root{
   --bg:#f3f5f8; --surface:#ffffff; --ink:#1b2433; --muted:#5c6779; --line:#c9d1dd;
-  --accent:#d98a14; --accent-soft:#fbecd2; --core:#23395b; --core-ink:#ffffff; --new:#2f7d62; --new-soft:#dcefe7;
+  --accent:#d98a14; --accent-soft:#fbecd2; --info:#fbecd2; --core:#23395b; --core-ink:#ffffff; --new:#2f7d62; --new-soft:#dcefe7;
   --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --body:"Figtree",ui-sans-serif,system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121821; --surface:#1b2330; --ink:#e7ecf3; --muted:#9aa6b8; --line:#344154;
-  --accent:#f0a83a; --accent-soft:#3a2c14; --core:#e7ecf3; --core-ink:#121821; --new:#5cc29c; --new-soft:#173229; color-scheme:dark}}
+  --accent:#f0a83a; --accent-soft:#3a2c14; --info:#222c3b; --core:#e7ecf3; --core-ink:#121821; --new:#5cc29c; --new-soft:#173229; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121821; --surface:#1b2330; --ink:#e7ecf3; --muted:#9aa6b8; --line:#344154;
-  --accent:#f0a83a; --accent-soft:#3a2c14; --core:#e7ecf3; --core-ink:#121821; --new:#5cc29c; --new-soft:#173229; color-scheme:dark}
+  --accent:#f0a83a; --accent-soft:#3a2c14; --info:#222c3b; --core:#e7ecf3; --core-ink:#121821; --new:#5cc29c; --new-soft:#173229; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
 .wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:20px 40px}
@@ -67,7 +67,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 .sched td{padding:2px 6px 2px 0;vertical-align:top}.sched td:first-child{color:var(--muted);white-space:nowrap}
 .sched .day td{font-weight:600;color:var(--ink);padding-top:8px}
 .empty{color:var(--muted)}
-.info{background:var(--accent-soft);border-radius:10px;padding:4px 14px 10px;margin-bottom:4px}
+.info{background:var(--info);border-left:4px solid var(--accent);border-radius:10px;padding:4px 14px 10px;margin-bottom:4px}
 .todo{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:16px}
 .todo h2{font-family:var(--display);font-weight:800;font-size:1.1rem;margin:0 0 8px}
 .who-line{font:500 13px var(--body);color:var(--muted);margin-left:6px}
@@ -76,7 +76,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 #todo input{margin-top:4px;accent-color:var(--accent);flex:none}
 #todo input:checked + span{color:var(--muted);text-decoration:line-through}
 .owner{display:inline-block;font-size:12px;font-weight:600;color:var(--ink);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:4px}
-.info h3{margin-top:10px}.info ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.info h3{margin-top:10px}.info ul{margin:0;padding-left:18px;display:grid;gap:7px}.info li{color:var(--ink);line-height:1.45}.info li b{font-weight:800;color:var(--ink)}.info li::marker{color:var(--accent)}
 .saved{font-size:12px;color:var(--muted);margin-top:4px;min-height:1em}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--core);color:var(--core-ink);padding:10px 16px;border-radius:8px;font-weight:600}
 @media (max-width:960px){
@@ -313,7 +313,7 @@ const N = [
   info:["Plan A : FJT Queuleu + cuisine du Grand Séminaire","Plan B : Grand Séminaire (salle et cuisine)","Plan C : Église de Borny + cuisine chez Edmond","Grand jeu dehors ; s'il pleut, prévoir une solution à l'intérieur","Budget : payer la location, en visant moins de 400 €","Culte du dimanche avec l'implantation Metz Sud au FJT","Clés dès vendredi 16h · nettoyage dimanche 14h30–15h30"],
   q:[["Plan A : confirmer le FJT Queuleu et la cuisine du Grand Séminaire",""],["Grand jeu : quelle solution à l'intérieur s'il pleut ?",""],["Coût exact, acompte et annulation du lieu retenu",""],["Qui fait partie de l'équipe de nettoyage dimanche ?",""]]},
  {id:"theme",t:"Thème",why:"Le fil rouge des prédications, de la com et du visuel.",
-  info:["Titre : Rencontrer Jésus aujourd'hui ?","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte à Borny"],
+  info:["Titre : Rencontrer Jésus aujourd'hui ?","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte avec Metz Sud au FJT"],
   q:[]},
  {id:"orateur",t:"Orateurs & ateliers",why:"Les messages, la DAB et les ateliers du samedi.",
   info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi soir : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : en attente (vote en cours, onglet Ateliers)","Intervenants des ateliers : en attente"],
@@ -331,10 +331,10 @@ const N = [
   info:["Dépenses : lieu (viser moins de 400 €), repas, don à l'orateur (100–200 €)","Tarif de base · −10 % dès 5 inscrits d'une même ville · +10 € après le 23 novembre","Don libre possible en plus de l'inscription","Paiement : virement ou sur place","Site d'inscription : Edmond","Infos demandées : nom, prénom, date de naissance, e-mail, téléphone, ville, jour d'arrivée, allergies, besoin de covoiturage","Soutien possible des églises (ex. Borny), par exemple pour l'orateur"],
   q:[["Prix de base de l'inscription ?","Marion, Joël"],["Seuil minimum de participants pour équilibrer le budget","Marion, Joël"],["Qui demande le soutien des églises ?",""]]},
  {id:"planning",t:"Planning",go:"planning",why:"Le programme du week-end, créneau par créneau.",
-  info:["Programme validé le 12 octobre","Fin dimanche à 14h","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 au culte dimanche à Borny (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h20 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h05 à 22h30, puis temps libre jusqu'à 23h30"],
+  info:["Programme validé le 12 octobre","Fin dimanche à 14h30","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 dimanche matin après le culte avec Metz Sud au FJT (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h30 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h15 à 22h30, puis temps libre (dernier départ 1h00)"],
   q:[["Témoignage de 16h20 : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
  {id:"equipe",t:"Équipe & rôles",why:"Qui fait quoi.",
-  info:["Pôle louange : respo Romuald + équipe louange","Pôle témoignage et sketch : respo Eléa + (?)","Pôle activités et jeux : respo Emma + (?)","Pôle ateliers : respo Edmond + équipe orga","Pôle cuisine : respo recrutement (?) · respo cuisine (?)","Pôle logement : respo (?)","Pôle communication : respo (?)","Pôle DAB : Sacha + (?)","Salle principale : Edmond","Prédicateurs : Edmond et Marion","Planning : tous"],
+  info:["Pôle louange : respo Romuald + équipe louange","Pôle témoignage et sketch : respo Eléa + (?)","Pôle activités et jeux : respo Emma + Etienne","Pôle ateliers : respo Edmond + équipe orga","Pôle cuisine : respo recrutement (?) · respo cuisine (?)","Pôle logement : respo Emma","Pôle communication : Elisa le S. et Eléa","Pôle DAB : Sacha + (?)","Salle principale : Edmond","Prédicateurs : Edmond et Marion","Planning : tous"],
   q:[]}
 ];
 
@@ -367,7 +367,7 @@ function open(id){
   document.querySelectorAll("#lines line").forEach(e=>e.classList.toggle("on",e.id==="line-"+id));
   const done=n.q.filter((_,i)=>s.c[i]).length;
   panel.innerHTML=`${n.nw?'<span class="tag">Point ajouté</span>':''}<h2>${n.t}</h2><p class="why">${n.why}</p>
-   ${n.info?`<div class="info"><h3>Ce qu'on sait déjà</h3><ul>${n.info.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
+   ${n.info?`<div class="info"><h3>Ce qu'on sait déjà</h3><ul>${n.info.map(x=>{const k=x.indexOf(" : ");return `<li>${k>0?`<b>${x.slice(0,k)}</b> : ${x.slice(k+3)}`:x}</li>`}).join("")}</ul></div>`:""}
    ${n.q.length?`<h3>Reste à régler · <span id="cnt">${done}/${n.q.length}</span></h3><ul class="qs">${n.q.map((q,i)=>`<li><label><input type="checkbox" id="q-${id}-${i}" data-i="${i}" ${s.c[i]?"checked":""}><span>${q[0]}${q[1]?`<span class="owner">${q[1]}</span>`:""}</span></label></li>`).join("")}</ul>`:""}
    ${n.prog?`<h3>Programme actuel</h3><div style="overflow-x:auto"><table class="sched">${PROG.map(r=>r.length===1?`<tr class="day"><td colspan="2">${r[0]}</td></tr>`:`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table></div>`:""}
    <h3><label for="notes-${id}">Notes de l'appel</label></h3>
@@ -756,5 +756,3 @@ document.getElementById("bXlsx").onclick=exportXlsx;
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
 showPage(startPage);
 </script>
-</body>
-</html>
