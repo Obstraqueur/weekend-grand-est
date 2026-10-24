@@ -251,7 +251,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
   </section>
   <section id="p-budget" class="page" hidden>
-    <div class="phead"><div><h2>Budget</h2><p class="muted">Même calcul que l'onglet Budget de la Check list. Change une hypothèse, tout se recalcule.</p></div><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></div>
+    <div class="phead"><div><h2>Budget</h2><p class="muted">Même calcul que l'onglet Budget de la Check list. Change une hypothèse, tout se recalcule.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="https://obstraqueur.github.io/weekend-grand-est/inscription/#infos" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Site d'inscription</a><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></div></div>
     <div class="kpis" id="bKpi"></div>
     <div class="sim" id="bSim">
       <div class="simtop">
@@ -299,22 +299,22 @@ const N = [
  {id:"theme",t:"Thème",why:"Le fil rouge des prédications, de la com et du visuel.",
   info:["Titre : Rencontré · Appelé · Envoyé","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte à Borny","Pas de 4e message, le week-end finit à 14h","Save the date : 4 versions prêtes"],
   q:[["Quelle version du save the date envoyer le 15 octobre ?","Équipe orga"]]},
- {id:"orateur",t:"Orateur & ateliers",why:"3 prédications, témoignages, DAB et ateliers du samedi.",
-  info:["Orateur pressenti : Louis-Maël Jean (réponse attendue)","Défraiement : un don de 100 à 200 €","DAB sur la 1re prédication","Un seul créneau d'ateliers, le samedi après-midi, avec plusieurs ateliers au choix","Inscription aux ateliers sur place, avec QR code"],
-  q:[["Orateur confirmé ? Sinon Bertrand, Timothée ou quelqu'un d'Algrange","Louis-Maël Jean"],["Témoignages samedi après-midi et soir : qui ?","Les jeunes"],["Combien d'ateliers, sur quels sujets ? (ou demander aux gens ce qu'ils pourraient aborder)","Équipe orga"]]},
+ {id:"orateur",t:"Orateurs & ateliers",why:"Les messages, la DAB et les ateliers du samedi.",
+  info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi soir : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : en attente (vote en cours, onglet Ateliers)","Intervenants des ateliers : en attente"],
+  q:[["Deuxième animateur DAB avec Sacha",""],["Thèmes des ateliers",""],["Intervenants des ateliers",""]]},
  {id:"louange",t:"Louange & technique",why:"Louange du week-end, culte du dimanche, son et image.",
   info:["Louange du week-end : Cynthia et Romuald, organisation déléguée à Ichtus","Répétition vendredi 19h–21h si besoin","Samedi : louange et sketch à 9h45 ; soirée louange, témoignages et prière de 21h05 à 22h30","Louange du culte de dimanche : à proposer avec Elisabeth pour Metz-Borny","Sono (S&Metz) et projecteur : Edmond et Marion s'en occupent"],
   q:[["Combien de temps de louange, et à quels moments ?","Cynthia et Romuald"],["Écran pour les paroles et présentations","Edmond, Marion"],["Louange du culte de dimanche à Borny : confirmer","Elisabeth"],["Sono S&Metz : quand la récupérer et la rendre ?","Edmond, Marion"]]},
  {id:"repas",t:"Repas & cuisine",why:"Repas de l'équipe vendredi et samedi matin, repas participants, quatre-heures.",
   info:["Respo cuisine : Elisa (à confirmer)","Cuisiniers : Edmond demande à l'église de Metz, chaque responsable à son église ; 4 personnes en cuisine prévues dans l'effectif","Courses : les gens de Metz","Allergies et régimes : demandés sur le site d'inscription","Samedi : petit-déjeuner 8h–8h30, repas 12h et 18h20, quatre-heures 15h30","Dimanche : petit-déjeuner 8h–9h, repas 12h20 tous ensemble à l'église"],
   q:[["Cuisiniers confirmés ?","Edmond + responsables"],["Planning des cuisiniers par repas","Elisa"],["Repas de dimanche midi à Borny : préparé où et comment ? Cuisine proche ?",""]]},
- {id:"couchage",t:"Couchage",why:"Nuits de vendredi et samedi.",
+ {id:"couchage",t:"Logement",go:"logement",why:"Nuits de vendredi et samedi.",
   info:["Plan A : Onville, chez les Leuba","Plan B : chez l'habitant, 12 foyers pour 50 places (Mattias 10, Edmond 8, Emma 6, Agirla, Romuald, Leuba, Lydie 4, Marine, Aline, Terence, Benoit, Tigran 2) : voir la page Logement","Autre piste : auberge de jeunesse Metz-Plage (voir le comparatif d'hébergement)","À apporter : sac de couchage ou drap, linge, et un matelas selon le lieu"],
   q:[["Plan B : trajets entre les familles et l'église",""],["Si on dort à Onville : trajet jusqu'à Borny dimanche matin pour le culte de 10h",""]]},
- {id:"budget",t:"Budget & inscriptions",why:"Équilibrer le budget, inscrire tout le monde.",
+ {id:"budget",t:"Budget & inscriptions",go:"budget",why:"Équilibrer le budget, inscrire tout le monde.",
   info:["Dépenses : lieu (1 000 € max), repas, don à l'orateur (100–200 €)","Tarif de base · −10 % dès 5 inscrits d'une même ville · +10 € après le 23 novembre","Don libre possible en plus de l'inscription","Paiement : virement ou sur place","Site d'inscription : Edmond","Infos demandées : nom, prénom, date de naissance, e-mail, téléphone, ville, jour d'arrivée, allergies, besoin de covoiturage","Soutien possible des églises (ex. Borny), par exemple pour l'orateur"],
   q:[["Prix de base de l'inscription ?","Marion, Joël"],["Seuil minimum de participants pour équilibrer le budget","Marion, Joël"],["Qui demande le soutien des églises ?",""]]},
- {id:"planning",t:"Planning",why:"Le programme du week-end, créneau par créneau.",
+ {id:"planning",t:"Planning",go:"planning",why:"Le programme du week-end, créneau par créneau.",
   info:["Programme validé le 12 octobre","Fin dimanche à 14h","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 au culte dimanche à Borny (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h20 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h05 à 22h30, puis temps libre jusqu'à 23h30"],
   q:[["Témoignage de 16h20 : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
  {id:"equipe",t:"Équipe & rôles",why:"Qui fait quoi.",
@@ -337,7 +337,7 @@ N.forEach((n,i)=>{
   b.type="button"; b.className="node"+(n.nw?" new":""); b.id="node-"+n.id;
   b.style.left=n.x+"%"; b.style.top=n.y+"%";
   b.innerHTML=`<span>${n.t}</span><i class="dot"></i>`;
-  b.onclick=()=>open(n.id);
+  b.onclick=()=>n.go?showPage(n.go):open(n.id);
   map.appendChild(b);
   const l=document.createElementNS("http://www.w3.org/2000/svg","line");
   l.setAttribute("x1","50%");l.setAttribute("y1","50%");l.setAttribute("x2",n.x+"%");l.setAttribute("y2",n.y+"%");l.id="line-"+n.id;
@@ -380,7 +380,7 @@ document.getElementById("copyAll").onclick=()=>{
 
 refreshDots();
 let last="planning"; try{last=localStorage.getItem(KEY+".last")||"planning"}catch(e){}
-open(N.some(n=>n.id===last)?last:"planning");
+open(N.some(n=>n.id===last&&!n.go)?last:"lieu");
 /* ---------- Pages: tabs ---------- */
 
 /* ---------- Ateliers ---------- */
