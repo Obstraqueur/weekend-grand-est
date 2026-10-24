@@ -297,8 +297,8 @@ const N = [
   info:["Plan A, Onville chez les Leuba : grand salon (50 personnes, ça passe), 5 salles pour les ateliers, cuisine sur place","Onville : grande salle du village de 100 places, à demander","Plan B, Metz : Église de Borny (5 salles pour les ateliers) ; sinon église baptiste, qui a de la place mais pas de cuisine adaptée","Culte de dimanche à l'Église de Borny, qu'on soit à Onville ou pas","Budget lieu : 1 000 € maximum","Clés dès vendredi 17h · équipe de nettoyage dimanche 14h–16h"],
   q:[["Onville disponible du 27 au 29 nov. ? Confirmé par écrit ? (Edmond appelle, réponse avant le 17 oct.)","Elisabeth Leuba"],["Salle du village d'Onville : disponible ? Quel prix ?","Edmond"],["Sport possible à Onville, ou seulement une balade ?","Romane"],["Plan B : quelle église de Metz a une cuisine (ADD, église chinoise, Grange-aux-Bois) ?","Agirla"],["Coût exact, acompte et annulation du lieu retenu",""],["Qui fait partie de l'équipe de nettoyage dimanche 14h–16h ?",""]]},
  {id:"theme",t:"Thème",why:"Le fil rouge des prédications, de la com et du visuel.",
-  info:["Titre : Rencontré · Appelé · Envoyé","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte à Borny","Pas de 4e message, le week-end finit à 14h","Save the date : 4 versions prêtes"],
-  q:[["Quelle version du save the date envoyer le 15 octobre ?","Équipe orga"]]},
+  info:["Titre : Rencontrer Jésus aujourd'hui ?","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte à Borny"],
+  q:[]},
  {id:"orateur",t:"Orateurs & ateliers",why:"Les messages, la DAB et les ateliers du samedi.",
   info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi soir : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : en attente (vote en cours, onglet Ateliers)","Intervenants des ateliers : en attente"],
   q:[["Deuxième animateur DAB avec Sacha",""],["Thèmes des ateliers",""],["Intervenants des ateliers",""]]},
@@ -352,8 +352,7 @@ function open(id){
   const done=n.q.filter((_,i)=>s.c[i]).length;
   panel.innerHTML=`${n.nw?'<span class="tag">Point ajouté</span>':''}<h2>${n.t}</h2><p class="why">${n.why}</p>
    ${n.info?`<div class="info"><h3>Ce qu'on sait déjà</h3><ul>${n.info.map(x=>`<li>${x}</li>`).join("")}</ul></div>`:""}
-   <h3>Reste à régler · <span id="cnt">${done}/${n.q.length}</span></h3>
-   ${n.q.length?`<ul class="qs">${n.q.map((q,i)=>`<li><label><input type="checkbox" id="q-${id}-${i}" data-i="${i}" ${s.c[i]?"checked":""}><span>${q[0]}${q[1]?`<span class="owner">${q[1]}</span>`:""}</span></label></li>`).join("")}</ul>`:`<p class="empty">Tout est réglé sur ce sujet.</p>`}
+   ${n.q.length?`<h3>Reste à régler · <span id="cnt">${done}/${n.q.length}</span></h3><ul class="qs">${n.q.map((q,i)=>`<li><label><input type="checkbox" id="q-${id}-${i}" data-i="${i}" ${s.c[i]?"checked":""}><span>${q[0]}${q[1]?`<span class="owner">${q[1]}</span>`:""}</span></label></li>`).join("")}</ul>`:""}
    ${n.prog?`<h3>Programme actuel</h3><div style="overflow-x:auto"><table class="sched">${PROG.map(r=>r.length===1?`<tr class="day"><td colspan="2">${r[0]}</td></tr>`:`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table></div>`:""}
    <h3><label for="notes-${id}">Notes de l'appel</label></h3>
    <textarea id="notes-${id}" placeholder="Décisions, qui s'en occupe, prochaines étapes…">${esc(s.n)}</textarea>
