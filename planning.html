@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Planning WE Grand Est</title>
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: agenda 3 jours à gauche (grille horaire 7h–24h), colonne des choix à trancher à droite ; empilé sur mobile */
+:root{
+  --bg:#F5F3F0; --surface:#FFFFFF; --ink:#24181A; --muted:#6E6264; --line:#E3DDD8; --line2:#EEEAE6;
+  --accent:#7A1F2B; --accent-ink:#FFFFFF; --ochre:#C98A2E; --focus:#2F6FDB;
+  --ok:#2F7D4F; --warn:#B4610E;
+  --c-accueil:#DCE9F7; --b-accueil:#3E78B5;
+  --c-repas:#F8E6C6; --b-repas:#C98A2E;
+  --c-message:#F3D6DA; --b-message:#7A1F2B;
+  --c-louange:#E7DDF5; --b-louange:#6B4BA6;
+  --c-atelier:#D5EEE9; --b-atelier:#2E8A7A;
+  --c-sport:#DDEFD3; --b-sport:#4E8C2E;
+  --c-temoignage:#F8DCEB; --b-temoignage:#B34782;
+  --c-priere:#DCDFF5; --b-priere:#4652A8;
+  --c-equipe:#E6E2DE; --b-equipe:#6E6264;
+  --c-libre:#F0EEEB; --b-libre:#A39A95;
+  --display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --body:'Source Sans 3','Segoe UI',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#171213; --surface:#211A1B; --ink:#F2ECEA; --muted:#B3A7A5; --line:#3A3031; --line2:#2B2324;
+  --accent:#D9707E; --accent-ink:#1A0E10; --ochre:#E0A84E; --focus:#7FA8F0; --ok:#6CC28F; --warn:#E6A256;
+  --c-accueil:#1E2D3F; --b-accueil:#7FB0E6; --c-repas:#3A2E19; --b-repas:#E0A84E;
+  --c-message:#3D1F25; --b-message:#E38895; --c-louange:#2E2540; --b-louange:#AE93E0;
+  --c-atelier:#173430; --b-atelier:#62C4B2; --c-sport:#1F3319; --b-sport:#8CC96A;
+  --c-temoignage:#3D1D2F; --b-temoignage:#E487BB; --c-priere:#22264A; --b-priere:#9BA4EC;
+  --c-equipe:#2E2829; --b-equipe:#B3A7A5; --c-libre:#262021; --b-libre:#8E8482;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171213; --surface:#211A1B; --ink:#F2ECEA; --muted:#B3A7A5; --line:#3A3031; --line2:#2B2324;
+  --accent:#D9707E; --accent-ink:#1A0E10; --ochre:#E0A84E; --focus:#7FA8F0; --ok:#6CC28F; --warn:#E6A256;
+  --c-accueil:#1E2D3F; --b-accueil:#7FB0E6; --c-repas:#3A2E19; --b-repas:#E0A84E;
+  --c-message:#3D1F25; --b-message:#E38895; --c-louange:#2E2540; --b-louange:#AE93E0;
+  --c-atelier:#173430; --b-atelier:#62C4B2; --c-sport:#1F3319; --b-sport:#8CC96A;
+  --c-temoignage:#3D1D2F; --b-temoignage:#E487BB; --c-priere:#22264A; --b-priere:#9BA4EC;
+  --c-equipe:#2E2829; --b-equipe:#B3A7A5; --c-libre:#262021; --b-libre:#8E8482;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1440px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.eyebrow{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:850;font-stretch:72%;font-size:clamp(30px,4.4vw,46px);line-height:1;margin:4px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:#B3261E;border-color:currentColor;background:transparent}
+.save{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.save i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+.save.pending i{background:var(--warn)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{width:12px;height:12px;border-radius:3px;border-left:3px solid;display:inline-block}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+@media (max-width:1100px){.layout{grid-template-columns:minmax(0,1fr)}}
+.cal-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.cal{min-width:620px;position:relative;user-select:none;-webkit-user-select:none}
+.days-head{display:grid;grid-template-columns:52px repeat(3,1fr);position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.days-head div{padding:10px 10px 8px;font-family:var(--display);font-weight:800;font-stretch:80%;font-size:17px}
+.days-head small{display:block;font-family:var(--body);font-weight:400;font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:52px repeat(3,1fr);position:relative}
+.hours{position:relative}
+.hours span{position:absolute;right:8px;font-size:11px;color:var(--muted);transform:translateY(-50%);font-variant-numeric:tabular-nums}
+.col{position:relative;border-left:1px solid var(--line);touch-action:pan-y}
+.col .hl{position:absolute;left:0;right:0;border-top:1px solid var(--line2)}
+.col .hl.h{border-top-color:var(--line)}
+.block{position:absolute;border-radius:7px;padding:4px 7px 6px 9px;overflow:hidden;cursor:grab;border-left:4px solid;
+  font-size:12.5px;line-height:1.25;box-shadow:0 1px 0 rgba(0,0,0,.06);touch-action:none;transition:box-shadow .15s}
+.block:hover{box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.block.dragging{cursor:grabbing;box-shadow:0 8px 22px rgba(0,0,0,.22);z-index:4;opacity:.95}
+.block .t{font-weight:700;display:block}
+.block.tiny{padding:1px 6px 0 8px;font-size:11.5px}
+.block.tiny .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.block.tiny .chip{top:1px;font-size:9px}
+.block .tm{font-variant-numeric:tabular-nums;font-size:11.5px;opacity:.8;display:block}
+.block .nt{display:block;font-size:11px;opacity:.75;margin-top:2px}
+.block .rz{position:absolute;left:0;right:0;height:8px;cursor:ns-resize}
+.block .rz.top{top:0}.block .rz.bot{bottom:0}
+.block .chip{position:absolute;right:4px;top:4px;font-family:var(--display);font-weight:800;font-size:10px;letter-spacing:.04em;
+  background:var(--warn);color:#fff;border-radius:4px;padding:1px 4px;cursor:pointer}
+.block.flash{animation:flash 1.8s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--ochre)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.block.flash{animation:none;outline:2px solid var(--ochre)}}
+.now-ghost{position:absolute;left:4px;right:4px;border:2px dashed var(--muted);border-radius:7px;pointer-events:none}
+.hint{font-size:13px;color:var(--muted);margin:0}
+
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.aside-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.aside-head h2{font-family:var(--display);font-weight:850;font-stretch:78%;font-size:24px;margin:0}
+.count{font-size:13px;color:var(--muted)}
+.dec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dec.focus{outline:2px solid var(--ochre)}
+.dec-top{display:flex;gap:10px;align-items:flex-start}
+.num{font-family:var(--display);font-weight:850;font-size:13px;min-width:30px;text-align:center;border-radius:6px;padding:3px 0;background:var(--warn);color:#fff}
+.dec.done .num{background:var(--ok)}
+.dec h3{margin:0;font-size:16px;line-height:1.3;font-weight:700;text-wrap:balance;flex:1}
+.status{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--warn)}
+.dec.done .status{color:var(--ok)}
+details summary{cursor:pointer;font-size:13px;color:var(--muted);font-weight:600}
+.quotes{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.quotes q{display:block;font-size:13px;color:var(--muted);border-left:2px solid var(--line);padding-left:8px;quotes:none}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:9px 10px;cursor:pointer;background:transparent;text-align:left;width:100%}
+.opt:hover{border-color:var(--muted)}
+.opt .dot{flex:none;width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);margin-top:2px}
+.opt[aria-checked="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.opt[aria-checked="true"] .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.opt b{display:block;font-size:14px}
+.opt span{display:block;font-size:13px;color:var(--muted)}
+.linkish{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px;align-self:flex-start}
+
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;width:min(440px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(20,10,12,.4)}
+form.ed{display:flex;flex-direction:column;gap:12px;padding:18px}
+form.ed h2{margin:0;font-family:var(--display);font-weight:850;font-stretch:80%;font-size:22px}
+.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg);color:var(--ink);font-weight:400;font-size:15px;width:100%}
+.row3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.actions div{display:flex;gap:8px;flex-wrap:wrap}
+.err{color:#B3261E;font-size:13px;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:9px;font-size:14px;z-index:50;max-width:calc(100vw - 32px)}
+.vtabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.vtab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.vtab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.dhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.dtitle{font-family:var(--display);font-weight:850;font-stretch:78%;font-size:28px;margin:0}
+.dnote{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:14px}
+.dnote span{font-weight:700;color:var(--accent);white-space:nowrap}
+.dnote input{flex:1;min-width:0;border:0;background:transparent;font-size:14px;color:var(--ink)}
+.dday{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ddayh{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+.ddayh h3{margin:0;font-family:var(--display);font-weight:850;font-stretch:80%;font-size:21px;color:var(--accent)}
+.pres{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);font-weight:600}
+.pres input{border:1px solid var(--line);border-radius:7px;padding:5px 8px;background:var(--bg);color:var(--ink);font-size:14px;width:180px}
+.dscroll{overflow-x:auto}
+.dt{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+.dt th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px 8px;border-bottom:1px solid var(--line);background:var(--bg)}
+.dt td{border-bottom:1px solid var(--line2);padding:0;vertical-align:top}
+.dt tr:last-child td{border-bottom:0}
+.dt td.cc{width:8px;padding:0}
+.dt td.cc i{display:block;width:6px;height:100%;min-height:36px}
+.dt input,.dt textarea,.dt select{width:100%;border:0;background:transparent;color:var(--ink);font:inherit;padding:8px;resize:none}
+.dt textarea{field-sizing:content;min-height:36px;line-height:1.35}
+.dt input:focus,.dt textarea:focus,.dt select:focus{outline:2px solid var(--focus);outline-offset:-2px;background:var(--bg)}
+.dt .ch{width:118px;font-variant-numeric:tabular-nums;font-weight:700}
+.dt .cq{width:32%}.dt .cw{width:17%}.dt .ct{width:120px}.dt .cx{width:40px}
+.dt select{font-size:12px;color:var(--muted)}
+.rx{border:0;background:none;color:var(--muted);cursor:pointer;padding:8px;font-size:16px;line-height:1}
+.rx:hover,.rx.sure{color:#B3261E}
+.dadd{display:flex;gap:8px;padding:8px 10px;border-top:1px solid var(--line)}
+.dlist{display:flex;flex-direction:column;gap:16px;margin-top:4px}
+.emb .eyebrow,.emb header h1{display:none}
+.emb body{padding-block:4px 24px;padding-left:0;padding-right:0;background:transparent}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Week-end régional GBU Grand Est · 27–29 novembre 2026</div>
+      <h1>Planning du week-end</h1>
+      <p class="sub" id="subTxt">Glisse un bloc pour le déplacer, tire son bord haut ou bas pour changer l'horaire, clique dessus pour le modifier. Double-clic sur une case vide pour ajouter un bloc.</p>
+    </div>
+    <div class="toolbar">
+      <span class="save" id="save"><i></i><span id="saveTxt">Chargement…</span></span>
+      <button class="btn primary" id="addBtn" type="button">+ Ajouter un bloc</button>
+      <button class="btn" id="copyBtn" type="button">Copier en texte</button>
+      <span id="resetZone"><button class="btn ghost" id="resetBtn" type="button">Revenir au planning de départ</button></span>
+    </div>
+  </header>
+  <nav class="vtabs" role="tablist" aria-label="Vues">
+    <button type="button" class="vtab on" role="tab" id="tab-agenda" aria-selected="true" data-v="agenda">Agenda</button>
+    <button type="button" class="vtab" role="tab" id="tab-detail" aria-selected="false" data-v="detail">Planning détaillé</button>
+  </nav>
+  <section id="v-agenda">
+  <div class="legend" id="legend"></div>
+  <div class="layout">
+    <div>
+      <div class="cal-scroll"><div class="cal" id="cal"></div></div>
+    </div>
+    <aside>
+      <div class="aside-head"><h2>Choix à trancher</h2><span class="count" id="decCount"></span></div>
+      <p class="hint">Tirés des commentaires du Google Doc. Chaque réponse modifie le planning tout de suite ; les blocs touchés clignotent.</p>
+      <div id="decs" style="display:flex;flex-direction:column;gap:12px"></div>
+    </aside>
+  </div>
+  </section>
+  <section id="v-detail" hidden>
+    <div class="dhead">
+      <div><h2 class="dtitle">Planning détaillé</h2><p class="hint">Le déroulé minute par minute pour l'équipe : quoi, qui, et les détails à ne pas oublier. Tout se modifie directement dans le tableau.</p></div>
+      <div class="toolbar"><button class="btn" type="button" id="dCopy">Copier pour Google Sheets</button></div>
+    </div>
+    <label class="dnote"><span>À préparer</span><input id="dNote" placeholder="Ex. feuille d'urgence pour l'équipe" maxlength="300"></label>
+    <div id="det"></div>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <form class="ed" id="edForm" method="dialog">
+    <h2 id="edTitle">Modifier le bloc</h2>
+    <label class="f">Titre<input id="fTitle" required maxlength="140"></label>
+    <div class="row3">
+      <label class="f">Jour<select id="fDay"><option value="0">Vendredi 27</option><option value="1">Samedi 28</option><option value="2">Dimanche 29</option></select></label>
+      <label class="f">Début<input id="fStart" type="time" step="300" required></label>
+      <label class="f">Fin<input id="fEnd" type="time" step="300" required></label>
+    </div>
+    <label class="f">Type<select id="fCat"></select></label>
+    <label class="f">Notes, responsable<textarea id="fNote" rows="2" maxlength="400"></textarea></label>
+    <p class="err" id="fErr" hidden></p>
+    <div class="actions">
+      <div id="delZone"><button class="btn danger" type="button" id="delBtn">Supprimer</button></div>
+      <div><button class="btn" type="button" id="cancelBtn">Annuler</button><button class="btn primary" type="submit" id="okBtn">Enregistrer</button></div>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(()=>{
+const DAYS=[{n:'Vendredi 27',s:'Équipe dès 17h'},{n:'Samedi 28',s:'Journée complète'},{n:'Dimanche 29',s:'Fin à 14h'}];
+const START=7*60, END=24*60, PPM=1.15, SNAP=5;
+const CATS={accueil:'Accueil',repas:'Repas',message:'Message',louange:'Louange',atelier:'Ateliers',sport:'Jeux & sport',temoignage:'Témoignage',priere:'Prière & envoi',equipe:'Équipe & logistique',libre:'Temps libre'};
+const t=(h,m=0)=>h*60+m;
+const fmt=m=>{const h=Math.floor(m/60)%24,mm=m%60;return h+'h'+(mm?String(mm).padStart(2,'0'):'')};
+const toInput=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const fromInput=v=>{if(!v)return null;const[a,b]=v.split(':').map(Number);let m=a*60+b;return m};
+
+/* Planning de départ = version du Google Doc « Planning à commenter » */
+const BASE=[
+ {id:'f1',day:0,start:t(17),end:t(18),title:'Prise des locaux · installation sono',cat:'equipe'},
+ {id:'f2',day:0,start:t(19),end:t(21),title:'Répétition louange (si besoin)',cat:'louange'},
+ {id:'f3',day:0,start:t(20),end:t(20,30),title:'Installation des chaises',cat:'equipe'},
+ {id:'f4',day:0,start:t(20,30),end:t(21,30),title:"Point d'équipe, prière, accueil des premiers arrivants",cat:'accueil'},
+ {id:'s1',day:1,start:t(8),end:t(8,30),title:'Petit-déjeuner',cat:'repas'},
+ {id:'s2',day:1,start:t(8,30),end:t(9),title:'Finalisation & prière',cat:'equipe'},
+ {id:'s3',day:1,start:t(9),end:t(9,45),title:'Accueil au stand, répartition des chambres',cat:'accueil'},
+ {id:'s4',day:1,start:t(9,45),end:t(11,20),title:'Louange, sketch + Message 1 « Viens et vois » en DAB (Jean 4)',cat:'message'},
+ {id:'s5',day:1,start:t(11,20),end:t(12),title:'Présentation des ateliers (QR code)',cat:'atelier'},
+ {id:'s6',day:1,start:t(12),end:t(14),title:'Repas',cat:'repas'},
+ {id:'s7',day:1,start:t(14),end:t(15,30),title:'Sports & balade',cat:'sport'},
+ {id:'s8',day:1,start:t(15,30),end:t(16),title:'Quatre-heures',cat:'repas'},
+ {id:'s9',day:1,start:t(16,20),end:t(17,45),title:'Témoignage & ateliers',cat:'atelier'},
+ {id:'s10',day:1,start:t(18,20),end:t(19,30),title:'Repas',cat:'repas'},
+ {id:'s11',day:1,start:t(19,45),end:t(20,50),title:'Message 2 « Suis-moi » (Luc 5)',cat:'message'},
+ {id:'s12',day:1,start:t(21,5),end:t(22,30),title:'Soirée louange, témoignages, prière',cat:'louange'},
+ {id:'s13',day:1,start:t(22,30),end:t(23,30),title:'Libre',cat:'libre'},
+ {id:'d1',day:2,start:t(8),end:t(9),title:'Petit-déjeuner',cat:'repas'},
+ {id:'d2',day:2,start:t(10),end:t(12,20),title:"Culte à l'Église de Borny + Message 3 « Va et deviens » (Jean 17 ?)",cat:'message'},
+ {id:'d3',day:2,start:t(12,20),end:t(13,30),title:"Repas tous ensemble à l'église",cat:'repas'},
+ {id:'d4',day:2,start:t(13,30),end:t(14),title:'Temps de prière pour les villes',cat:'priere'},
+ {id:'d5',day:2,start:t(14),end:t(16),title:'Fin · nettoyage (équipe)',cat:'equipe'},
+];
+
+const find=(m,id)=>m.find(b=>b.id===id);
+const set=(m,id,p)=>{const b=find(m,id);if(b)Object.assign(b,p)};
+const add=(m,b)=>{if(!find(m,b.id))m.push(b)};
+const del=(m,id)=>{const i=m.findIndex(b=>b.id===id);if(i>=0)m.splice(i,1)};
+const stripTem=m=>{const b=find(m,'s9');if(b)b.title=b.title.replace(/^Témoignage & a/,'A').replace(/^Témoignage & /,'')};
+
+/* Ordre d'application : D1, D2, D3, D5, D4, D6 (D4 se cale sur les horaires de D5) */
+const DECISIONS=[
+ {id:'D1',q:'Quand commence le week-end pour les participants ?',blocks:['f2','f3','f4','s3','x1','x2','x3'],
+  quotes:["Moi je ferais commencer le week-end vendredi soir avec l'arrivée des participants, premier repas ensemble et jeux brise-glace.","Commencer samedi matin rend le week-end moins lourd pour tous (hébergeurs, participants, cuisine). Ceux qui voyagent peuvent venir tôt samedi ou vendredi soir.","J'aime venir le vendredi soir : moments informels, on apprend à se connaître… mais si c'est la logistique et l'hébergement, ça prime."],
+  opts:[
+   {k:'A',label:'Samedi matin',desc:"Vendredi soir : équipe + premiers arrivants seulement. Plus léger pour les hébergeurs et la cuisine.",fx:m=>{}},
+   {k:'B',label:'Vendredi soir pour tous',desc:"Arrivée à 20h avec repas tiré du sac, puis jeux brise-glace. Samedi 9h devient l'accueil des retardataires.",fx:m=>{
+     set(m,'f2',{start:t(18),end:t(19,30)});set(m,'f3',{start:t(19),end:t(19,30)});
+     set(m,'f4',{start:t(19,30),end:t(20),title:"Point d'équipe & prière",cat:'equipe'});
+     add(m,{id:'x1',day:0,start:t(20),end:t(21),title:'Arrivée des participants · repas tiré du sac',cat:'accueil'});
+     add(m,{id:'x2',day:0,start:t(21),end:t(22,30),title:'Jeux brise-glace',cat:'sport'});
+     set(m,'s3',{title:'Accueil des arrivants du samedi, chambres'});}},
+   {k:'C',label:'Vendredi soir en option',desc:"Ceux qui peuvent arrivent vendredi soir pour une soirée informelle. Le programme commence samedi.",fx:m=>{
+     add(m,{id:'x3',day:0,start:t(21,30),end:t(23),title:'Soirée informelle (facultative) · jeux brise-glace',cat:'sport'});}},
+  ]},
+ {id:'D2',q:'Où placer la DAB, et garde-t-on le culte à Borny ?',blocks:['s4','d2','d3'],
+  quotes:["Si on fait la DAB plutôt le dimanche matin, notre orateur n'a besoin de venir que le samedi ?","C'est quoi l'Église de Borny ? Si on n'est pas logé dans une église, mieux vaut rester entre nous, notamment pour faire la DAB le dimanche."],
+  opts:[
+   {k:'A',label:'DAB samedi + culte à Borny',desc:"Comme dans le doc.",fx:m=>{}},
+   {k:'B',label:'DAB dimanche matin, entre nous',desc:"L'orateur ne vient que le samedi (message 1 classique). Dimanche 9h30 : louange + message 3 en DAB sur place.",fx:m=>{
+     set(m,'s4',{title:'Louange, sketch + Message 1 « Viens et vois » (Jean 4)'});
+     set(m,'d2',{start:t(9,30),end:t(11,45),title:'Louange + Message 3 « Va et deviens » en DAB (Jean 17 ?)'});
+     set(m,'d3',{start:t(12),title:'Repas tous ensemble'});}},
+   {k:'C',label:'DAB samedi, dimanche sur place',desc:"On garde la DAB samedi, mais le dimanche matin se fait entre nous, sans aller à Borny.",fx:m=>{
+     set(m,'d2',{start:t(9,30),end:t(11,45),title:'Louange + Message 3 « Va et deviens » (Jean 17 ?)'});
+     set(m,'d3',{start:t(12),title:'Repas tous ensemble'});}},
+  ]},
+ {id:'D3',q:'Quel format pour les ateliers ?',blocks:['s5','s9','x4','s4'],
+  quotes:["En plénière on n'a la place que d'en faire un ; sinon on en propose plusieurs au choix, mais notre seul créneau c'est 16h20–17h45.","Plutôt participatif, entre formation et creuser un sujet ensemble : la marche par l'Esprit, témoigner intentionnellement, toutes les religions mènent-elles à Dieu ?, le mariage, les questions dures de notre époque, la pornographie."],
+  opts:[
+   {k:'A',label:'Plusieurs ateliers au choix',desc:"En parallèle sur le créneau 16h20–17h45, choix par QR code le matin.",fx:m=>{
+     set(m,'s9',{title:'Ateliers au choix (en parallèle)',note:"Pistes : marche par l'Esprit · témoigner · religions · mariage · questions dures · pornographie"});
+     set(m,'s5',{title:'Présentation des ateliers & choix (QR code)'});}},
+   {k:'B',label:'Un seul atelier en plénière',desc:"Tout le monde ensemble sur un thème. Plus de présentation des ateliers le matin.",fx:m=>{
+     set(m,'s9',{title:'Atelier en plénière (thème à choisir)'});del(m,'s5');set(m,'s4',{end:t(11,45)});}},
+   {k:'C',label:'Deux créneaux au choix',desc:"Un créneau samedi 16h20 et un second dimanche 9h, pour pouvoir suivre deux ateliers.",fx:m=>{
+     set(m,'s9',{title:'Ateliers au choix · créneau 1',note:"Pistes : marche par l'Esprit · témoigner · religions · mariage · questions dures · pornographie"});
+     set(m,'s5',{title:'Présentation des ateliers & choix (QR code)'});
+     add(m,{id:'x4',day:2,start:t(9),end:t(9,55),title:'Ateliers au choix · créneau 2',cat:'atelier'});}},
+  ]},
+ {id:'D5',q:'Samedi soir : le repas à 18h20 est-il trop tôt ?',blocks:['s10','s11','s12','s13'],
+  quotes:["C'est beaucoup trop tôt, on n'est pas en Suisse :p On pourrait mettre le message 2 à la place ou à la suite de l'atelier.","19h45–20h50, c'est peut-être un horaire assez chaud pour écouter ?"],
+  opts:[
+   {k:'A',label:'Garder les horaires du doc',desc:'Repas 18h20, message 2 à 19h45.',fx:m=>{}},
+   {k:'B',label:'Message 2 juste après les ateliers',desc:'Message à 18h, repas à 19h15, soirée louange à 20h45.',fx:m=>{
+     set(m,'s11',{start:t(18),end:t(19)});set(m,'s10',{start:t(19,15),end:t(20,30)});set(m,'s12',{start:t(20,45),end:t(22,30)});}},
+   {k:'C',label:'Repas à 19h, message à 20h15',desc:'Tout décale de 40 min ; la soirée finit vers 23h.',fx:m=>{
+     set(m,'s10',{start:t(19),end:t(20)});set(m,'s11',{start:t(20,15),end:t(21,15)});set(m,'s12',{start:t(21,30),end:t(23)});set(m,'s13',{start:t(23),end:t(24)});}},
+  ]},
+ {id:'D4',q:'Les témoignages : lesquels et quand ?',blocks:['s9','s11','s12','x5','x6'],
+  quotes:["Témoignage de qui ? En rapport avec les ateliers ?","Plutôt avant les ateliers, en plénière. 2 témoignages préparés : une conversion, et un appel de Jésus. Le soir, témoignages libres pendant la louange.","Ça peut être trop bien, c'est concret et ça illustre les messages !"],
+  opts:[
+   {k:'A',label:'Deux témoignages préparés',desc:"Conversion avant les ateliers, appel juste avant le message 2. Témoignages libres le soir.",fx:m=>{
+     stripTem(m);const a=find(m,'s9'),b=find(m,'s11');
+     if(a){add(m,{id:'x5',day:a.day,start:a.start,end:a.start+15,title:'Témoignage préparé · conversion',cat:'temoignage'});a.start+=15;}
+     if(b){add(m,{id:'x6',day:b.day,start:b.start,end:b.start+15,title:"Témoignage préparé · Jésus m'a appelé",cat:'temoignage'});b.start+=15;}
+     set(m,'s12',{title:'Soirée louange, témoignages libres, prière'});}},
+   {k:'B',label:'Un témoignage + libres le soir',desc:"Une conversion avant les ateliers, le reste en libre pendant la soirée louange.",fx:m=>{
+     stripTem(m);const a=find(m,'s9');
+     if(a){add(m,{id:'x5',day:a.day,start:a.start,end:a.start+15,title:'Témoignage préparé · conversion',cat:'temoignage'});a.start+=15;}
+     set(m,'s12',{title:'Soirée louange, témoignages libres, prière'});}},
+   {k:'C',label:'Seulement en soirée',desc:"Pas de témoignage préparé : témoignages libres pendant la soirée louange.",fx:m=>{
+     stripTem(m);set(m,'s12',{title:'Soirée louange, témoignages libres, prière'});}},
+  ]},
+ {id:'D6',q:'Dimanche 13h30 : prière pour les villes ou temps d\'envoi ?',blocks:['d3','d4','x7'],
+  quotes:["Nouvelles des différents groupes, temps de prière, et on s'envoie ?","Je pense surtout un temps de prière.","Je tiens à un moment d'envoi : la transition vers le quotidien est dure. Se demander quel prochain pas je veux faire, en écho à ce que j'ai entendu, et prier avec d'autres."],
+  opts:[
+   {k:'A',label:"Temps d'envoi",desc:'Nouvelles des groupes, prochain pas, prière à deux (13h15–14h).',fx:m=>{
+     set(m,'d3',{end:t(13,15)});set(m,'d4',{start:t(13,15),title:"Envoi : nouvelles des groupes, prochain pas, prière à deux"});}},
+   {k:'B',label:'Prière pour les villes',desc:'Comme dans le doc.',fx:m=>{}},
+   {k:'C',label:'Les deux',desc:"Prière pour les villes, puis envoi avec un prochain pas et prière à deux.",fx:m=>{
+     set(m,'d3',{end:t(13,15)});set(m,'d4',{start:t(13,15),end:t(13,35)});
+     add(m,{id:'x7',day:2,start:t(13,35),end:t(14),title:'Envoi : prochain pas & prière à deux',cat:'priere'});}},
+  ]},
+];
+const DEC_ORDER_UI=['D1','D2','D3','D5','D4','D6'];
+const DEC_NUM={};DECISIONS.forEach((d,i)=>DEC_NUM[d.id]=i+1);
+
+const DEFAULT_STATE={"decisions": {"D1": "B", "D2": "A", "D3": "A", "D6": "C"}, "overrides": {"d1": {"cat": "repas", "day": 2, "end": 540, "note": "", "start": 480, "title": "Petit-déjeuner chez l'habitant"}, "d2": {"cat": "message", "day": 2, "end": 720, "note": "", "start": 600, "title": "Culte à l'Église Borny/FPC ? + Message 3 « Va et deviens » (Jean 17 ?)"}, "d3": {"day": 2, "end": 810, "start": 720}, "d4": {"day": 2, "end": 840, "start": 810}, "d5": {"day": 2, "end": 930, "start": 870}, "f1": {"day": 0, "end": 1020, "start": 960}, "f2": {"day": 0, "end": 1140, "start": 1020}, "f4": {"day": 0, "end": 1110, "start": 1080}, "s1": {"day": 1, "end": 555, "start": 510}, "s10": {"day": 1, "end": 1200, "start": 1125}, "s11": {"cat": "message", "day": 1, "end": 1275, "note": "", "start": 1215, "title": "sketch + Message 2 « Suis-moi » (Luc 5)"}, "s12": {"day": 1, "end": 1350, "start": 1275}, "s2": {"day": 1, "end": 510, "start": 480}, "s3": {"cat": "accueil", "day": 1, "end": 570, "note": "", "start": 555, "title": "Accueil des arrivants du samedi"}, "s4": {"day": 1, "end": 690, "start": 570}, "s5": {"day": 1, "end": 715, "start": 690}, "s6": {"day": 1, "end": 840, "start": 735}, "s7": {"cat": "sport", "day": 1, "end": 945, "note": "", "start": 840, "title": "Grand jeu ou Sports & balade"}, "s8": {"day": 1, "end": 975, "start": 945}, "s9": {"day": 1, "end": 1075, "start": 1010}, "x1": {"day": 0, "end": 1200, "start": 1110}, "x2": {"day": 0, "end": 1245, "start": 1200}, "x7": {"day": 2, "end": 865, "start": 840}}, "custom": [{"cat": "repas", "day": 0, "end": 1200, "id": "cmvexmqia", "note": "", "start": 1140, "title": "Repas tiré du sac"}, {"cat": "temoignage", "day": 0, "end": 1320, "id": "cmvexuxhk", "note": "", "start": 1245, "title": "Soirée d'intro + louange + 1 témoignage"}, {"cat": "libre", "day": 0, "end": 1395, "id": "cmveyfo8g", "note": "", "start": 1380, "title": "Dernier départ"}, {"cat": "temoignage", "day": 1, "end": 1005, "id": "cmveyrwza", "note": "", "start": 990, "title": "Témoignage"}, {"cat": "libre", "day": 1, "end": 1440, "id": "cmvf04jfr", "note": "", "start": 1430, "title": "Dernier départ"}], "deleted": ["f3"]};
+let state=JSON.parse(JSON.stringify(DEFAULT_STATE));
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+function baseModel(decs){
+  const m=clone(BASE);
+  for(const d of DECISIONS){const k=decs[d.id];if(!k)continue;const o=d.opts.find(x=>x.k===k);if(o)o.fx(m);}
+  return m;
+}
+function model(){
+  let m=baseModel(state.decisions).filter(b=>!state.deleted.includes(b.id));
+  m=m.map(b=>Object.assign(b,state.overrides[b.id]||{}));
+  for(const c of state.custom) if(!state.deleted.includes(c.id)) m.push(clone(c));
+  return m;
+}
+function blockDecisions(id){return DECISIONS.filter(d=>d.blocks.includes(id)).map(d=>d.id)}
+
+/* ---------- persistance ---------- */
+let db=null, ref=null, saveTimer=null, dragging=false, pendingRemote=null, mode='local';
+const saveEl=document.getElementById('save'),saveTxt=document.getElementById('saveTxt');
+function setSave(txt,pending){saveTxt.textContent=txt;saveEl.classList.toggle('pending',!!pending)}
+function loadLocal(){try{const s=localStorage.getItem('we-planning-v1');if(s)state=Object.assign(state,JSON.parse(s))}catch(e){}}
+function persist(){
+  setSave('Enregistrement…',true);
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const body=Object.assign(clone(state),{updatedAt:new Date().toISOString()});
+    try{localStorage.setItem('we-planning-v1',JSON.stringify(state))}catch(e){}
+    if(ref){
+      try{await ref.set(body);setSave('Enregistré · partagé avec l\'équipe')}
+      catch(e){if(e&&e.code==='unavailable'){setTimeout(()=>ref.set(body).then(()=>setSave('Enregistré · partagé avec l\'équipe')).catch(()=>setSave('Pas enregistré en ligne, réessaie',true)),800)}else setSave('Pas enregistré en ligne : '+(e&&e.message||'erreur'),true)}
+    }else setSave('Enregistré dans ce navigateur');
+  },500);
+}
+function applyRemote(d){
+  if(!d)return;
+  const nx={decisions:d.decisions||{},overrides:d.overrides||{},custom:d.custom||[],deleted:d.deleted||[]};
+  if(JSON.stringify(nx)===JSON.stringify(state))return;
+  state={decisions:d.decisions||{},overrides:d.overrides||{},custom:d.custom||[],deleted:d.deleted||[]};
+  render();
+}
+
+/* ---------- rendu ---------- */
+const cal=document.getElementById('cal');
+const H=(END-START)*PPM;
+function layoutDay(blocks){
+  const arr=blocks.slice().sort((a,b)=>a.start-b.start||b.end-a.end);
+  let cluster=[],clusterEnd=-1;const out=[];
+  const flush=()=>{const cols=[];for(const b of cluster){let c=0;while(cols[c]&&cols[c]>b.start)c++;cols[c]=b.end;b._col=c}const n=cols.length;for(const b of cluster)b._n=n;out.push(...cluster);cluster=[]};
+  for(const b of arr){if(b.start>=clusterEnd&&cluster.length)flush();cluster.push(b);clusterEnd=Math.max(clusterEnd,b.end);if(cluster.length===1)clusterEnd=b.end}
+  if(cluster.length)flush();return out;
+}
+let flashIds=new Set();
+function render(){
+  const m=model();
+  let html='<div class="days-head"><div></div>'+DAYS.map(d=>`<div>${d.n}<small>${d.s}</small></div>`).join('')+'</div>';
+  html+=`<div class="grid" style="height:${H}px"><div class="hours">`;
+  for(let h=8;h<24;h++)html+=`<span style="top:${(h*60-START)*PPM}px">${h}h</span>`;
+  html+='</div>';
+  for(let d=0;d<3;d++){
+    html+=`<div class="col" data-day="${d}">`;
+    for(let mm=START+30;mm<END;mm+=30)html+=`<div class="hl ${mm%60?'':'h'}" style="top:${(mm-START)*PPM}px"></div>`;
+    for(const b of layoutDay(m.filter(x=>x.day===d))){
+      const top=(b.start-START)*PPM,h=Math.max(16,(b.end-b.start)*PPM-2);
+      const w=100/b._n,left=w*b._col;
+      const open=blockDecisions(b.id).filter(id=>!state.decisions[id]);
+      const chip=open.length?`<span class="chip" data-goto="${open[0]}" title="Choix à trancher">C${DEC_NUM[open[0]]}</span>`:'';
+      const short=(b.end-b.start)<=30;
+      html+=`<div class="block${(b.end-b.start)<=20?' tiny':''}${flashIds.has(b.id)?' flash':''}" tabindex="0" role="button" aria-label="${esc(b.title)}, ${DAYS[b.day].n}, ${fmt(b.start)} à ${fmt(b.end)}" data-id="${b.id}" style="top:${top}px;height:${h}px;left:calc(${left}% + 3px);width:calc(${w}% - 6px);background:var(--c-${b.cat});border-color:var(--b-${b.cat})">
+        <span class="rz top" data-rz="top"></span>${chip}
+        <span class="t" style="${open.length?'padding-right:26px':''}">${short?`<span style="font-weight:400;opacity:.8">${fmt(b.start)}</span> `:''}${esc(b.title)}</span>
+        ${short?'':`<span class="tm">${fmt(b.start)} – ${fmt(b.end)}</span>`}
+        ${b.note&&(b.end-b.start)>=60?`<span class="nt">${esc(b.note)}</span>`:''}
+        <span class="rz bot" data-rz="bot"></span></div>`;
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+  cal.innerHTML=html;
+  renderDecisions();
+  if(flashIds.size)setTimeout(()=>{flashIds=new Set()},1900);
+}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+const decsEl=document.getElementById('decs');
+function renderDecisions(){
+  const done=DECISIONS.filter(d=>state.decisions[d.id]).length;
+  document.getElementById('decCount').textContent=`${done} / ${DECISIONS.length} tranchés`;
+  decsEl.innerHTML=DECISIONS.map(d=>{
+    const cur=state.decisions[d.id];
+    return `<section class="dec${cur?' done':''}" id="dec-${d.id}">
+      <div class="dec-top"><span class="num">C${DEC_NUM[d.id]}</span><div style="flex:1;min-width:0"><div class="status">${cur?'Tranché':'À trancher'}</div><h3>${esc(d.q)}</h3></div></div>
+      <details><summary>Voir les commentaires (${d.quotes.length})</summary><div class="quotes">${d.quotes.map(q=>`<q>${esc(q)}</q>`).join('')}</div></details>
+      <div class="opts" role="radiogroup" aria-label="${esc(d.q)}">${d.opts.map(o=>`<button type="button" class="opt" role="radio" aria-checked="${cur===o.k}" data-dec="${d.id}" data-opt="${o.k}"><span class="dot"></span><span style="min-width:0"><b>${esc(o.label)}</b><span>${esc(o.desc)}</span></span></button>`).join('')}</div>
+      ${cur?`<button type="button" class="linkish" data-clear="${d.id}">Remettre à trancher</button>`:''}
+    </section>`}).join('');
+}
+function chooseDecision(did,k){
+  const before=baseModel(state.decisions);
+  const next=Object.assign({},state.decisions);
+  if(k)next[did]=k;else delete next[did];
+  const after=baseModel(next);
+  const changed=new Set();
+  const key=b=>JSON.stringify([b.day,b.start,b.end,b.title,b.cat,b.note||'']);
+  const mb=new Map(before.map(b=>[b.id,key(b)])),ma=new Map(after.map(b=>[b.id,key(b)]));
+  for(const [id,v] of ma)if(mb.get(id)!==v)changed.add(id);
+  for(const id of mb.keys())if(!ma.has(id))changed.add(id);
+  let cleared=0;
+  for(const id of changed){if(state.overrides[id]){delete state.overrides[id];cleared++}}
+  state.decisions=next;
+  flashIds=new Set([...changed].filter(id=>ma.has(id)));
+  render();persist();
+  const n=changed.size;
+  toast(n?`${n} bloc${n>1?'s':''} mis à jour${cleared?' (tes retouches manuelles sur ces blocs ont été remplacées)':''}`:'Planning inchangé');
+}
+decsEl.addEventListener('click',e=>{
+  const o=e.target.closest('.opt');if(o){chooseDecision(o.dataset.dec,o.dataset.opt);return}
+  const c=e.target.closest('[data-clear]');if(c)chooseDecision(c.dataset.clear,null);
+});
+
+/* ---------- modification d'un bloc ---------- */
+function updateBlock(id,patch){
+  const c=state.custom.find(b=>b.id===id);
+  if(c)Object.assign(c,patch);else state.overrides[id]=Object.assign({},state.overrides[id]||{},patch);
+}
+function deleteBlock(id){
+  const i=state.custom.findIndex(b=>b.id===id);
+  if(i>=0)state.custom.splice(i,1);else if(!state.deleted.includes(id))state.deleted.push(id);
+  delete state.overrides[id];
+}
+
+/* ---------- glisser / redimensionner ---------- */
+let drag=null;
+function minutesAt(clientY){const r=cal.querySelector('.grid').getBoundingClientRect();return START+(clientY-r.top)/PPM}
+function dayAt(clientX){const cols=[...cal.querySelectorAll('.col')];for(const c of cols){const r=c.getBoundingClientRect();if(clientX>=r.left&&clientX<r.right)return +c.dataset.day}
+  const f=cols[0].getBoundingClientRect(),l=cols[2].getBoundingClientRect();return clientX<f.left?0:clientX>=l.right?2:null}
+const snap=v=>Math.round(v/SNAP)*SNAP;
+cal.addEventListener('pointerdown',e=>{
+  if(e.button!==0)return;
+  if(e.target.closest('.chip'))return;
+  const el=e.target.closest('.block');if(!el)return;
+  const b=model().find(x=>x.id===el.dataset.id);if(!b)return;
+  const rz=e.target.dataset.rz||null;
+  drag={id:b.id,orig:{day:b.day,start:b.start,end:b.end},mode:rz||'move',x0:e.clientX,y0:e.clientY,m0:minutesAt(e.clientY),moved:false,cur:null,pid:e.pointerId};
+  cal.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+cal.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.pid)return;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)<5)return;
+  drag.moved=true;dragging=true;
+  const dm=snap(minutesAt(e.clientY)-drag.m0);const o=drag.orig;let p;
+  if(drag.mode==='move'){const len=o.end-o.start;let s=Math.min(Math.max(o.start+dm,START),END-len);const d=dayAt(e.clientX);p={day:d==null?o.day:d,start:s,end:s+len}}
+  else if(drag.mode==='top'){p={day:o.day,start:Math.min(Math.max(o.start+dm,START),o.end-SNAP*2),end:o.end}}
+  else{p={day:o.day,start:o.start,end:Math.max(Math.min(o.end+dm,END),o.start+SNAP*2)}}
+  drag.cur=p;
+  const el=cal.querySelector(`.block[data-id="${drag.id}"]`);
+  if(el){
+    const col=cal.querySelector(`.col[data-day="${p.day}"]`);
+    if(el.parentNode!==col)col.appendChild(el);
+    el.classList.add('dragging');el.style.top=(p.start-START)*PPM+'px';el.style.height=Math.max(16,(p.end-p.start)*PPM-2)+'px';
+    if(drag.mode==='move'){el.style.left='3px';el.style.width='calc(100% - 6px)'}
+    const tm=el.querySelector('.tm');if(tm)tm.textContent=fmt(p.start)+' – '+fmt(p.end);else{const tt=el.querySelector('.t span');if(tt)tt.textContent=fmt(p.start)}
+  }
+});
+function endDrag(e){
+  if(!drag||e.pointerId!==drag.pid)return;
+  const d=drag;drag=null;dragging=false;
+  try{cal.releasePointerCapture(e.pointerId)}catch(_){}
+  if(!d.moved){if(e.type==='pointerup')openEditor(d.id);return}
+  if(d.cur){updateBlock(d.id,d.cur);persist()}
+  render();
+}
+cal.addEventListener('pointerup',endDrag);cal.addEventListener('pointercancel',endDrag);
+cal.addEventListener('click',e=>{const c=e.target.closest('.chip');if(c){goto(c.dataset.goto)}});
+cal.addEventListener('keydown',e=>{const el=e.target.closest('.block');if(el&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openEditor(el.dataset.id)}});
+cal.addEventListener('dblclick',e=>{
+  if(e.target.closest('.block'))return;const col=e.target.closest('.col');if(!col)return;
+  const s=Math.min(Math.max(Math.floor(minutesAt(e.clientY)/15)*15,START),END-60);
+  openEditor(null,{day:+col.dataset.day,start:s,end:s+60,title:'',cat:'atelier'});
+});
+function goto(did){const el=document.getElementById('dec-'+did);if(!el)return;el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});el.classList.add('focus');setTimeout(()=>el.classList.remove('focus'),1600)}
+
+/* ---------- éditeur ---------- */
+const dlg=document.getElementById('dlg'),fT=document.getElementById('fTitle'),fD=document.getElementById('fDay'),fS=document.getElementById('fStart'),fE=document.getElementById('fEnd'),fC=document.getElementById('fCat'),fN=document.getElementById('fNote'),fErr=document.getElementById('fErr');
+fC.innerHTML=Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+let editing=null;
+function resetDel(){document.getElementById('delZone').innerHTML='<button class="btn danger" type="button" id="delBtn">Supprimer</button>'}
+function openEditor(id,preset){
+  const b=id?model().find(x=>x.id===id):preset;if(!b)return;
+  editing=id;resetDel();document.getElementById('delZone').hidden=!id;
+  document.getElementById('edTitle').textContent=id?'Modifier le bloc':'Nouveau bloc';
+  fT.value=b.title||'';fD.value=b.day;fS.value=toInput(b.start);fE.value=b.end>=END?'23:55':toInput(b.end);fC.value=b.cat||'atelier';fN.value=b.note||'';fErr.hidden=true;
+  dlg.showModal();setTimeout(()=>fT.focus(),30);
+}
+document.getElementById('edForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const s=fromInput(fS.value);let en=fromInput(fE.value);
+  if(en!==null&&en===t(23,55))en=END;
+  if(s===null||en===null||en<=s){fErr.textContent="L'heure de fin doit être après l'heure de début.";fErr.hidden=false;return}
+  if(s<START){fErr.textContent='Le planning commence à 7h.';fErr.hidden=false;return}
+  const p={title:fT.value.trim()||'Sans titre',day:+fD.value,start:s,end:en,cat:fC.value,note:fN.value.trim()};
+  if(editing){updateBlock(editing,p);flashIds=new Set([editing])}
+  else{const id='c'+Date.now().toString(36);state.custom.push(Object.assign({id},p));flashIds=new Set([id])}
+  dlg.close();render();persist();
+});
+document.getElementById('cancelBtn').addEventListener('click',()=>dlg.close());
+document.getElementById('delZone').addEventListener('click',e=>{
+  const z=document.getElementById('delZone');
+  if(e.target.id==='delBtn'){z.innerHTML='<span class="confirm">Supprimer ce bloc ? <button class="btn danger" type="button" id="delYes">Oui, supprimer</button><button class="btn" type="button" id="delNo">Non</button></span>'}
+  else if(e.target.id==='delYes'){deleteBlock(editing);dlg.close();render();persist();toast('Bloc supprimé')}
+  else if(e.target.id==='delNo')resetDel();
+});
+document.getElementById('addBtn').addEventListener('click',()=>openEditor(null,{day:1,start:t(10),end:t(11),title:'',cat:'atelier'}));
+
+/* ---------- réinitialiser ---------- */
+const rz=document.getElementById('resetZone');
+rz.addEventListener('click',e=>{
+  if(e.target.id==='resetBtn')rz.innerHTML='<span class="confirm">Annuler tes changements et revenir au planning de départ ? <button class="btn danger" type="button" id="rYes">Oui</button><button class="btn" type="button" id="rNo">Non</button></span>';
+  else if(e.target.id==='rYes'){state=JSON.parse(JSON.stringify(DEFAULT_STATE));render();persist();restoreReset();toast('Planning remis à la version de départ')}
+  else if(e.target.id==='rNo')restoreReset();
+});
+function restoreReset(){rz.innerHTML='<button class="btn ghost" id="resetBtn" type="button">Revenir au planning de départ</button>'}
+
+/* ---------- export texte ---------- */
+document.getElementById('copyBtn').addEventListener('click',async()=>{
+  const m=model();let txt='Week-end régional GBU Grand Est · 27–29 novembre 2026\n';
+  DAYS.forEach((d,i)=>{txt+='\n'+d.n.toUpperCase()+'\n';m.filter(b=>b.day===i).sort((a,b)=>a.start-b.start).forEach(b=>{txt+=`${fmt(b.start)}–${fmt(b.end)} · ${b.title}${b.note?' ('+b.note+')':''}\n`})});
+  const open=DECISIONS.filter(d=>!state.decisions[d.id]);
+  if(open.length)txt+='\nÀ trancher : '+open.map(d=>d.q).join(' / ')+'\n';
+  try{await navigator.clipboard.writeText(txt);toast('Planning copié')}
+  catch(_){const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;inset:20px;height:60vh;z-index:60';document.body.appendChild(ta);ta.select();toast('Sélectionné : copie avec Ctrl+C, puis clique ailleurs');ta.addEventListener('blur',()=>ta.remove())}
+});
+
+let toastT;function toast(msg){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3200)}
+
+document.getElementById('legend').innerHTML=Object.entries(CATS).map(([k,v])=>`<span><b style="background:var(--c-${k});border-color:var(--b-${k})"></b>${v}</span>`).join('');
+
+
+/* ---------- vues ---------- */
+const vAg=document.getElementById('v-agenda'),vDe=document.getElementById('v-detail');
+function showView(v){vAg.hidden=v!=='agenda';vDe.hidden=v!=='detail';document.querySelectorAll('.vtab').forEach(b=>{const on=b.dataset.v===v;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+  document.getElementById('addBtn').hidden=v!=='agenda';document.getElementById('copyBtn').hidden=v!=='agenda';document.getElementById('resetZone').hidden=v!=='agenda';
+  document.getElementById('subTxt').textContent=v==='agenda'?"Glisse un bloc pour le déplacer, tire son bord haut ou bas pour changer l'horaire, clique dessus pour le modifier. Double-clic sur une case vide pour ajouter un bloc.":"Le déroulé détaillé pour l'équipe, partagé et modifiable par tous.";try{localStorage.setItem('we-planning-view',v)}catch(e){} if(v==='detail')renderDetail()}
+document.querySelectorAll('.vtab').forEach(b=>b.onclick=()=>showView(b.dataset.v));
+
+/* ---------- planning détaillé ---------- */
+const DEFAULT_DETAIL={"note": "Feuille d'urgence pour l'équipe (numéros utiles, pharmacie, adresses des hôtes)", "days": [{"pres": "", "rows": [{"c": "equipe", "d": "Clés : voir avec le lieu", "h": "16h00", "id": "s001", "q": "Prise des locaux", "w": "Edmond"}, {"c": "equipe", "d": "Sono S&Metz : vérifier à partir de quand on peut la récupérer", "h": "16h00-17h00", "id": "s002", "q": "Installation sono & projecteur", "w": "Edmond, Marion"}, {"c": "louange", "d": "", "h": "17h00-19h00", "id": "s003", "q": "Répétition louange // répétition sketch", "w": "Cynthia, Romuald · équipe sketch"}, {"c": "equipe", "d": "Idéalement avec les intercesseurs", "h": "18h00-18h30", "id": "s004", "q": "Point d'équipe & prière", "w": "Orga : Edmond, Eléa, Marion"}, {"c": "accueil", "d": "Liste des inscrits, badges, répartition chez l'habitant", "h": "18h30-20h00", "id": "s005", "q": "Arrivée des participants, accueil au stand", "w": "Pôle hébergement"}, {"c": "repas", "d": "Prévoir tables, eau, poubelles", "h": "19h00-20h00", "id": "s006", "q": "Repas tiré du sac", "w": "Tous"}, {"c": "sport", "d": "", "h": "20h00-20h45", "id": "s007", "q": "Jeux brise-glace", "w": "Pôle jeux & brise-glace"}, {"c": "temoignage", "d": "Présenter le thème Rencontré · Appelé · Envoyé", "h": "20h45-22h00", "id": "s008", "q": "Soirée d'intro : louange + 1 témoignage", "w": "Louange : Cynthia, Romuald · témoignage : ?"}, {"c": "libre", "d": "Organiser les trajets vers les familles", "h": "22h00-23h00", "id": "s009", "q": "Libre, départs chez l'habitant", "w": "Pôle hébergement"}, {"c": "libre", "d": "", "h": "23h00", "id": "s010", "q": "Dernier départ", "w": ""}]}, {"pres": "", "rows": [{"c": "equipe", "d": "", "h": "08h00-08h30", "id": "s011", "q": "Finalisation & prière (équipe)", "w": "Orga"}, {"c": "repas", "d": "", "h": "08h30-09h15", "id": "s012", "q": "Petit-déjeuner", "w": "Cuisine (Elisa)"}, {"c": "accueil", "d": "Liste, badges, répartition chez l'habitant", "h": "09h15-09h30", "id": "s013", "q": "Accueil des arrivants du samedi", "w": "Pôle hébergement"}, {"c": "accueil", "d": "Lever les participants par ville + 1re fois à un WE GBU", "h": "09h30-09h35", "id": "s014", "q": "Accueil et annonces", "w": "Présidence"}, {"c": "louange", "d": "Passage des slides : qui ? (PC + projecteur)", "h": "09h35-10h00", "id": "s015", "q": "Louange", "w": "Cynthia, Romuald"}, {"c": "message", "d": "", "h": "10h00-10h10", "id": "s016", "q": "Sketch", "w": "Équipe sketch"}, {"c": "message", "d": "", "h": "10h10-10h20", "id": "s017", "q": "Introduction au thème & présentation de l'orateur", "w": "Orga + orateur"}, {"c": "message", "d": "Groupes DAB et feuilles de questions · 1 projecteur + 1 de rechange", "h": "10h20-11h30", "id": "s018", "q": "Message 1 « Viens et vois » en DAB (Jean 4)", "w": "Orateur + animateurs DAB"}, {"c": "atelier", "d": "QR code, wifi, liste des salles", "h": "11h30-11h55", "id": "s019", "q": "Présentation des ateliers & choix (QR code)", "w": "Pôle ateliers"}, {"c": "repas", "d": "Demander des volontaires pour la vaisselle", "h": "12h15", "id": "s020", "q": "Repas", "w": "Cuisine"}, {"c": "equipe", "d": "Tour de table sur les enjeux du message, répartition des ateliers", "h": "13h15", "id": "s021", "q": "Café-débriefing équipe & prière", "w": "Équipe"}, {"c": "sport", "d": "Trousse de secours", "h": "14h00-15h45", "id": "s022", "q": "Grand jeu ou sports & balade", "w": "Pôle jeux & sport"}, {"c": "repas", "d": "// répétition louange", "h": "15h45-16h15", "id": "s023", "q": "Quatre-heures, pause // douches", "w": "Cuisine"}, {"c": "temoignage", "d": "", "h": "16h30-16h45", "id": "s024", "q": "Témoignage (conversion)", "w": "?"}, {"c": "atelier", "d": "Chaque participant se présente au début de l'atelier", "h": "16h50-17h55", "id": "s025", "q": "Ateliers au choix (1 créneau)", "w": "Intervenants des ateliers"}, {"c": "equipe", "d": "", "h": "17h55-18h10", "id": "s026", "q": "Débriefing ateliers", "w": "Pôle ateliers + équipe"}, {"c": "repas", "d": "Donner rendez-vous à 20h15", "h": "18h45", "id": "s027", "q": "Repas", "w": "Cuisine"}, {"c": "message", "d": "", "h": "20h15-20h25", "id": "s028", "q": "Sketch", "w": "Équipe sketch"}, {"c": "message", "d": "", "h": "20h25-21h15", "id": "s029", "q": "Message 2 « Suis-moi » (Luc 5)", "w": "Orateur"}, {"c": "louange", "d": "", "h": "21h15-22h30", "id": "s030", "q": "Soirée louange, témoignages libres, prière", "w": "Louange + intercesseurs"}, {"c": "libre", "d": "Jeux de société", "h": "22h30-23h30", "id": "s031", "q": "Libre", "w": ""}, {"c": "libre", "d": "", "h": "23h50", "id": "s032", "q": "Dernier départ chez l'habitant", "w": "Pôle hébergement"}]}, {"pres": "", "rows": [{"c": "repas", "d": "", "h": "08h00-09h00", "id": "s033", "q": "Petit-déjeuner chez l'habitant", "w": "Hôtes"}, {"c": "equipe", "d": "Bagages dans les voitures · un groupe installe les chaises", "h": "09h00-09h45", "id": "s034", "q": "Trajets vers l'église, installation", "w": "Pôle hébergement"}, {"c": "message", "d": "Louange du culte à voir avec l'église", "h": "10h00-12h00", "id": "s035", "q": "Culte à l'Église de Borny/FPC ? + Message 3 « Va et deviens » (Jean 17 ?)", "w": "Orateur · coordination du culte : ?"}, {"c": "repas", "d": "Fin du repas : la présidence fait les annonces", "h": "12h00-13h30", "id": "s036", "q": "Repas tous ensemble", "w": "Cuisine"}, {"c": "priere", "d": "", "h": "13h30-14h00", "id": "s037", "q": "Temps de prière pour les villes", "w": "Intercesseurs"}, {"c": "priere", "d": "1 point que je retiens du WE · sondage de retour", "h": "14h00-14h25", "id": "s038", "q": "Envoi : prochain pas & prière à deux", "w": "Orga"}, {"c": "priere", "d": "", "h": "14h25-14h30", "id": "s039", "q": "Conclusion & bénédiction", "w": ""}, {"c": "equipe", "d": "Objets trouvés", "h": "14h30-15h30", "id": "s040", "q": "Nettoyage", "w": "Équipe"}, {"c": "equipe", "d": "", "h": "15h30-16h00", "id": "s041", "q": "Débriefing à chaud", "w": "Équipe"}]}]};
+let detail=JSON.parse(JSON.stringify(DEFAULT_DETAIL));
+let dref=null,dTimer=null,dPending=null;
+const detEl=document.getElementById('det');
+const rid=()=>'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function loadDetailLocal(){try{const s=localStorage.getItem('we-planning-detail-v1');if(s)detail=JSON.parse(s)}catch(e){}}
+function saveDetail(){
+  setSave('Enregistrement…',true);clearTimeout(dTimer);
+  dTimer=setTimeout(async()=>{
+    try{localStorage.setItem('we-planning-detail-v1',JSON.stringify(detail))}catch(e){}
+    if(dref){try{await dref.set(Object.assign(JSON.parse(JSON.stringify(detail)),{updatedAt:new Date().toISOString()}));setSave("Enregistré · partagé avec l'équipe")}catch(e){setSave('Pas enregistré en ligne, réessaie',true)}}
+    else setSave('Enregistré dans ce navigateur');
+  },600);
+}
+function catSel(c){return '<select data-k="c" aria-label="Type">'+Object.entries(CATS).map(([k,v])=>`<option value="${k}"${k===c?' selected':''}>${v}</option>`).join('')+'</select>'}
+function renderDetail(){
+  document.getElementById('dNote').value=detail.note||'';
+  const empty=detail.days.every(d=>!d.rows.length);
+  detEl.innerHTML=(empty?`<p class="hint" style="margin:10px 0">Le planning détaillé est vide pour l'instant. Ajoute une ligne dans un jour pour commencer.</p>`:'')+'<div class="dlist">'+DAYS.map((D,di)=>{
+    const d=detail.days[di]||{pres:'',rows:[]};
+    return `<section class="dday"><div class="ddayh"><h3>${D.n}</h3><label class="pres">Présidence<input data-day="${di}" data-k="pres" value="${esc(d.pres||'')}" placeholder="Qui anime la journée ?"></label></div>
+    <div class="dscroll"><table class="dt"><thead><tr><th class="cc"></th><th class="ch">Heure</th><th class="cq">Quoi ?</th><th class="cw">Qui ?</th><th>Détails</th><th class="ct">Type</th><th class="cx"></th></tr></thead><tbody>
+    ${d.rows.map((r,ri)=>`<tr data-day="${di}" data-i="${ri}"><td class="cc"><i style="background:var(--b-${r.c||'equipe'})"></i></td>
+      <td class="ch"><input data-k="h" value="${esc(r.h)}" aria-label="Heure" placeholder="10h00-10h30"></td>
+      <td class="cq"><textarea data-k="q" rows="1" aria-label="Quoi">${esc(r.q)}</textarea></td>
+      <td class="cw"><textarea data-k="w" rows="1" aria-label="Qui">${esc(r.w)}</textarea></td>
+      <td><textarea data-k="d" rows="1" aria-label="Détails">${esc(r.d)}</textarea></td>
+      <td class="ct">${catSel(r.c)}</td>
+      <td class="cx"><button type="button" class="rx" data-act="del" aria-label="Supprimer la ligne" title="Supprimer la ligne">×</button></td></tr>`).join('')}
+    </tbody></table></div><div class="dadd"><button type="button" class="btn" data-act="add" data-day="${di}">+ Ajouter une ligne</button><button type="button" class="btn ghost" data-act="sort" data-day="${di}">Trier par heure</button></div></section>`}).join('')+'</div>';
+}
+detEl.addEventListener('input',e=>{
+  const el=e.target,k=el.dataset.k;if(!k)return;
+  if(k==='pres'){detail.days[+el.dataset.day].pres=el.value;saveDetail();return}
+  const tr=el.closest('tr');if(!tr)return;const r=detail.days[+tr.dataset.day].rows[+tr.dataset.i];
+  r[k]=el.value; if(k==='c')tr.querySelector('.cc i').style.background=`var(--b-${el.value})`;
+  saveDetail();
+});
+detEl.addEventListener('change',e=>{if(e.target.dataset.k==='c'){}});
+detEl.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const act=b.dataset.act;
+  if(act==='add'){const di=+b.dataset.day;detail.days[di].rows.push({id:rid(),h:'',q:'',w:'',d:'',c:'equipe'});renderDetail();saveDetail();
+    const rows=detEl.querySelectorAll(`tr[data-day="${di}"]`);const last=rows[rows.length-1];if(last)last.querySelector('input').focus();return}
+  if(act==='sort'){const di=+b.dataset.day;const key=h=>{const m=(h||'').match(/(\d{1,2})h(\d{0,2})/);return m?(+m[1]<5?+m[1]+24:+m[1])*60+(+m[2]||0):9999};
+    detail.days[di].rows.sort((a,c)=>key(a.h)-key(c.h));renderDetail();saveDetail();return}
+  if(act==='del'){if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Supprimer ?';setTimeout(()=>{if(b.isConnected){b.classList.remove('sure');b.textContent='×'}},3000);return}
+    const tr=b.closest('tr');detail.days[+tr.dataset.day].rows.splice(+tr.dataset.i,1);renderDetail();saveDetail();toast('Ligne supprimée')}
+});
+detEl.addEventListener('focusout',()=>{setTimeout(()=>{if(dPending&&!detEl.contains(document.activeElement)){detail=dPending;dPending=null;if(!vDe.hidden)renderDetail()}},50)});
+document.getElementById('dNote').addEventListener('input',e=>{detail.note=e.target.value;saveDetail()});
+document.getElementById('dCopy').addEventListener('click',async()=>{
+  const clean=v=>String(v||'').replace(/\t|\n/g,' ');
+  let out='WE régional GBU Grand Est 2026\n'+(detail.note?'\t\t\t'+clean(detail.note)+'\n':'');
+  DAYS.forEach((D,di)=>{const d=detail.days[di];out+=`\n${D.n}\tQuoi ?\tQui ?\tDétails\n`;if(d.pres)out+=`\tPrésidence\t${clean(d.pres)}\n`;d.rows.forEach(r=>{out+=`${clean(r.h)}\t${clean(r.q)}\t${clean(r.w)}\t${clean(r.d)}\n`})});
+  try{await navigator.clipboard.writeText(out);toast('Copié : colle-le dans Google Sheets')}
+  catch(_){const ta=document.createElement('textarea');ta.value=out;ta.style.cssText='position:fixed;inset:20px;height:60vh;z-index:60';document.body.appendChild(ta);ta.select();toast('Sélectionné : copie avec Ctrl+C, puis clique ailleurs');ta.addEventListener('blur',()=>ta.remove())}
+});
+/* ---------- démarrage ---------- */
+loadLocal();loadDetailLocal();render();setSave('Enregistré dans ce navigateur');
+try{if(localStorage.getItem('we-planning-view')==='detail')showView('detail')}catch(e){}
+/* intégré dans la page d'orga : hauteur transmise à la page parente */
+const EMB=window.self!==window.top;
+if(EMB){document.documentElement.classList.add('emb');
+  const send=()=>{try{parent.postMessage({wePlanningHeight:document.documentElement.scrollHeight},'*')}catch(e){}};
+  new ResizeObserver(send).observe(document.body);window.addEventListener('load',send);setTimeout(send,300);}
+})();
+</script>
+</body>
+</html>

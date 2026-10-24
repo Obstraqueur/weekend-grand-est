@@ -209,12 +209,16 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 
   <nav class="tabs" role="tablist" aria-label="Pages">
     <button type="button" class="tab" role="tab" id="t-carte" data-p="carte">Carte</button>
+    <button type="button" class="tab" role="tab" id="t-planning" data-p="planning">Planning</button>
     <button type="button" class="tab" role="tab" id="t-taches" data-p="taches">À faire</button>
     <button type="button" class="tab" role="tab" id="t-logement" data-p="logement">Logement</button>
     <button type="button" class="tab" role="tab" id="t-budget" data-p="budget">Budget</button>
     <button type="button" class="tab" role="tab" id="t-ateliers" data-p="ateliers">Ateliers</button>
   </nav>
 
+  <section id="p-planning" class="page" hidden>
+    <iframe id="planFrame" title="Planning du week-end : agenda et planning détaillé" data-src="planning.html" style="width:100%;border:0;display:block;min-height:900px;background:transparent"></iframe>
+  </section>
   <section id="p-taches" class="page" hidden>
     <div class="phead"><div><h2>À faire</h2><p class="muted">La Check list WER, mise à jour avec tout ce que vous avez décidé. Coche une tâche quand elle est faite.</p></div></div>
     <div class="fchips" id="taskCounts"></div>
@@ -406,12 +410,13 @@ function renderAteliers(){
     return `<div class="acat"><h4><span class="cdot" style="background:${c}"></span>${n}<small>${items.length}</small></h4><ul>${items.map(a=>`<li><span>${a.t}${a.aka.length?`<small>Aussi proposé : ${a.aka.join(" · ")}</small>`:""}</span>${nv?`<span class="vc">${counts[a.id]||0} vote${(counts[a.id]||0)>1?"s":""}</span>`:""}</li>`).join("")}</ul></div>`}).join("")||`<p class="muted">Aucun atelier ne correspond.</p>`;
 }
 document.getElementById("aSearch").oninput=e=>{aQ=e.target.value;renderAteliers()};
-const PAGES=["carte","taches","logement","budget","ateliers"];
+const PAGES=["carte","planning","taches","logement","budget","ateliers"];
+window.addEventListener("message",e=>{const h=e.data&&e.data.wePlanningHeight;if(h){const f=document.getElementById("planFrame");if(f&&e.source===f.contentWindow)f.style.height=Math.max(600,h+8)+"px"}});
 function showPage(id){
   if(!PAGES.includes(id)) id="carte";
   PAGES.forEach(p=>{document.getElementById("p-"+p).hidden=p!==id;const t=document.getElementById("t-"+p);t.classList.toggle("on",p===id);t.setAttribute("aria-selected",p===id)});
   try{localStorage.setItem(KEY+".page",id)}catch(e){}
-  if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget(); if(id==="ateliers")renderAteliers();
+  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget(); if(id==="ateliers")renderAteliers();
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showPage(t.dataset.p));
 
