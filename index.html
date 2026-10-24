@@ -170,6 +170,19 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 .rk.top .n{color:var(--accent)}
 .cdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
 @media (max-width:860px){.agrid{grid-template-columns:1fr}}
+.bpart .crow{grid-template-columns:200px minmax(0,1fr) 54px}
+@media (max-width:860px){.bpart .crow{grid-template-columns:120px minmax(0,1fr) 44px}}
+.subtabs{display:flex;gap:4px;margin:6px 0 4px;border-bottom:1px solid var(--line)}
+.stab{font:600 14px var(--body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer}
+.stab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.compta td.sec{font-family:var(--display);font-weight:800;font-size:1rem;padding-top:14px}
+.compta tr.rev td.sec{color:var(--new)}.compta tr.dep td.sec{color:#c0392b}
+.compta tr.tot td{font-weight:700;background:var(--accent-soft)}
+.compta tr.sub td{font-weight:600;background:var(--bg)}
+.compta td input{width:90px;font:600 14px var(--body);color:var(--ink);background:#fff8a8;border:1px solid var(--line);border-radius:6px;padding:4px 6px;text-align:right}
+:root[data-theme="dark"] .compta td input{background:#4a4520}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .compta td input{background:#4a4520}}
+.compta .pos{color:var(--new)}.compta .neg{color:#c0392b}
 .hgauge{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:grid;gap:8px}
 .hbar{display:grid;grid-template-columns:110px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:14px}
 .hbar .tr2{height:14px;background:var(--bg);border:1px solid var(--line);border-radius:7px;overflow:hidden}
@@ -231,7 +244,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <div class="kpis" id="hostKpi"></div>
     <div class="hgauge" id="hostGauge"></div>
     <div class="lgrid">
-      <div class="card"><h3 class="bh" style="margin-top:4px">Participants par ville</h3><p class="muted" style="margin:0 0 10px;font-size:13px">Les mêmes chiffres que dans l'onglet Budget : changer ici change aussi le budget.</p><div id="cities" class="cities"></div></div>
+      <div class="card"><h3 class="bh" style="margin-top:4px">Participants par ville</h3><p class="muted" style="margin:0 0 10px;font-size:13px">Pour estimer le nombre de lits à prévoir.</p><div id="cities" class="cities"></div></div>
       <div class="card"><h3 class="bh" style="margin-top:4px">Qui n'a pas besoin de lit ?</h3><div id="locals"></div></div>
     </div>
     <h3 class="bh">Foyers d'accueil</h3>
@@ -251,23 +264,26 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
   </section>
   <section id="p-budget" class="page" hidden>
-    <div class="phead"><div><h2>Budget</h2><p class="muted">Même calcul que l'onglet Budget de la Check list. Change une hypothèse, tout se recalcule.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="https://obstraqueur.github.io/weekend-grand-est/inscription/#infos" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Site d'inscription</a><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></div></div>
+    <div class="phead"><div><h2>Budget</h2><p class="muted">Repris du fichier « Budget WER EST 2026 ». Bouge un curseur ou change un montant : la simulation et le budget comptable se recalculent ensemble.</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="https://obstraqueur.github.io/weekend-grand-est/inscription/#infos" target="_blank" rel="noopener">Site d'inscription</a><button class="btn" type="button" id="bXlsx" style="background:var(--accent);border-color:var(--accent);color:#1b2433">Télécharger le budget (Excel)</button><span id="bResetZone"><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></span></div></div>
     <div class="kpis" id="bKpi"></div>
-    <div class="sim" id="bSim">
-      <div class="simtop">
-        <label for="simN"><b>Et si on est moins nombreux ?</b><span class="muted">Fais glisser pour changer le nombre total de participants, au prix de base fixé.</span></label>
-        <output id="simOut" for="simN"></output>
+    <nav class="subtabs" role="tablist" aria-label="Vues du budget">
+      <button type="button" class="stab on" role="tab" id="bt-sim" data-v="sim" aria-selected="true">Simulation</button>
+      <button type="button" class="stab" role="tab" id="bt-compta" data-v="compta" aria-selected="false">Budget comptable</button>
+    </nav>
+    <div id="bv-sim">
+      <h3 class="bh">Participants</h3>
+      <div class="card"><div id="bPart" class="cities bpart"></div></div>
+      <div class="sim" id="bSim" style="margin-top:16px">
+        <div class="simtop"><div><b>Et si on est moins nombreux ?</b><span class="muted" style="display:block;font-size:13px">Solde selon le nombre de participants payants, aux tarifs actuels.</span></div><span class="simres" id="simRes"></span></div>
+        <svg id="simChart" viewBox="0 0 1100 170" role="img" aria-label="Solde selon le nombre de participants"></svg>
       </div>
-      <input type="range" id="simN" min="6" max="50" step="1" value="50">
-      <div class="simres" id="simRes"></div>
-      <svg id="simChart" viewBox="0 0 1100 170" role="img" aria-label="Solde selon le nombre de participants"></svg>
+      <h3 class="bh">Tarifs et coûts</h3>
+      <div class="binputs" id="bInputs"></div>
     </div>
-    <h3 class="bh">Hypothèses</h3>
-    <div class="binputs" id="bInputs"></div>
-    <div class="bgrid">
-      <div><h3 class="bh">Dépenses</h3><div class="tbox"><table id="bDep" class="dtable"></table></div></div>
-      <div><h3 class="bh">Inscriptions par ville</h3><div class="tbox"><table id="bEff" class="dtable"></table></div>
-        <h3 class="bh">Recettes</h3><div class="tbox"><table id="bRec" class="dtable"></table></div></div>
+    <div id="bv-compta" hidden>
+      <p class="muted" style="margin:0 0 10px">Le prévisionnel suit la simulation. Remplis la colonne « Réalisé » au fur et à mesure (inscrits réels, tickets de caisse) : l'écart se calcule tout seul.</p>
+      <div class="tbox"><table id="bCompta" class="dtable compta"></table></div>
     </div>
   </section>
 
@@ -564,75 +580,112 @@ document.getElementById("hResetZone").onclick=e=>{const z=document.getElementByI
   else if(e.target.id==="hNo") z.innerHTML='<button class="btn" type="button" id="hReset">Revenir aux valeurs de départ</button>'};
 
 /* ---------- Budget ---------- */
-const BDEF={prix:45,red:10,min:5,maj:10,ntard:0,repas:1.8,pdj:1,gout:0.8,cad:7,imp:10,lieu:400,orateur:150,entretien:25,sono:0,com:0,donsEgl:0,donsPart:0,
-  eff:{Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Externes:3,"Équipe cuisine":4,Orateur:2}};
-const NOPAY=["Équipe cuisine","Orateur"];
-S._b=Object.assign(JSON.parse(JSON.stringify(BDEF)),S._b||{}); S._b.eff=Object.assign({},BDEF.eff,(S._b&&S._b.eff)||{});
+const BDEF={eff:{Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Externes:3,"Équipe cuisine":4,Orateur:2}};
+S._b=Object.assign({},S._b||{}); S._b.eff=Object.assign({},BDEF.eff,S._b.eff||{});
+/* Hypothèses = fichier « Budget WER EST 2026 », onglet Prévisionnel */
+const PDEF={t:{plein:35,groupe:30,active:40,charge:0},n:{plein:5,groupe:35,active:4,charge:6},dons:100,repas:1.8,nRepas:3,pdj:1,nPdj:2,gout:10,nGout:3,lieu:400,cuisine:100,orateur:150,entretien:25,cad:7,nCuis:4,imprevus:100};
+const CATP=[["plein","Étudiants tarif plein"],["groupe","Étudiants tarif groupe"],["active","Vie active"],["charge","Pris en charge (CR, orateur, cuisiniers)"]];
+const clone=o=>JSON.parse(JSON.stringify(o));
+S._p=S._p?Object.assign(clone(PDEF),S._p,{t:Object.assign({},PDEF.t,S._p.t||{}),n:Object.assign({},PDEF.n,S._p.n||{})}):clone(PDEF);
+S._r=S._r||{n:{},dep:{}};
 const eur=(x,d=0)=>(Math.round(x*100)/100).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d})+" €";
-function calc(){
-  const b=S._b, part=Object.values(b.eff).reduce((a,x)=>a+(+x||0),0);
-  const rows=Object.entries(b.eff).map(([g,n])=>{n=+n||0;const pay=!NOPAY.includes(g),grp=pay&&n>=b.min,w=pay?n*(1-(grp?b.red/100:0)):0;return {g,n,pay,grp,w,rec:w*b.prix}});
-  const W=rows.reduce((a,r)=>a+r.w,0), insc=rows.reduce((a,r)=>a+r.rec,0);
-  const dep=[["Location du lieu",b.lieu,"lieu","Objectif : moins de 400 €"],
-    ["Repas principaux (3 × "+part+")",3*part*b.repas,null,"Sam. midi, sam. soir, dim. midi à "+eur(b.repas,2)],
-    ["Petits-déjeuners (2 × "+part+")",2*part*b.pdj,null,"Estimation haute (samedi : arrivés du vendredi)"],
-    ["Quatre-heures (samedi)",part*b.gout,null,""],
-    ["Repas du vendredi soir",0,null,"Tiré du sac"],
-    ["Don à l'orateur",b.orateur,"orateur","Entre 100 et 200 €"],
-    ["Cadeaux cuisiniers ("+(+b.eff["Équipe cuisine"]||0)+" × "+eur(b.cad)+")",(+b.eff["Équipe cuisine"]||0)*b.cad,null,""],
-    ["Produits d'entretien et de cuisine",b.entretien,"entretien","Éponges, liquide vaisselle, torchons"],
-    ["Sono S&Metz et projecteur",b.sono,"sono","Emprunt, à confirmer"],
-    ["Com (visuel, vidéo, site)",b.com,"com","Fait par l'équipe"]];
-  const sous=dep.reduce((a,d)=>a+d[1],0), imp=sous*b.imp/100, totDep=sous+imp;
-  const majo=b.ntard*b.maj, totRec=insc+majo+b.donsEgl+b.donsPart;
-  return {part,rows,W,insc,dep,sous,imp,totDep,majo,totRec,solde:totRec-totDep,eq:W?(totDep-majo-b.donsEgl-b.donsPart)/W:0,coutPart:part?totDep/part:0};
+function prev(p=S._p){
+  const N=CATP.reduce((a,[k])=>a+(+p.n[k]||0),0);
+  const rev=CATP.map(([k,l])=>({k,l,u:+p.t[k]||0,n:+p.n[k]||0,v:(+p.t[k]||0)*(+p.n[k]||0)}));
+  const insc=rev.reduce((a,r)=>a+r.v,0), totRev=insc+(+p.dons||0);
+  const dep={repas:p.repas*N*p.nRepas,pdj:p.pdj*N*p.nPdj,gout:p.gout*p.nGout,lieu:+p.lieu||0,cuisine:+p.cuisine||0,orateur:+p.orateur||0,entretien:+p.entretien||0,cadeau:p.cad*p.nCuis,imprevus:+p.imprevus||0};
+  const courses=dep.repas+dep.pdj+dep.gout, lieux=dep.lieu+dep.cuisine, autres=dep.orateur+dep.entretien+dep.cadeau+dep.imprevus, totDep=courses+lieux+autres;
+  const pay=rev.filter(r=>r.u>0).reduce((a,r)=>a+r.n,0);
+  return {N,rev,insc,totRev,dep,courses,lieux,autres,totDep,solde:totRev-totDep,pay};
+}
+function real(){
+  const r=S._r, has=v=>v!==undefined&&v!==null&&v!=="";
+  const rev=CATP.map(([k,l])=>({k,n:has(r.n[k])?+r.n[k]:null}));
+  const anyN=rev.some(x=>x.n!==null);
+  const insc=CATP.reduce((a,[k],i)=>a+(rev[i].n||0)*(+S._p.t[k]||0),0);
+  const dons=has(r.dons)?+r.dons:null;
+  const D=k=>has(r.dep[k])?+r.dep[k]:null;
+  const keys=["repas","pdj","gout","lieu","cuisine","orateur","entretien","cadeau","imprevus"], dep={};keys.forEach(k=>dep[k]=D(k));
+  const sum=ks=>ks.reduce((a,k)=>a+(dep[k]||0),0);
+  const courses=sum(["repas","pdj","gout"]),lieux=sum(["lieu","cuisine"]),autres=sum(["orateur","entretien","cadeau","imprevus"]);
+  const totRev=insc+(dons||0), totDep=courses+lieux+autres;
+  return {rev,anyN,insc,dons,dep,courses,lieux,autres,totRev,totDep,solde:totRev-totDep,started:anyN||dons!==null||keys.some(k=>dep[k]!==null)};
 }
 function num(id,label,val,step,unit,hint){return `<label class="bin" for="b-${id}"><span>${label}${hint?`<small>${hint}</small>`:""}</span><span class="bv"><input type="number" id="b-${id}" data-k="${id}" value="${val}" step="${step}" min="0">${unit}</span></label>`}
-function renderBudget(){
-  const b=S._b, r=calc();
+let bView="sim"; try{bView=localStorage.getItem(KEY+".bview")||"sim"}catch(e){}
+function setBView(v){bView=v;document.getElementById("bv-sim").hidden=v!=="sim";document.getElementById("bv-compta").hidden=v!=="compta";
+  document.querySelectorAll(".stab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
+  try{localStorage.setItem(KEY+".bview",v)}catch(e){} if(v==="compta")renderCompta()}
+document.querySelectorAll(".stab").forEach(b=>b.onclick=()=>setBView(b.dataset.v));
+function renderKpis(){
+  const r=prev();
   document.getElementById("bKpi").innerHTML=`
-   <div class="kpi"><span>Dépenses</span><b>${eur(r.totDep)}</b><small>dont ${eur(r.imp)} d'imprévus</small></div>
-   <div class="kpi"><span>Recettes</span><b>${eur(r.totRec)}</b><small>${r.part} participants</small></div>
-   <div class="kpi ${r.solde<0?"bad":"good"}"><span>Solde</span><b>${r.solde>=0?"+":""}${eur(r.solde)}</b><small>${r.solde<0?"Déficit":"Excédent"}</small></div>
-   <div class="kpi"><span>Prix d'équilibre</span><b>${eur(Math.ceil(r.eq))}</b><small>prix de base minimum · coût réel ${eur(r.coutPart)} / pers.</small></div>`;
-  document.getElementById("bInputs").innerHTML=
-    num("prix","Prix de base de l'inscription",b.prix,1," €")+num("lieu","Location du lieu",b.lieu,50," €","viser moins de 400 €")+
-    num("red","Réduction de groupe",b.red,1," %","dès "+b.min+" pers. d'une ville")+num("orateur","Don à l'orateur",b.orateur,10," €","100 à 200 €")+
-    num("ntard","Inscriptions tardives",b.ntard,1," pers.","+"+b.maj+" € après le 23 nov.")+num("repas","Repas principal / pers.",b.repas,0.1," €","règle cuisine")+
-    num("donsEgl","Dons des églises",b.donsEgl,10," €")+num("donsPart","Dons libres",b.donsPart,10," €")+num("imp","Imprévus",b.imp,1," %");
-  document.querySelectorAll("#bInputs input").forEach(i=>i.onchange=()=>{S._b[i.dataset.k]=Math.max(0,+i.value||0);save();renderBudget()});
-  document.getElementById("bEff").innerHTML=`<thead><tr><th>Groupe</th><th>Pers.</th><th>Paie</th><th>−${b.red} %</th><th class="num">Recette</th></tr></thead><tbody>${r.rows.map(x=>`<tr><td>${x.g}</td><td><input type="number" min="0" id="eff-${x.g.replace(/\W/g,"")}" data-g="${x.g}" value="${x.n}" aria-label="Personnes ${x.g}"></td><td>${x.pay?"Oui":"Non"}</td><td>${x.grp?"Oui":"–"}</td><td class="num">${eur(x.rec,2)}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td>${r.part}</td><td></td><td></td><td class="num">${eur(r.insc,2)}</td></tr></tfoot>`;
-  document.querySelectorAll("#bEff input").forEach(i=>i.onchange=()=>{S._b.eff[i.dataset.g]=Math.max(0,+i.value||0);save();renderBudget()});
-  document.getElementById("bDep").innerHTML=`<thead><tr><th>Poste</th><th class="num">Montant</th><th>Remarque</th></tr></thead><tbody>${r.dep.map(d=>`<tr><td>${d[0]}</td><td class="num">${eur(d[1],2)}</td><td class="muted">${d[3]}</td></tr>`).join("")}
-   <tr class="sub"><td>Sous-total</td><td class="num">${eur(r.sous,2)}</td><td></td></tr><tr><td>Imprévus (${b.imp} %)</td><td class="num">${eur(r.imp,2)}</td><td></td></tr></tbody>
-   <tfoot><tr><td>Total dépenses</td><td class="num">${eur(r.totDep,2)}</td><td></td></tr></tfoot>`;
-  document.getElementById("bRec").innerHTML=`<tbody><tr><td>Inscriptions</td><td class="num">${eur(r.insc,2)}</td></tr><tr><td>Majorations tardives</td><td class="num">${eur(r.majo,2)}</td></tr><tr><td>Dons des églises</td><td class="num">${eur(b.donsEgl,2)}</td></tr><tr><td>Dons libres</td><td class="num">${eur(b.donsPart,2)}</td></tr></tbody><tfoot><tr><td>Total recettes</td><td class="num">${eur(r.totRec,2)}</td></tr></tfoot>`;
-  renderSim();
+   <div class="kpi"><span>Dépenses prévues</span><b>${eur(r.totDep)}</b><small>courses ${eur(r.courses)} · lieux ${eur(r.lieux)}</small></div>
+   <div class="kpi"><span>Revenus prévus</span><b>${eur(r.totRev)}</b><small>${r.N} participants dont ${r.pay} payants</small></div>
+   <div class="kpi ${r.solde<0?"bad":"good"}"><span>Solde prévu</span><b>${r.solde>=0?"+":""}${eur(r.solde)}</b><small>${r.solde<0?"Perte":"Bénéfice"}</small></div>
+   <div class="kpi"><span>Coût par personne</span><b>${eur(r.N?r.totDep/r.N:0)}</b><small>dépenses ÷ participants</small></div>`;
 }
-
-function soldeAt(N,r){
-  const b=S._b, nonpay=r.rows.filter(x=>!x.pay).reduce((a,x)=>a+x.n,0), payBase=r.rows.filter(x=>x.pay).reduce((a,x)=>a+x.n,0);
-  const f=payBase?Math.max(0,N-nonpay)/payBase:0;
-  const insc=r.insc*f, perPers=3*b.repas+2*b.pdj+b.gout;
-  const fixed=b.lieu+b.orateur+(+b.eff["Équipe cuisine"]||0)*b.cad+b.entretien+b.sono+b.com;
-  const dep=(fixed+perPers*N)*(1+b.imp/100);
-  return {dep,rec:insc+r.majo+b.donsEgl+b.donsPart,solde:insc+r.majo+b.donsEgl+b.donsPart-dep,pay:Math.max(0,N-nonpay)};
+function renderBudget(){
+  const p=S._p;
+  renderKpis();
+  document.getElementById("bPart").innerHTML=CATP.map(([k,l])=>`<div class="crow"><label for="bp-${k}">${l}</label><input type="range" id="bp-${k}" data-k="${k}" min="0" max="${Math.max(60,+p.n[k]||0)}" step="1" value="${+p.n[k]||0}"><output id="bpo-${k}">${+p.n[k]||0}</output></div>`).join("")
+    +`<div class="crow tot"><span>Total</span><span class="muted" style="font-weight:400;font-size:13px">participants</span><output id="bpTot">${prev().N}</output></div>`;
+  document.querySelectorAll("#bPart input").forEach(sl=>sl.oninput=()=>{S._p.n[sl.dataset.k]=+sl.value;document.getElementById("bpo-"+sl.dataset.k).textContent=sl.value;document.getElementById("bpTot").textContent=prev().N;save();renderKpis();renderSim()});
+  document.getElementById("bInputs").innerHTML=
+    num("t_plein","Tarif étudiant plein",p.t.plein,1," €")+num("t_groupe","Tarif étudiant groupe",p.t.groupe,1," €","inscription avec son GBU local")+num("t_active","Tarif vie active",p.t.active,1," €")+
+    num("dons","Dons",p.dons,10," €")+num("repas","Repas principal / pers.",p.repas,0.1," €",p.nRepas+" repas")+num("pdj","Petit-déjeuner / pers.",p.pdj,0.1," €",p.nPdj+" petits-déjeuners")+
+    num("gout","Goûter (forfait)",p.gout,1," €","× "+p.nGout)+num("lieu","Location du lieu",p.lieu,50," €","viser moins de 400 €")+num("cuisine","Location cuisine",p.cuisine,10," €")+
+    num("orateur","Don orateur",p.orateur,10," €")+num("entretien","Produits d'entretien",p.entretien,5," €")+num("cad","Cadeau cuisinier",p.cad,1," €","× "+p.nCuis+" cuisiniers")+num("imprevus","Dépenses imprévues",p.imprevus,10," €");
+  document.querySelectorAll("#bInputs input").forEach(i=>i.onchange=()=>{const k=i.dataset.k,v=Math.max(0,+i.value||0);if(k.startsWith("t_"))S._p.t[k.slice(2)]=v;else S._p[k]=v;save();renderBudget()});
+  renderSim(); setBView(bView);
+}
+function renderCompta(){
+  const P=prev(), R=real(), r=S._r;
+  const v=(x)=>x===null?"":x;
+  const gap=(re,pr,rev)=>{if(re===null)return '<td class="num muted">–</td>';const g=re-pr, good=rev?g>=0:g<=0;return `<td class="num ${good?"pos":"neg"}">${g>=0?"+":""}${eur(g,2)}</td>`};
+  const row=(label,unit,nb,pr,realCell,re,rev,cls="")=>`<tr class="${cls}"><td>${label}</td><td class="num">${unit}</td><td class="num">${nb}</td><td class="num">${eur(pr,2)}</td><td class="num">${realCell}</td>${gap(re,pr,rev)}</tr>`;
+  const inN=k=>`<input type="number" min="0" step="1" data-rn="${k}" value="${v(r.n[k]??null)}" aria-label="Nombre réel">`;
+  const inE=k=>`<input type="number" min="0" step="0.01" data-rd="${k}" value="${v(r.dep[k]??null)}" aria-label="Montant réel">`;
+  let h=`<thead><tr><th>Poste</th><th class="num">Unité</th><th class="num">Nombre</th><th class="num">Prévisionnel</th><th class="num">Réalisé</th><th class="num">Écart</th></tr></thead><tbody>`;
+  h+=`<tr class="rev"><td class="sec" colspan="6">Revenus</td></tr>`;
+  CATP.forEach(([k,l],i)=>{const re=R.rev[i].n===null?null:R.rev[i].n*(+S._p.t[k]||0);
+    h+=row("Inscriptions · "+l,eur(+S._p.t[k]||0,2),`${P.rev[i].n} <span class="muted">/ réel</span> ${inN(k)}`,P.rev[i].v,re===null?"":eur(re,2),re,true)});
+  h+=row("Dons","","",+S._p.dons||0,`<input type="number" min="0" step="0.01" data-rdons="1" value="${v(r.dons??null)}" aria-label="Dons réels">`,R.dons,true);
+  h+=`<tr class="tot"><td>Total revenus</td><td></td><td></td><td class="num">${eur(P.totRev,2)}</td><td class="num">${R.started?eur(R.totRev,2):""}</td>${R.started?gap(R.totRev,P.totRev,true):'<td class="num muted">–</td>'}</tr>`;
+  h+=`<tr class="dep"><td class="sec" colspan="6">Dépenses</td></tr>`;
+  const sub=(lbl,pr,re)=>`<tr class="sub"><td>${lbl}</td><td></td><td></td><td class="num">${eur(pr,2)}</td><td class="num">${R.started?eur(re,2):""}</td>${R.started?gap(re,pr,false):'<td class="num muted">–</td>'}</tr>`;
+  const p=S._p;
+  h+=row("Courses · petit-déj., déj., goûter et dîner",eur(p.repas,2),`${P.N} × ${p.nRepas} repas`,P.dep.repas,inE("repas"),R.dep.repas,false);
+  h+=row("Courses · petits-déjeuners",eur(p.pdj,2),`${P.N} × ${p.nPdj}`,P.dep.pdj,inE("pdj"),R.dep.pdj,false);
+  h+=row("Courses · goûter",eur(p.gout,2),`× ${p.nGout}`,P.dep.gout,inE("gout"),R.dep.gout,false);
+  h+=sub("Sous-total courses",P.courses,R.courses);
+  h+=row("Location du lieu (ou don)","","",P.dep.lieu,inE("lieu"),R.dep.lieu,false);
+  h+=row("Location cuisine","","",P.dep.cuisine,inE("cuisine"),R.dep.cuisine,false);
+  h+=sub("Sous-total lieux",P.lieux,R.lieux);
+  h+=row("Don orateur","","",P.dep.orateur,inE("orateur"),R.dep.orateur,false);
+  h+=row("Achat produits d'entretien","","",P.dep.entretien,inE("entretien"),R.dep.entretien,false);
+  h+=row("Cadeau cuisiniers",eur(p.cad,2),`× ${p.nCuis}`,P.dep.cadeau,inE("cadeau"),R.dep.cadeau,false);
+  h+=row("Dépenses imprévues","","",P.dep.imprevus,inE("imprevus"),R.dep.imprevus,false);
+  h+=sub("Sous-total autres frais",P.autres,R.autres);
+  h+=`<tr class="tot"><td>Total dépenses</td><td></td><td></td><td class="num">${eur(P.totDep,2)}</td><td class="num">${R.started?eur(R.totDep,2):""}</td>${R.started?gap(R.totDep,P.totDep,false):'<td class="num muted">–</td>'}</tr>`;
+  h+=`<tr class="tot"><td>Perte / bénéfice</td><td></td><td></td><td class="num ${P.solde<0?"neg":"pos"}">${P.solde>=0?"+":""}${eur(P.solde,2)}</td><td class="num ${R.solde<0?"neg":"pos"}">${R.started?(R.solde>=0?"+":"")+eur(R.solde,2):""}</td><td></td></tr></tbody>`;
+  const t=document.getElementById("bCompta"); t.innerHTML=h;
+  t.querySelectorAll("input").forEach(i=>i.onchange=()=>{const val=i.value===""?null:Math.max(0,+i.value);
+    if(i.dataset.rn)S._r.n[i.dataset.rn]=val;else if(i.dataset.rd)S._r.dep[i.dataset.rd]=val;else S._r.dons=val;save();renderCompta()});
+}
+function soldeAt(Np){
+  const p=S._p, base=prev(), payBase=base.pay, f=payBase?Np/payBase:0;
+  const q=clone(p); CATP.forEach(([k])=>{if((+p.t[k]||0)>0)q.n[k]=(+p.n[k]||0)*f});
+  return prev(q).solde;
 }
 function renderSim(){
-  const r=calc(), sl=document.getElementById("simN"), max=Math.max(r.part,6);
-  sl.max=max; let N=Math.min(+(S._b.nSim??max),max); if(!(N>=6))N=max; sl.value=N;
-  const x=soldeAt(N,r);
-  let seuil=null; for(let n=6;n<=200;n++){if(soldeAt(n,r).solde>=0){seuil=n;break}}
-  document.getElementById("simOut").innerHTML=`${N}<small>participants</small>`;
-  document.getElementById("simRes").innerHTML=`<span>Payants : <b>${x.pay}</b></span><span>Dépenses : <b>${eur(x.dep)}</b></span><span>Recettes : <b>${eur(x.rec)}</b></span>
-    <span>Solde : <b class="${x.solde<0?"bad":"good"}">${x.solde>=0?"+":""}${eur(x.solde)}</b></span>
-    <span>Seuil à ${eur(S._b.prix)} : <b>${seuil===null?"jamais atteint, augmente le prix":"au moins "+seuil+" participants"}</b></span>`;
-  // chart
-  const W=1100,H=170,L=58,R=12,T=12,B=24, pts=[];for(let n=6;n<=max;n++)pts.push([n,soldeAt(n,r).solde]);
+  const base=prev(), max=Math.max(base.pay,10);
+  let seuil=null; for(let n=1;n<=200;n++){if(soldeAt(n)>=0){seuil=n;break}}
+  document.getElementById("simRes").innerHTML=`<span>Solde avec ${base.pay} payants : <b class="${base.solde<0?"bad":"good"}">${base.solde>=0?"+":""}${eur(base.solde)}</b></span><span>Seuil d'équilibre : <b>${seuil===null?"jamais atteint, augmente les tarifs":"au moins "+seuil+" payants"}</b></span>`;
+  const W=1100,H=170,L=58,R=12,T=12,B=24, pts=[];for(let n=0;n<=max;n++)pts.push([n,soldeAt(n)]);
   const ys=pts.map(p=>p[1]), lo=Math.min(0,...ys), hi=Math.max(0,...ys), span=(hi-lo)||1;
-  const X=n=>L+(n-6)/Math.max(1,max-6)*(W-L-R), Y=v=>T+(hi-v)/span*(H-T-B);
+  const X=n=>L+n/max*(W-L-R), Y=v=>T+(hi-v)/span*(H-T-B);
   const path=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
-  const acc=getComputedStyle(document.documentElement).getPropertyValue("--accent");
   document.getElementById("simChart").innerHTML=`
     <line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-width="1.5"/>
     <text x="${L-6}" y="${Y(0)+4}" text-anchor="end">0 €</text>
@@ -640,11 +693,65 @@ function renderSim(){
     <text x="${L-6}" y="${Y(lo)+4}" text-anchor="end">${lo<0&&Y(lo)-Y(0)>16?Math.round(lo)+" €":""}</text>
     ${seuil!==null&&seuil<=max?`<line x1="${X(seuil)}" x2="${X(seuil)}" y1="${T}" y2="${H-B}" stroke="var(--new)" stroke-dasharray="4 3"/><text x="${X(seuil)}" y="${H-6}" text-anchor="middle" style="fill:var(--new)">${seuil}</text>`:""}
     <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>
-    <circle cx="${X(N)}" cy="${Y(x.solde)}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
-    <text x="${L}" y="${H-6}">6</text>${seuil!==null&&Math.abs(seuil-max)<4?"":`<text x="${W-R}" y="${H-6}" text-anchor="end">${max}</text>`}`;
+    <circle cx="${X(base.pay)}" cy="${Y(base.solde)}" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+    <text x="${L}" y="${H-6}">0</text>${seuil!==null&&Math.abs(seuil-max)<4?"":`<text x="${W-R}" y="${H-6}" text-anchor="end">${max} payants</text>`}`;
 }
-document.getElementById("simN").oninput=e=>{S._b.nSim=+e.target.value;save();renderSim()};
-document.getElementById("bReset").onclick=()=>{S._b=JSON.parse(JSON.stringify(BDEF));save();renderBudget()};
+document.getElementById("bResetZone").onclick=e=>{const z=document.getElementById("bResetZone");
+  if(e.target.id==="bReset")z.innerHTML='<span style="font-size:13px">Remettre les valeurs du fichier (le réalisé est gardé) ? <button class="btn" type="button" id="bYes">Oui</button> <button class="btn" type="button" id="bNo">Non</button></span>';
+  else if(e.target.id==="bYes"){S._p=clone(PDEF);save();z.innerHTML='<button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button>';renderBudget()}
+  else if(e.target.id==="bNo")z.innerHTML='<button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button>'};
+/* ---------- Export Excel ---------- */
+function loadExcelJS(){return window.ExcelJS?Promise.resolve(window.ExcelJS):new Promise((ok,ko)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";sc.onload=()=>ok(window.ExcelJS);sc.onerror=()=>ko(new Error("load"));document.head.appendChild(sc)})}
+function fillSheet(ws,title,p,nOver,depOver,donsOver){
+  const EUR='#,##0.00" €"', F=c=>({type:"pattern",pattern:"solid",fgColor:{argb:c}});
+  ws.columns=[{width:52},{width:12},{width:20},{width:18},{width:16}];
+  ws.mergeCells("A1:E3"); const t=ws.getCell("A1"); t.value=title; t.font={bold:true,size:14}; t.alignment={vertical:"middle",horizontal:"center",wrapText:true}; t.fill=F("FFC0C0C0");
+  const n=k=>nOver?(nOver[k]??0):(+p.n[k]||0);
+  [["A5","Etudiants tarif plein","plein"],["A6","Etudiants tarif groupe","groupe"],["A7","Vie active","active"],["A8","Personnes prises en charge (CR + orateur + cuisinier.es)","charge"]].forEach(([c,l,k],i)=>{ws.getCell(c).value=l;const b=ws.getCell("B"+(5+i));b.value=n(k);b.fill=F("FF9FC5E8")});
+  ws.getCell("A9").value="Total";ws.getCell("B9").value={formula:"SUM(B5:B8)"};["A9","B9"].forEach(c=>{ws.getCell(c).font={bold:true};ws.getCell(c).fill=F("FFC0C0C0")});
+  const head=(r,lbls,col)=>{lbls.forEach((l,i)=>{const c=ws.getCell(r,i+1);c.value=l;c.fill=F(col);if(i===0||i===4)c.font={bold:true}})};
+  head(11,["REVENUS","Unité","Nombre de personnes","","Budget"],"FFB6D7A8");
+  [["Inscriptions – étudiants tarif plein","plein",5],["Inscriptions – étudiants tarif groupe","groupe",6],["Inscriptions – vie active","active",7],["Personnes prises en charge (orateur, CR et cuisiniers)","charge",8]].forEach(([l,k,src],i)=>{const r=12+i;
+    ws.getCell("A"+r).value=l;const u=ws.getCell("B"+r);u.value=+p.t[k]||0;u.numFmt=EUR;u.fill=F("FFA4C2F4");ws.getCell("C"+r).value={formula:"B"+src};const e=ws.getCell("E"+r);e.value={formula:`B${r}*C${r}`};e.numFmt=EUR;e.fill=F("FFEFEFEF")});
+  ws.getCell("A16").value="Dons";const d=ws.getCell("E16");d.value=donsOver!==undefined?donsOver:(+p.dons||0);d.numFmt=EUR;d.fill=F("FFEFEFEF");
+  ws.getCell("A17").value="Total Revenus";ws.getCell("E17").value={formula:"SUM(E12:E16)"};["A17","E17"].forEach(c=>{const x=ws.getCell(c);x.font={bold:true};x.fill=F("FFB6D7A8");x.numFmt=EUR});
+  head(19,["DEPENSES","Coût","Nombre de personnes","Nombre de repas","Budget"],"FFEA9999");
+  ws.getCell("A20").value="Courses";ws.getCell("A20").font={bold:true};
+  const dep=(r,lbl,unit,nb,nr,key,formula)=>{ws.getCell("A"+r).value=lbl;if(unit!==null){const u=ws.getCell("B"+r);u.value=unit;u.numFmt=EUR;u.fill=F("FF9FC5E8")}
+    if(nb!==null)ws.getCell("C"+r).value=nb;if(nr!==null)ws.getCell("D"+r).value=nr;const e=ws.getCell("E"+r);
+    e.value=depOver?(depOver[key]??0):(formula?{formula}:null);e.numFmt=EUR;e.fill=F("FFEFEFEF")};
+  dep(21,"Petit déj, déj, goûter et dîner",p.repas,{formula:"B9"},p.nRepas,"repas","B21*C21*D21");
+  dep(22,"Petit déj",p.pdj,{formula:"B9"},p.nPdj,"pdj","B22*C22*D22");
+  dep(23,"Goûter",p.gout,null,p.nGout,"gout","B23*D23");
+  const st=(r,l,f)=>{ws.getCell("A"+r).value=l;ws.getCell("A"+r).font={bold:true};ws.getCell("A"+r).fill=F("FFEA9999");const e=ws.getCell("E"+r);e.value={formula:f};e.font={bold:true};e.fill=F("FFCCCCCC");e.numFmt=EUR};
+  st(24,"Sous-total - courses","SUM(E21:E23)");
+  ws.getCell("A26").value="Lieux";ws.getCell("A26").font={bold:true};
+  const fix=(r,l,key,val)=>{ws.getCell("A"+r).value=l;const e=ws.getCell("E"+r);e.value=depOver?(depOver[key]??0):val;e.numFmt=EUR;e.fill=F("FFEFEFEF")};
+  fix(27,"Location lieu (ou don)","lieu",+p.lieu||0);fix(28,"Location cuisine","cuisine",+p.cuisine||0);st(29,"Sous-total - lieux","SUM(E27:E28)");
+  ws.getCell("A31").value="Autres frais";ws.getCell("A31").font={bold:true};
+  fix(32,"Don orateur","orateur",+p.orateur||0);fix(33,"Achat produits d'entretien","entretien",+p.entretien||0);
+  ws.getCell("A34").value="Cadeau cuisinier";ws.getCell("B34").value=p.cad;ws.getCell("B34").numFmt=EUR;ws.getCell("C34").value=p.nCuis;const e34=ws.getCell("E34");e34.value=depOver?(depOver.cadeau??0):{formula:"B34*C34"};e34.numFmt=EUR;e34.fill=F("FFEFEFEF");
+  fix(35,"Dépenses imprévues","imprevus",+p.imprevus||0);st(36,"Sous-total - autres frais","SUM(E32:E35)");
+  const tot=(r,l,f,c)=>{ws.getCell("A"+r).value=l;const a=ws.getCell("A"+r);a.font={bold:true};a.fill=F(c);const e=ws.getCell("E"+r);e.value={formula:f};e.font={bold:true};e.fill=F(c);e.numFmt=EUR};
+  tot(37,"Total Charges","E24+E29+E36","FFEA9999");tot(39,"PERTE/BÉNÉFICES","E17-E37","FFC0C0C0");
+}
+async function exportXlsx(){
+  const btn=document.getElementById("bXlsx"), old=btn.textContent; btn.textContent="Préparation…"; btn.disabled=true;
+  try{
+    const ExcelJS=await loadExcelJS(); const wb=new ExcelJS.Workbook(); wb.creator="GBU Grand Est";
+    fillSheet(wb.addWorksheet("Prévisionnel 2026"),"Budget prévisionnel\nWeek-end régional GBU Grand Est · Metz",S._p);
+    const R=real(), nReal={}; CATP.forEach(([k],i)=>nReal[k]=R.rev[i].n??0);
+    const depReal={}; Object.keys(R.dep).forEach(k=>depReal[k]=R.dep[k]??0);
+    fillSheet(wb.addWorksheet("Réalisé 2026"),"Budget réalisé\nWeek-end régional GBU Grand Est · Metz",S._p,nReal,depReal,R.dons??0);
+    const buf=await wb.xlsx.writeBuffer(), blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}), name="Budget_WER_EST_2026.xlsx";
+    let dl=null; try{dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null}catch(e){dl=null}
+    if(dl){try{await dl.save({filename:name,data:blob})}catch(e){if(e&&e.code!=="declined")toastB("Le téléchargement n'a pas marché ici. Ouvre la page sur le site GitHub pour télécharger.")}}
+    else{const u=URL.createObjectURL(blob),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+  }catch(e){toastB("Impossible de préparer le fichier Excel (connexion ?). Réessaie.")}
+  btn.textContent=old; btn.disabled=false;
+}
+function toastB(m){const e=document.getElementById("toast");e.textContent=m;e.hidden=false;setTimeout(()=>e.hidden=true,3500)}
+document.getElementById("bXlsx").onclick=exportXlsx;
 
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
 showPage(startPage);
