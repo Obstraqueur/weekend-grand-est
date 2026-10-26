@@ -13,19 +13,21 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Figtree:wght@400;600;700&display=swap">
 <style>
-:root{--wine:#7A1F2B;--wine-deep:#5C1520;--sand:#E7A24A;--dusk:#F3D6A8;--paper:#FAF3E8;--ink:#2A1714;--muted:#6E5A52;--line:#E6D6C2;
+:root{--wine:#7A1F2B;--wine-deep:#5C1520;--sand:#E7A24A;--dusk:#F3D6A8;--paper:#FAF3E8;--ink:#2A1714;--muted:#6E5A52;--line:#E6D6C2;--card:#FFFDF8;--ok:#2F7D62;
   --display:"Archivo","Arial Narrow",sans-serif;--body:"Figtree",system-ui,sans-serif}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6}
 img{max-width:100%;display:block}
 .wrap{max-width:1040px;margin:0 auto;padding-inline:20px}
-.btn{display:inline-block;font:700 17px var(--body);text-decoration:none;border-radius:999px;padding:14px 30px;background:var(--wine);color:#fff;border:2px solid var(--wine)}
+.btn{display:inline-block;font:700 17px var(--body);text-decoration:none;border-radius:999px;padding:14px 30px;background:var(--wine);color:#fff;border:2px solid var(--wine);cursor:pointer}
 .btn:hover{background:var(--wine-deep)}
 .btn.ghost{background:transparent;color:var(--wine)}
-.btn:focus-visible{outline:3px solid var(--sand);outline-offset:3px}
+.btn.ghost:hover{background:#fff}
+.btn.small{font-size:15px;padding:9px 18px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sand);outline-offset:3px}
 h1,h2{font-family:var(--display);font-weight:850;font-stretch:70%;color:var(--wine);margin:0;line-height:.9;text-transform:uppercase}
-
 .hero{background:linear-gradient(180deg,var(--dusk),var(--paper) 85%);padding-block:56px 64px}
 .hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:48px;align-items:center}
 .hero h1{font-size:clamp(2.6rem,6.2vw,4.8rem)}
@@ -33,20 +35,44 @@ h1,h2{font-family:var(--display);font-weight:850;font-stretch:70%;color:var(--wi
 .date{font-family:var(--display);font-weight:800;font-stretch:80%;font-size:clamp(1.4rem,3vw,1.9rem);margin:22px 0 28px}
 .ctas{display:flex;flex-wrap:wrap;gap:12px}
 .poster{max-height:min(600px,80vh);width:auto;height:auto;justify-self:center;border-radius:6px;box-shadow:0 30px 60px -20px rgba(92,21,32,.45)}
-
+.invite{background:var(--wine);color:#fff;border-radius:14px;padding:14px 18px;margin:0 0 22px;font-size:16px;line-height:1.45}
+.invite b{color:#FFD58A}
 section.block{padding-block:64px;text-align:center}
 section.block h2{font-size:clamp(2.2rem,5vw,3rem);margin-bottom:32px}
 .three{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;text-align:center}
 .three h3{font-family:var(--display);font-weight:850;font-stretch:72%;font-size:30px;text-transform:uppercase;margin:0;color:var(--ink)}
-.three p{margin:4px 0 0;color:var(--muted)}
-.alt{background:#FFFDF8;border-block:1px solid var(--line)}
-.facts{list-style:none;padding:0;margin:0 auto;max-width:560px;display:grid;gap:10px}
-.facts li{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:10px;text-align:left}
-.facts b{color:var(--wine);white-space:nowrap}
+.alt{background:var(--card);border-block:1px solid var(--line)}
+.facts{list-style:none;padding:0;margin:0 auto;max-width:680px;display:grid;gap:12px}
+.facts li{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;border-bottom:1px solid var(--line);padding-bottom:12px;text-align:left}
+.facts b{color:var(--wine)}
+.facts small{display:block;color:var(--muted);font-size:15px;line-height:1.45;margin-top:2px}
 .note{color:var(--muted);font-size:15px;margin:24px 0 0}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:720px;margin:0 auto;text-align:left}
+.choice{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:20px 22px;display:grid;gap:6px;cursor:pointer;font:inherit;color:inherit;text-align:left}
+.choice:hover,.choice.on{border-color:var(--wine)}
+.choice strong{font-family:var(--display);font-weight:850;font-stretch:75%;font-size:28px;text-transform:uppercase;color:var(--wine);line-height:1}
+.choice span{color:var(--muted);font-size:15px;line-height:1.45}
+.panel{max-width:720px;margin:22px auto 0;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tabs button{font:600 15px var(--body);border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
+.tabs button.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.field{display:grid;gap:4px;margin-bottom:14px}
+.field label{font-weight:700;font-size:15px}
+.field small{color:var(--muted);font-size:14px}
+input[type=text],input[type=email],select{font:16px var(--body);color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.people{display:grid;gap:8px;margin-bottom:10px}
+.person{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:8px;align-items:center}
+.person span{font-family:var(--display);font-weight:800;color:var(--muted);text-align:right}
+.x{font:600 14px var(--body);border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:8px;padding:8px 10px;cursor:pointer}
+.count{font-size:14px;color:var(--muted);margin:6px 0 16px}
+.count.ok{color:var(--ok);font-weight:700}
+.result{border:2px solid var(--ok);border-radius:14px;padding:16px 18px;margin-top:6px;display:grid;gap:10px}
+.result h3{margin:0;font-family:var(--display);font-weight:850;font-stretch:75%;font-size:26px;text-transform:uppercase;color:var(--ok)}
+.linkbox{display:flex;gap:8px;flex-wrap:wrap}
+.linkbox input{flex:1;min-width:0;font-size:14px}
+.err{color:var(--wine);font-weight:600;font-size:15px;margin:0}
 footer{background:var(--wine-deep);color:#f3e3d6;padding-block:28px;font-size:15px;text-align:center}
-
-@media (max-width:820px){.hero .wrap{grid-template-columns:minmax(0,1fr)}.three{grid-template-columns:repeat(2,minmax(0,1fr))}.poster{max-height:none;width:100%;max-width:400px}}
+@media (max-width:820px){.hero .wrap{grid-template-columns:minmax(0,1fr)}.three{grid-template-columns:repeat(2,minmax(0,1fr))}.poster{max-height:none;width:100%;max-width:400px}.choices{grid-template-columns:1fr}.facts li{grid-template-columns:1fr;gap:2px}}
 </style>
 </head>
 <body>
@@ -54,9 +80,10 @@ footer{background:var(--wine-deep);color:#f3e3d6;padding-block:28px;font-size:15
 <section class="hero">
   <div class="wrap">
     <div>
+      <div class="invite" id="inviteHero" hidden></div>
       <h1><span>Rencontrer</span><span>Jésus</span><span>aujourd’hui&nbsp;?</span></h1>
       <p class="date">Week-end GBU Grand Est<br>Vendredi 27 au dimanche 29 novembre<br>Metz</p>
-      <div class="ctas"><a class="btn" href="https://form.jotform.com/262846622284059">Inscription</a><a class="btn ghost" href="#infos">Infos pratiques</a></div>
+      <div class="ctas"><a class="btn" href="#inscription">Je m'inscris</a><a class="btn ghost" href="#infos">Infos pratiques</a></div>
     </div>
     <img class="poster" src="../assets/affiche.jpg" alt="Affiche du week-end : Rencontrer Jésus aujourd’hui ?" width="1108" height="1419">
   </div>
@@ -78,24 +105,126 @@ footer{background:var(--wine-deep);color:#f3e3d6;padding-block:28px;font-size:15
   <div class="wrap">
     <h2>Infos pratiques</h2>
     <ul class="facts">
-      <li><b>Quand</b><span>Vendredi 27 nov., 20h → dimanche 29 nov., 14h30</span></li>
-      <li><b>Où</b><span>Metz</span></li>
+      <li><b>Arrivée</b><span>Vendredi 27 novembre, entre 18h et 19h30. Début du programme à 20h.<small>Tu ne peux pas venir le vendredi ? Arrivée possible samedi 28 à 9h.</small></span></li>
+      <li><b>Où</b><span>28 rue Le Goullon, Metz<small>Accessible en Mettis B depuis la gare (15 min).</small></span></li>
+      <li><b>Fin</b><span>Dimanche 29 novembre à 14h30</span></li>
       <li><b>Pour qui</b><span>Étudiants des GBU et leurs amis, chrétiens ou non</span></li>
-      <li><b>Prix</b><span>35 € par personne · 30 € en inscription groupée avec ton GBU local</span></li>
-      <li><b>Logement</b><span>Inclus, avec les repas</span></li>
+      <li><b>Prix</b><span>35 € par personne<small>30 € en inscription groupée avec ton GBU local (5 personnes ou plus).</small></span></li>
+      <li><b>Logement</b><span>Inclus, avec les repas<small>Sauf le repas du vendredi soir : prévois un repas tiré du sac.</small></span></li>
     </ul>
-    <p class="note">Arrivée possible dès le vendredi 27 à 18h : amène un repas tiré du sac.</p>
   </div>
 </section>
 
 <section class="block" id="inscription">
   <div class="wrap">
     <h2>Inscription</h2>
-    <a class="btn" href="https://form.jotform.com/262846622284059">Je m'inscris</a>
-    <p class="note">Ouverte à partir du 20 octobre · +10 € après le 23 novembre</p>
+    <div class="invite" id="inviteBox" hidden style="max-width:720px;margin:0 auto 22px;text-align:left"></div>
+    <div class="choices" id="choices">
+      <button type="button" class="choice" id="cGroupe"><strong>Je m'inscris en groupe</strong><span>5 personnes ou plus de ton GBU local : 30 € au lieu de 35 €. Tu crées le groupe, puis tu envoies un lien à chacun.</span></button>
+      <a class="choice" id="cSeul" href="https://form.jotform.com/262846622284059"><strong>Je m'inscris seul</strong><span>Tu remplis directement le formulaire d'inscription.</span></a>
+    </div>
+
+    <div class="panel" id="gPanel" hidden>
+      <div class="tabs" role="tablist">
+        <button type="button" class="on" data-t="new" id="tNew">Créer un groupe</button>
+        <button type="button" data-t="add" id="tAdd">Ajouter une personne à un groupe déjà inscrit</button>
+      </div>
+
+      <form id="fNew" novalidate>
+        <div class="field"><label for="gNom">Nom du groupe</label><input type="text" id="gNom" maxlength="40" placeholder="Ex. GBU Strasbourg" required><small>Il apparaîtra dans le lien envoyé aux membres.</small></div>
+        <div class="field"><label for="gVille">GBU</label><select id="gVille"><option>Metz</option><option>Nancy</option><option>Strasbourg</option><option>Mulhouse</option><option>Belfort</option><option>Autre</option></select></div>
+        <div class="field"><label for="gResp">Ton prénom et nom</label><input type="text" id="gResp" maxlength="60"></div>
+        <div class="field"><label for="gMail">Ton e-mail <small>(facultatif)</small></label><input type="email" id="gMail" maxlength="80"></div>
+        <div class="field"><label>Prénoms des personnes du groupe (toi compris)</label><div class="people" id="people"></div>
+          <div><button type="button" class="btn ghost small" id="addP">+ Ajouter une personne</button></div>
+          <p class="count" id="pCount"></p></div>
+        <p class="err" id="eNew" hidden></p>
+        <button type="submit" class="btn" id="bNew" disabled>Créer le lien du groupe</button>
+      </form>
+
+      <form id="fAdd" novalidate hidden>
+        <div class="field"><label for="aGroupe">Groupe déjà inscrit</label><select id="aGroupe"></select><small id="aHelp">Les groupes créés apparaissent ici (mise à jour toutes les heures).</small></div>
+        <div class="field"><label>Prénom(s) à ajouter</label><div class="people" id="peopleAdd"></div>
+          <div><button type="button" class="btn ghost small" id="addA">+ Ajouter une personne</button></div></div>
+        <p class="err" id="eAdd" hidden></p>
+        <button type="submit" class="btn" id="bAdd" disabled>Ajouter et récupérer le lien</button>
+      </form>
+
+      <div class="result" id="result" hidden></div>
+    </div>
+    <p class="note">Inscriptions ouvertes à partir du 27 octobre · +10 € après le 23 novembre · <a href="../assets/IBAN_GBU_Region_Lorraine.pdf" download="RIB_GBU_Region_Lorraine.pdf" style="color:var(--wine)">Télécharger le RIB pour le virement</a></p>
   </div>
 </section>
 </main>
 <footer>GBU Grand Est · Rencontrer Jésus aujourd’hui ?</footer>
+<iframe name="jfSink" id="jfSink" title="Envoi du groupe" hidden></iframe>
+<script>
+const FORM="https://form.jotform.com/262846622284059", GFORM="262985327820061";
+const BASE=location.origin+location.pathname.replace(/index\.html$/,"");
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30)||"groupe";
+const rnd=()=>Math.random().toString(36).slice(2,6);
+const linkFor=g=>`${BASE}?groupe=${encodeURIComponent(g.code)}&nom=${encodeURIComponent(g.nom)}`;
+const formFor=g=>`${FORM}?radio6=Oui&textbox7=${encodeURIComponent(g.nom+" ("+g.code+")")}`;
+let local=[]; try{local=JSON.parse(localStorage.getItem("weGroupes")||"[]")}catch(e){}
+const saveLocal=()=>{try{localStorage.setItem("weGroupes",JSON.stringify(local))}catch(e){}};
+let remote=[];
+
+/* Arrivée par un lien de groupe */
+const q=new URLSearchParams(location.search);
+if(q.get("groupe")){
+  const g={code:q.get("groupe"),nom:q.get("nom")||q.get("groupe")};
+  const msg=`Tu es invité·e dans le groupe <b>« ${esc(g.nom)} »</b> : tarif groupe à 30 €.`;
+  $("inviteHero").innerHTML=msg; $("inviteHero").hidden=false;
+  $("inviteBox").innerHTML=`${msg}<div style="margin-top:12px"><a class="btn" style="background:#fff;color:var(--wine);border-color:#fff" href="${formFor(g)}">Je m'inscris avec ce groupe</a></div>`; $("inviteBox").hidden=false;
+  document.querySelector(".hero .ctas .btn").setAttribute("href",formFor(g)); document.querySelector(".hero .ctas .btn").textContent="Je m'inscris avec mon groupe";
+}
+
+/* Choix groupe / seul */
+$("cGroupe").onclick=()=>{$("gPanel").hidden=false;$("cGroupe").classList.add("on");if(!$("people").children.length)for(let i=0;i<5;i++)addPerson("people");$("gNom").focus()};
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{const t=b.dataset.t;document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  $("fNew").hidden=t!=="new";$("fAdd").hidden=t!=="add";$("result").hidden=true;if(t==="add"){fillGroups();if(!$("peopleAdd").children.length)addPerson("peopleAdd")}});
+
+function addPerson(box){const list=$(box),n=list.children.length+1,d=document.createElement("div");d.className="person";
+  d.innerHTML=`<span>${n}</span><input type="text" maxlength="40" aria-label="Prénom ${n}" placeholder="Prénom"><button type="button" class="x" aria-label="Retirer">✕</button>`;
+  d.querySelector(".x").onclick=()=>{d.remove();renumber(box);check()}; d.querySelector("input").oninput=check; list.appendChild(d); check(); return d}
+function renumber(box){[...$(box).children].forEach((d,i)=>{d.querySelector("span").textContent=i+1;d.querySelector("input").setAttribute("aria-label","Prénom "+(i+1))})}
+const names=box=>[...$(box).querySelectorAll("input")].map(i=>i.value.trim()).filter(Boolean);
+$("addP").onclick=()=>addPerson("people").querySelector("input").focus();
+$("addA").onclick=()=>addPerson("peopleAdd").querySelector("input").focus();
+$("gNom").oninput=check;
+function check(){const n=names("people").length,c=$("pCount");c.textContent=n>=5?`${n} personnes : tarif groupe validé.`:`${n} / 5 personnes minimum pour le tarif groupe.`;c.classList.toggle("ok",n>=5);
+  $("bNew").disabled=!(n>=5&&$("gNom").value.trim()); $("bAdd").disabled=!(names("peopleAdd").length&&$("aGroupe").value)}
+
+/* Envoi au formulaire Jotform des groupes */
+function sendGroup(o){const f=document.createElement("form");f.method="post";f.action=`https://submit.jotform.com/submit/${GFORM}/`;f.target="jfSink";f.hidden=true;
+  const v={formID:GFORM,simple_spc:GFORM+"-"+GFORM,website:"",q2_radio0:o.type,q3_textbox1:o.nom,q4_textbox2:o.code,q5_textbox3:o.ville||"",q6_textbox4:o.resp||"",q7_email5:o.mail||"",q8_textarea6:o.prenoms.join("\n"),q9_textbox7:linkFor(o)};
+  for(const k in v){const i=document.createElement(k==="q8_textarea6"?"textarea":"input");i.name=k;i.value=v[k];f.appendChild(i)} document.body.appendChild(f); f.submit(); setTimeout(()=>f.remove(),4000)}
+
+function showResult(g,added){const url=linkFor(g),wa="https://wa.me/?text="+encodeURIComponent(`Inscris-toi au week-end GBU Grand Est avec notre groupe « ${g.nom} » (30 €) : ${url}`);
+  $("result").innerHTML=`<h3>${added?"Personne ajoutée":"Groupe créé"}</h3><p style="margin:0">Envoie ce lien à chaque personne du groupe${added?" ajoutée":""} : chacun remplit son inscription, déjà marquée « ${esc(g.nom)} » pour le tarif groupe.</p>
+  <div class="linkbox"><input type="text" id="lk" readonly value="${esc(url)}" aria-label="Lien du groupe"><button type="button" class="btn small" id="cp">Copier</button></div>
+  <div class="ctas"><a class="btn ghost small" href="${wa}" target="_blank" rel="noopener">Envoyer sur WhatsApp</a><a class="btn ghost small" href="${formFor(g)}">M'inscrire maintenant</a></div>
+  <p class="note" style="margin:0">Prénoms enregistrés : ${esc(g.prenoms.join(", "))}</p>`;
+  $("result").hidden=false; $("result").scrollIntoView({behavior:"smooth",block:"center"});
+  $("cp").onclick=()=>{const i=$("lk");navigator.clipboard.writeText(i.value).then(()=>$("cp").textContent="Copié",()=>{i.select()})}}
+
+$("fNew").onsubmit=e=>{e.preventDefault();const nom=$("gNom").value.trim(),p=names("people");
+  if(!nom||p.length<5){$("eNew").textContent="Il faut un nom de groupe et au moins 5 prénoms.";$("eNew").hidden=false;return}
+  $("eNew").hidden=true;
+  const g={code:slug(nom)+"-"+rnd(),nom,ville:$("gVille").value,resp:$("gResp").value.trim(),mail:$("gMail").value.trim(),prenoms:p,type:"Nouveau groupe"};
+  sendGroup(g); local.push({code:g.code,nom:g.nom,ville:g.ville,prenoms:p}); saveLocal(); showResult(g,false)};
+
+async function loadRemote(){try{const r=await fetch("groupes.json?"+Date.now());if(r.ok)remote=await r.json()}catch(e){remote=[]}}
+function allGroups(){const m=new Map();remote.forEach(g=>m.set(g.code,g));local.forEach(g=>{if(!m.has(g.code))m.set(g.code,g)});return [...m.values()].sort((a,b)=>a.nom.localeCompare(b.nom,"fr"))}
+async function fillGroups(){await loadRemote();const gs=allGroups(),s=$("aGroupe");
+  s.innerHTML=gs.length?`<option value="">Choisis ton groupe…</option>`+gs.map(g=>`<option value="${esc(g.code)}">${esc(g.nom)}${g.ville?" · "+esc(g.ville):""}</option>`).join(""):`<option value="">Aucun groupe pour l'instant</option>`;
+  $("aHelp").textContent=gs.length?"Les groupes créés apparaissent ici (mise à jour toutes les heures).":"Aucun groupe inscrit pour l'instant : crée d'abord le groupe dans l'autre onglet.";
+  s.onchange=check; check()}
+$("fAdd").onsubmit=e=>{e.preventDefault();const g=allGroups().find(x=>x.code===$("aGroupe").value),p=names("peopleAdd");
+  if(!g||!p.length){$("eAdd").textContent="Choisis un groupe et indique au moins un prénom.";$("eAdd").hidden=false;return}
+  $("eAdd").hidden=true; const o={...g,prenoms:p,type:"Ajout à un groupe"}; sendGroup(o); showResult(o,true)};
+</script>
 </body>
 </html>
