@@ -284,6 +284,14 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 @media (max-width:860px){.tgrid{grid-template-columns:1fr}.slide.mapslide{grid-template-columns:1fr 1.1fr}.arow{grid-template-columns:54px minmax(0,1fr)}.gos{grid-column:2;justify-content:flex-start}.msgs{grid-template-columns:1fr}}
 @media (max-width:560px){.stage{aspect-ratio:4/5}.slide.mapslide{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){.slide,.ch,.prog{transition:none}}
+.atab{font:600 14px var(--body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer}
+.atab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.atab:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#aMain td.n{font-family:var(--display);font-weight:800;color:var(--accent);width:36px;text-align:right}
+#aMain td.t{font-weight:600}
+#aMain input{min-width:0;width:100%}
+#aMain td.w{width:42%}
+@media (max-width:640px){#aMain td.w{width:auto}#aMain tr{display:grid;grid-template-columns:36px minmax(0,1fr)}#aMain td.w{grid-column:2;padding-top:0}#aMain thead{display:none}#aMain td.n,#aMain td.t{border-bottom:0}}
 </style>
 
 <div class="wrap">
@@ -356,7 +364,18 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   </section>
 
   <section id="p-ateliers" class="page" hidden>
-    <div class="phead"><div><h2>Ateliers</h2><p class="muted">La sélection d'ateliers retenue par l'équipe. Chacun vote pour ses 12 préférés.</p></div>
+    <div class="phead"><div><h2>Ateliers</h2><p class="muted">Les 12 ateliers retenus pour le samedi après-midi. Indique à côté de chacun qui l'anime.</p></div></div>
+    <nav class="subtabs" role="tablist" aria-label="Vues des ateliers">
+      <button type="button" class="atab on" role="tab" id="at-main" data-v="main" aria-selected="true">Ateliers retenus</button>
+      <button type="button" class="atab" role="tab" id="at-vote" data-v="vote" aria-selected="false">Vote des ateliers</button>
+    </nav>
+    <div id="av-main">
+      <div class="tbox" style="margin-top:12px"><table class="dtable" id="aMain"></table></div>
+      <p class="muted" style="font-size:13px;margin:8px 0 0">Les intervenants que tu écris sont gardés dans ce navigateur. « Copier la liste » permet de la partager à l'équipe.</p>
+      <div style="margin-top:10px"><button class="btn" type="button" id="aCopy">Copier la liste</button></div>
+    </div>
+    <div id="av-vote" hidden>
+      <div class="phead" style="margin-top:12px"><div><p class="muted">La sélection de départ et le classement des votes. Chacun votait pour ses 12 préférés.</p></div>
       <a class="btn" id="voteBtn" href="https://form.jotform.com/262924244743056" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Voter pour mes 12 ateliers</a></div>
     <div class="kpis" id="aKpi"></div>
     <div class="agrid">
@@ -365,6 +384,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
         <div class="fchips" id="aCats"></div>
         <input type="search" id="aSearch" class="asearch" placeholder="Chercher un atelier…" aria-label="Chercher un atelier">
         <div id="aList" class="alist"></div></div>
+    </div>
     </div>
   </section>
   <section id="p-budget" class="page" hidden>
@@ -532,13 +552,30 @@ function renderAteliers(){
     return `<div class="acat"><h4><span class="cdot" style="background:${c}"></span>${n}<small>${items.length}</small></h4><ul>${items.map(a=>`<li><span>${a.t}${a.aka.length?`<small>Aussi proposé : ${a.aka.join(" · ")}</small>`:""}</span>${nv?`<span class="vc">${counts[a.id]||0} vote${(counts[a.id]||0)>1?"s":""}</span>`:""}</li>`).join("")}</ul></div>`}).join("")||`<p class="muted">Aucun atelier ne correspond.</p>`;
 }
 document.getElementById("aSearch").oninput=e=>{aQ=e.target.value;renderAteliers()};
+/* Ateliers retenus */
+const RETENUS=[[1,"Choisir le pardon pour avancer"],[2,"Servir Dieu : par où ou par quoi commencer ?"],[3,"Avancer dans les épreuves"],[4,"Comment se libérer d'un péché tenace"],[5,"Avancer avec Dieu grâce à la lecture régulière de la Bible"],[6,"Avancer avec Dieu grâce à ma vie de prière"],[7,""],[8,"Comment le mariage aide-t-il à cheminer avec Dieu ?"],[9,"Comment le célibat aide-t-il à cheminer avec Dieu ?"],[10,"Comment répondre aux questions de nos contemporains ?"],[11,"Le plan de Dieu et mes plans"],[12,"Les concurrents de Dieu dans ma vie (les idoles du cœur)"]];
+S._interv=S._interv||{};
+function renderRetenus(){
+  const t=document.getElementById("aMain");
+  t.innerHTML=`<thead><tr><th class="num">N°</th><th>Atelier</th><th>Intervenant</th></tr></thead><tbody>`+RETENUS.map(([n,titre])=>{const v=S._interv[n]||{};
+    return `<tr><td class="n">${n}</td><td class="t">${titre?esc(titre):`<input type="text" data-k="${n}" data-f="t" value="${esc(v.t||"")}" placeholder="Atelier 7 à définir" aria-label="Titre de l'atelier 7">`}</td><td class="w"><input type="text" data-k="${n}" data-f="who" value="${esc(v.who||"")}" placeholder="Qui l'anime ?" aria-label="Intervenant de l'atelier ${n}"></td></tr>`}).join("")+"</tbody>";
+  t.querySelectorAll("input").forEach(i=>i.oninput=()=>{const o=S._interv[i.dataset.k]=S._interv[i.dataset.k]||{};o[i.dataset.f]=i.value;save()});
+}
+document.getElementById("aCopy").onclick=()=>{const txt="Ateliers du samedi après-midi\n"+RETENUS.map(([n,titre])=>{const v=S._interv[n]||{};return `${n}. ${titre||v.t||"(à définir)"} : ${v.who||"intervenant à trouver"}`}).join("\n");
+  const b=document.getElementById("aCopy");navigator.clipboard.writeText(txt).then(()=>{b.textContent="Liste copiée";setTimeout(()=>b.textContent="Copier la liste",1600)},()=>{b.textContent="Copie impossible ici"})};
+let aView="main"; try{aView=localStorage.getItem(KEY+".aview")||"main"}catch(e){}
+function setAView(v){aView=v;document.getElementById("av-main").hidden=v!=="main";document.getElementById("av-vote").hidden=v!=="vote";
+  document.querySelectorAll(".atab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
+  try{localStorage.setItem(KEY+".aview",v)}catch(e){} if(v==="main")renderRetenus(); else renderAteliers()}
+document.querySelectorAll(".atab").forEach(b=>b.onclick=()=>setAView(b.dataset.v));
+
 const PAGES=["appel","carte","planning","taches","logement","budget","ateliers"];
 window.addEventListener("message",e=>{const h=e.data&&e.data.wePlanningHeight;if(h){const f=document.getElementById("planFrame");if(f&&e.source===f.contentWindow)f.style.height=Math.max(600,h+8)+"px"}});
 function showPage(id){
   if(!PAGES.includes(id)) id="carte";
   PAGES.forEach(p=>{document.getElementById("p-"+p).hidden=p!==id;const t=document.getElementById("t-"+p);t.classList.toggle("on",p===id);t.setAttribute("aria-selected",p===id)});
   try{localStorage.setItem(KEY+".page",id)}catch(e){}
-  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget(); if(id==="ateliers")renderAteliers(); if(id==="appel")renderAppel();
+  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget(); if(id==="ateliers")setAView(aView); if(id==="appel")renderAppel();
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showPage(t.dataset.p));
 
