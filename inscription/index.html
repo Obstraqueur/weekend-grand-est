@@ -166,7 +166,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 const slug=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,30)||"groupe";
 const rnd=()=>Math.random().toString(36).slice(2,6);
 const linkFor=g=>`${BASE}?groupe=${encodeURIComponent(g.code)}&nom=${encodeURIComponent(g.nom)}`;
-const formFor=g=>`${FORM}?radio6=Oui&textbox7=${encodeURIComponent(g.nom+" ("+g.code+")")}`;
+const formFor=g=>`${FORM}?textbox7=${encodeURIComponent(g.nom+" ("+g.code+")")}`;
 let local=[]; try{local=JSON.parse(localStorage.getItem("weGroupes")||"[]")}catch(e){}
 const saveLocal=()=>{try{localStorage.setItem("weGroupes",JSON.stringify(local))}catch(e){}};
 let remote=[];
