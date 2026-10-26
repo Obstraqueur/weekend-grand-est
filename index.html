@@ -292,6 +292,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 #aMain input{min-width:0;width:100%}
 #aMain td.w{width:42%}
 @media (max-width:640px){#aMain td.w{width:auto}#aMain tr{display:grid;grid-template-columns:36px minmax(0,1fr)}#aMain td.w{grid-column:2;padding-top:0}#aMain thead{display:none}#aMain td.n,#aMain td.t{border-bottom:0}}
+.cr{display:grid;gap:6px;max-width:900px}.cr h4{font-family:var(--display);font-weight:800;font-size:1.05rem;margin:10px 0 0;color:var(--accent)}.cr h4:first-child{margin-top:0}.cr ul{margin:0;padding-left:20px;display:grid;gap:4px}.cr li::marker{color:var(--accent)}.cr p{margin:0}
 </style>
 
 <div class="wrap">
@@ -329,6 +330,22 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <h3 class="bh" style="margin-top:26px">Déroulé</h3>
     <div class="agenda" id="agenda"></div>
 
+    <h3 class="bh" style="margin-top:26px">Compte rendu de l'appel</h3>
+    <div class="card cr" id="crBox">
+      <h4>Prière</h4><ul><li>La cuisine et l'équipe cuisine</li><li>La louange</li></ul>
+      <h4>La logistique</h4><ul><li><b>Cuisine :</b> trouver une salle pour cuisiner et une équipe cuisine (Edmond et Aline)</li><li><b>Logement :</b> trouver d'autres logements chez l'habitant (Emma)</li><li><b>Transport :</b> ajouter dans le questionnaire qui a une voiture (Edmond)</li></ul>
+      <h4>Le contenu</h4><ul><li><b>Prédicateurs :</b> Alain et Hugo seront présents au prochain appel (Edmond)</li>
+        <li><b>Louange :</b> demander s'il y a besoin d'instrumentistes (Eléa) · trouver le matériel sono et micros, et les consignes (Edmond) · préparer la soirée louange : qui voudrait la faire avec Romu ? · qui préside le culte du dimanche ? (Edmond voit avec Metz Sud)</li>
+        <li><b>Témoignages et sketch :</b> trouver des témoignages et des personnes pour les sketchs. Si vous avez une idée, si vous êtes motivés ou si vous pensez à quelqu'un, envoyez-le à Eléa</li>
+        <li><b>DAB :</b> Sacha, Lena, Jhonby, Mattias, une personne de Campus Central, d'autres à proposer. Qui veut vérifier qu'on a assez d'animateurs ? Edmond rédige une ligne directrice, puis chacun prépare</li>
+        <li><b>Activités et jeux :</b> Emma et Etienne préparent et nous en parlent au prochain appel</li>
+        <li><b>Ateliers :</b> proposition de 12 ateliers (Marion). Contacter les intervenants avant le prochain appel (Edmond, aidé des autres de Metz)</li>
+        <li><b>Planning :</b> le changement du samedi après-midi est validé. À reporter dans le planning détaillé (temps de vaisselle, de trajets) et valider les responsables de journée (Edmond)</li></ul>
+      <h4>Communication et inscriptions</h4><ul><li>Une vidéo sera prête en fin de semaine (Elisa)</li><li>On a déjà l'affiche et le site d'inscription : faites tous un retour sur le site et le formulaire</li><li>Message sur le groupe des responsables mardi à 18h avec l'affiche et le lien du site (Eléa)</li><li>Com sur tous les canaux à Metz (Lena)</li><li>Com plus large (Thionville, Épinal, etc.) selon le nombre d'inscriptions</li><li><b>Budget fixé :</b> 40 € vie active, 35 € étudiant, 30 € en groupe</li><li>Qui veut faire partie de l'équipe d'intercession ?</li></ul>
+      <h4>Prochaine date</h4><p>Votez sur le sondage.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="crCopy">Copier le compte rendu</button><button class="btn" type="button" id="crTasks">Voir les tâches</button></div>
+    </div>
+
     <h3 class="bh" id="transport" style="margin-top:26px">Transport : trajets vers la salle</h3>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
       <div class="seg" role="group" aria-label="Jour"><button type="button" class="on" data-v="borny" id="tvB">Vendredi et samedi · Borny</button><button type="button" data-v="fjt" id="tvF">Dimanche · FJT Queuleu</button></div>
@@ -345,7 +362,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <iframe id="planFrame" title="Planning du week-end : agenda et planning détaillé" data-src="planning.html" style="width:100%;border:0;display:block;min-height:900px;background:transparent"></iframe>
   </section>
   <section id="p-taches" class="page" hidden>
-    <div class="phead"><div><h2>À faire</h2><p class="muted">La Check list WER, mise à jour avec tout ce que vous avez décidé. Coche une tâche quand elle est faite.</p></div></div>
+    <div class="phead"><div><h2>À faire</h2><p class="muted">Mis à jour après l'appel du 26 octobre. Coche une tâche quand elle est faite.</p></div></div>
     <div class="fchips" id="taskCounts"></div>
     <div id="tasks" class="tgroups"></div>
   </section>
@@ -461,7 +478,7 @@ const N = [
   info:["Programme validé le 12 octobre","Fin dimanche à 14h30","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 dimanche matin après le culte avec Metz Sud au FJT (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h30 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h15 à 22h30, puis temps libre (dernier départ 1h00)"],
   q:[["Témoignage de 16h20 : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
  {id:"equipe",t:"Équipe & rôles",why:"Qui fait quoi.",
-  info:["Pôle louange : respo Romuald + équipe louange [en cours]","Pôle témoignage et sketch : respo Eléa + (?) [en cours]","Pôle activités et jeux : respo Emma + Etienne [en cours]","Pôle ateliers : respo Edmond + équipe orga [en cours]","Pôle cuisine : respo recrutement Aline · respo cuisine (?) [en cours]","Pôle logement : respo Emma [en cours]","Pôle communication : Elisa le S., Eléa et Lena [en cours]","Pôle DAB : Sacha + (?) [en cours]","Équipe d'intercession : (?) [en cours]","Salle principale : Edmond [validé]","Cuisine : Edmond [en cours]","Prédicateurs : Edmond et Marion [validé]","Planning : tous [en cours]"],
+  info:["Pôle louange : respo Romuald + équipe louange · soirée louange avec Romuald : (?) · besoin d'instrumentistes : Eléa demande [en cours]", "Pôle témoignage et sketch : respo Eléa · envoyez-lui vos idées de témoignages et les personnes motivées pour les sketchs [en cours]", "Pôle activités et jeux : respo Emma + Etienne · présentation au prochain appel [en cours]", "Pôle ateliers : respo Edmond + équipe orga · 12 ateliers proposés par Marion · intervenants à contacter avant le prochain appel (Edmond et ceux de Metz) [en cours]", "Pôle cuisine : respo recrutement Aline · respo cuisine (?) · salle pour cuisiner et équipe cuisine : Edmond et Aline [en cours]", "Pôle logement : respo Emma · trouver d'autres logements chez l'habitant [en cours]", "Pôle communication : Elisa le S., Eléa et Lena · vidéo en fin de semaine (Elisa), com à Metz (Lena) [en cours]", "Pôle DAB : Sacha, Lena, Jhonby, Mattias, une personne de Campus Central + (?) · ligne directrice : Edmond [en cours]", "Équipe d'intercession : (?) [en cours]", "Salle principale : Edmond [validé]", "Sono, micros et consignes : Edmond [en cours]", "Présidence du culte du dimanche : (?) · Edmond voit avec Metz Sud [en cours]", "Prédicateurs : Edmond et Marion · Alain et Hugo présents au prochain appel [validé]", "Planning : tous · responsables de journée à valider (Edmond) [en cours]"],
   q:[]}
 ];
 
@@ -583,47 +600,41 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showPage(t.dataset.p)
 const ST={fait:"Fait",cours:"En cours",afaire:"À faire",decider:"À décider"};
 const TASKS=[
  {g:"Organisation générale",items:[
-  ["Définir les objectifs du week-end","CR et DR","fait","Créer de l'unité dans la région ; un thème qui aide les GBUssiens au quotidien"],
-  ["Trouver une équipe","CR et DR","fait","Orga : Edmond, Eléa, Marion · équipe : Léna, Emma, Elisa"],
-  ["Trouver une date","CR et DR","fait","27–29 novembre, fin dimanche 14h"],
-  ["Trouver un titre","Équipe orga","fait","Rencontré · Appelé · Envoyé"],
-  ["Planning général","Équipe orga","fait","Validé le 12 octobre"],
-  ["Trouver un lieu","Edmond","cours","Plan A FJT Queuleu + cuisine du Grand Séminaire · plan B Grand Séminaire · plan C Église de Borny + cuisine chez Edmond"],
-  ["Trouver un orateur","Edmond","cours","Louis-Maël Jean pressenti ; sinon Bertrand, Timothée ou quelqu'un d'Algrange"],
-  ["Prochaine réunion d'équipe","Edmond, Marion, Eléa + équipe","afaire","Au plus tard le 20 octobre"],
-  ["Faire le budget et fixer le prix","Marion, Joël","cours","Prix d'équilibre ≈ 44 € avec un lieu à 1 000 € (voir Budget)"],
-  ["Demander le soutien des églises","","afaire","Par exemple Borny, pour l'orateur"]]},
+  ["Définir les objectifs du week-end", "CR et DR", "fait", "Un boost pour chaque GBU, ancrer le GBU dans Metz, ouvrir le week-end à tous"],
+  ["Trouver une équipe", "CR et DR", "fait", ""],
+  ["Date et thème", "Équipe orga", "fait", "27–29 novembre · « Rencontrer Jésus aujourd'hui ? »"],
+  ["Trouver un lieu", "Edmond", "fait", "Vendredi soir et samedi à l'Église de Borny, dimanche matin au FJT Queuleu"],
+  ["Budget et prix", "Marion, Joël", "fait", "40 € vie active · 35 € étudiant · 30 € en groupe"],
+  ["Fixer la date du prochain appel", "Tous", "afaire", "Votez sur le sondage"],
+  ["Équipe d'intercession", "", "decider", "Qui veut en faire partie ?"]]},
+ {g:"Logistique",items:[
+  ["Trouver une salle pour cuisiner", "Edmond, Aline", "cours", ""],
+  ["Monter l'équipe cuisine", "Edmond, Aline", "cours", "Aline : respo recrutement · respo cuisine à trouver"],
+  ["Trouver d'autres logements chez l'habitant", "Emma", "cours", ""],
+  ["Demander dans le questionnaire qui a une voiture sur place", "Edmond", "fait", "Ajouté au formulaire d'inscription le 26/10"],
+  ["Trouver le matériel sono et micros, et les consignes", "Edmond", "afaire", ""],
+  ["Courses", "Jhonby ?", "afaire", "À lui demander"]]},
+ {g:"Contenu",items:[
+  ["Alain et Hugo présents au prochain appel", "Edmond", "afaire", ""],
+  ["Demander s'il faut des instrumentistes", "Eléa", "afaire", ""],
+  ["Préparer la soirée louange avec Romuald", "", "decider", "Qui veut la faire avec Romu ?"],
+  ["Présidence du culte du dimanche", "Edmond", "afaire", "À voir avec Metz Sud"],
+  ["Trouver des témoignages et des personnes pour les sketchs", "Eléa", "cours", "Envoyez vos idées et les personnes motivées à Eléa"],
+  ["Écrire la ligne directrice de la DAB", "Edmond", "afaire", "Puis chaque animateur prépare"],
+  ["Vérifier qu'on a assez d'animateurs DAB", "", "decider", "Sacha, Lena, Jhonby, Mattias, une personne de Campus Central, d'autres à proposer"],
+  ["Préparer les activités et jeux", "Emma, Etienne", "cours", "À présenter au prochain appel"],
+  ["Proposer les 12 ateliers", "Marion", "fait", "Voir l'onglet Ateliers"],
+  ["Contacter les intervenants des ateliers", "Edmond + ceux de Metz", "afaire", "Avant le prochain appel"],
+  ["Reporter le changement du samedi après-midi dans le planning détaillé", "Edmond", "afaire", "Avec les temps de vaisselle et de trajets"],
+  ["Valider les responsables de journée", "Edmond", "afaire", ""]]},
  {g:"Com et inscriptions",items:[
-  ["Save the date","Équipe orga","cours","4 versions prêtes · envoi le 15 octobre"],
-  ["Vidéo teaser avec lien et QR code","Eléa, Elisa","afaire",""],
-  ["Site d'inscription","Edmond","afaire","Inscriptions ouvertes à partir du 20 oct. · fixer une date limite pour la cuisine"],
-  ["Pub sur l'Instagram de la région","","afaire",""],
-  ["Pub dans les groupes WhatsApp des responsables, GBU et églises","Edmond, Eléa","afaire","Puis relances par appel"],
-  ["Mail de confirmation à l'inscription","","afaire",""]]},
- {g:"Programme et intervenants",items:[
-  ["Introduction du week-end le vendredi soir ?","Équipe orga","decider","Prévue au WE précédent, absente du planning actuel"],
-  ["Animateurs du DAB (message 1)","Pôle prédication-DAB & sketch","afaire",""],
-  ["Équipe sketch (samedi 9h45)","Pôle prédication-DAB & sketch","afaire",""],
-  ["Ateliers du samedi : sujets et intervenants","Équipe orga","afaire","Inscription sur place par QR code"],
-  ["Responsables louange","Cynthia, Romuald ?","cours","Idée, à confirmer"],
-  ["PPT des temps de louange","","afaire",""],
-  ["Témoignages des jeunes","","afaire","En lien avec le thème"],
-  ["Grand jeu samedi 14h","Pôle jeux, brise-glace & sport","afaire","Dehors ; prévoir une solution à l'intérieur s'il pleut"],
-  ["Temps de prière et d'envoi avant la fin dimanche","Équipe orga","decider","Prévu au WE précédent ; colle avec « Envoyé »"],
-  ["Emprunter la sono (S&Metz) et un projecteur","Edmond, Marion","afaire",""],
-  ["Cadeaux pour les cuisiniers","","afaire","7 € maximum par cuisinier"]]},
- {g:"Logement",items:[
-  ["Liste des hôtes chez l'habitant","Edmond","fait","12 foyers, 50 places (voir Logement)"],
-  ["Répartir les participants chez les hôtes","Pôle hébergement","afaire","Une fois les inscriptions closes"],
-  ["Organiser les trajets hôtes ↔ église","Pôle hébergement","afaire",""]]},
- {g:"Cuisine",items:[
-  ["Responsable cuisine","Elisa ?","cours","À confirmer"],
-  ["Cuisiniers : 1 principal + aides (4 prévus)","Edmond + responsables","cours","Demande dans les églises de Metz et de Nancy"],
-  ["Vérifier le matériel de cuisine","","afaire","Couverts et vaisselle pour 50"],
-  ["Prévoir les menus","Respo cuisine","afaire","Pas de viande le soir, un seul dessert cuisiné, 1,80 €/repas/personne"],
-  ["Courses pour les repas","Les gens de Metz","afaire",""],
-  ["Courses pour les pauses et les petits-déjeuners","","afaire",""],
-  ["Apporter torchons, éponges, liquide vaisselle, bouilloire","","afaire",""]]},
+  ["Affiche", "Équipe orga", "fait", "Avec QR code vers le site"],
+  ["Site d'inscription et formulaire", "Edmond", "fait", "Inscription seul ou en groupe avec lien"],
+  ["Faire un retour sur le site et le formulaire", "Tous", "afaire", ""],
+  ["Vidéo", "Elisa", "cours", "Prête en fin de semaine"],
+  ["Message sur le groupe des responsables avec l'affiche et le lien", "Eléa", "afaire", "Mardi 27 octobre à 18h"],
+  ["Com sur tous les canaux à Metz", "Lena", "afaire", ""],
+  ["Com plus large (Thionville, Épinal…)", "", "decider", "Selon le nombre d'inscriptions"]]},
  {g:"Peu avant",items:[
   ["Donner les chiffres et les allergies aux cuisiniers","","afaire",""],
   ["Responsable annonces et timing","","afaire",""],
@@ -633,8 +644,8 @@ const TASKS=[
   ["Quelqu'un pour récupérer l'argent à l'accueil","","afaire","Vérifier montants et chèques dès l'accueil"],
   ["Mail de rappel et infos pratiques","","afaire","Accès, n° à appeler, repas du vendredi tiré du sac, sac de couchage, taie, Bible, de quoi noter, jeux, instruments"]]},
  {g:"Pendant",items:[
-  ["Responsable ménage et équipe de nettoyage","","afaire","Dimanche 14h–16h"],
-  ["Contact avec le lieu sur place","","afaire","Les Leuba ou l'Église de Borny"],
+  ["Responsable ménage et équipe de nettoyage","","afaire","Dimanche 14h30–15h30"],
+  ["Contact avec le lieu sur place","","afaire","Église de Borny (ven.–sam.) et FJT Queuleu (dim.)"],
   ["Photo de groupe","","afaire",""]]},
  {g:"Après",items:[
   ["Faire les comptes du WE","Joël","afaire",""],
@@ -1051,6 +1062,11 @@ function renderTransport(){
 }
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{tView=b.dataset.v;renderTransport()});
 
+
+document.getElementById("crCopy").onclick=()=>{const b=document.getElementById("crCopy"),box=document.getElementById("crBox");
+  let t="CR de l'appel du 26/10\n";box.querySelectorAll("h4,li,p").forEach(e=>{t+=e.tagName==="H4"?"\n"+e.textContent.toUpperCase()+"\n":(e.tagName==="LI"?"• ":"")+e.textContent+"\n"});
+  navigator.clipboard.writeText(t).then(()=>{b.textContent="Copié";setTimeout(()=>b.textContent="Copier le compte rendu",1600)},()=>{b.textContent="Copie impossible ici"})};
+document.getElementById("crTasks").onclick=()=>{showPage("taches");window.scrollTo({top:0,behavior:"smooth"})};
 let appelReady=false;
 function renderAppel(){
   if(!appelReady){buildSlides();renderAgenda();renderTransport();appelReady=true;
