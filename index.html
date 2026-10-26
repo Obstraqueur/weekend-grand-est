@@ -969,8 +969,8 @@ function showSlide(){
   document.getElementById("sProg").style.width=((sIdx+(map?mStep/MAPSTEPS:0))/(SLIDES.length-1)*100)+"%";
   document.getElementById("stage").classList.toggle("title",!!SLIDES[sIdx].cls);
 }
-function next(){if(SLIDES[sIdx].map&&mStep<MAPSTEPS){mStep++;showSlide();return} if(sIdx<SLIDES.length-1){sIdx++;if(SLIDES[sIdx].map){mStep=0;vb=V1.slice()}showSlide()}}
-function prev(){if(SLIDES[sIdx].map&&mStep>0){mStep--;showSlide();return} if(sIdx>0){sIdx--;if(SLIDES[sIdx].map){mStep=MAPSTEPS;vb=V2.slice()}showSlide()}}
+function slideNext(){if(SLIDES[sIdx].map&&mStep<MAPSTEPS){mStep++;showSlide();return} if(sIdx<SLIDES.length-1){sIdx++;if(SLIDES[sIdx].map){mStep=0;vb=V1.slice()}showSlide()}}
+function slidePrev(){if(SLIDES[sIdx].map&&mStep>0){mStep--;showSlide();return} if(sIdx>0){sIdx--;if(SLIDES[sIdx].map){mStep=MAPSTEPS;vb=V2.slice()}showSlide()}}
 function goSlide(i){sIdx=i;if(SLIDES[i].map){mStep=0;vb=V1.slice()}showSlide();document.getElementById("stage").scrollIntoView({behavior:"smooth",block:"start"})}
 
 /* Déroulé */
@@ -1017,11 +1017,11 @@ document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{tView=b.datas
 let appelReady=false;
 function renderAppel(){
   if(!appelReady){buildSlides();renderAgenda();renderTransport();appelReady=true;
-    document.getElementById("sNext").onclick=next;document.getElementById("sPrev").onclick=prev;
+    document.getElementById("sNext").onclick=slideNext;document.getElementById("sPrev").onclick=slidePrev;
     document.getElementById("sFull").onclick=()=>{const st=document.getElementById("stage");try{document.fullscreenElement?document.exitFullscreen():st.requestFullscreen().catch(()=>{})}catch(e){}};
-    document.getElementById("stage").addEventListener("click",e=>{if(!e.target.closest(".ctrl"))next()});
+    document.getElementById("stage").addEventListener("click",e=>{if(!e.target.closest(".ctrl"))slideNext()});
     document.addEventListener("keydown",e=>{if(document.getElementById("p-appel").hidden||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
-      if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();next()} else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();prev()}});
+      if(e.key==="ArrowRight"||e.key===" "||e.key==="PageDown"){e.preventDefault();slideNext()} else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();slidePrev()}});
     window.addEventListener("resize",scaleMap); document.addEventListener("fullscreenchange",()=>setTimeout(scaleMap,50));}
   showSlide();
 }
