@@ -910,7 +910,7 @@ const SLIDES=[
  {h:`<span class="eyebrow">Message 1 · Jean 4</span><h3>Viens et vois</h3><ul><li>Que les personnes viennent goûter à l'amour du Christ pendant ce week-end</li><li>Qu'elles entendent parler de son œuvre et de qui il est</li><li>Qu'elles soient guéries de leur passé, comme la femme samaritaine</li></ul>`},
  {h:`<span class="eyebrow">Message 2</span><h3>Suis-moi</h3><ul><li>Qu'est-ce qu'être un disciple de Jésus ? Et qu'est-ce que ne pas l'être ?</li><li>Dieu m'appelle à quoi ? Quand ? Pourquoi ?</li></ul><p class="goal">Que les personnes reçoivent la conviction que Jésus est le chemin, la vérité et la vie, et qu'il n'y a pas de plus grande joie qu'une vie qui lui est consacrée.</p>`},
  {h:`<span class="eyebrow">Message 3</span><h3>Va et deviens</h3><ul><li>Pourquoi est-ce dur de rester unis dans la foi avec nos frères et sœurs ?</li><li>Pourquoi est-ce dur de ne pas retomber dans le péché ?</li></ul><p class="goal">Que les personnes reçoivent les paroles de Jésus comme un sens pour leur vie, une direction, un envoi. Et que Jésus nous transforme en chemin.</p>`},
- {cls:"title",h:`<span class="eyebrow" style="color:var(--core-ink);opacity:.8">20h30 · 15 minutes</span><h3>Prions pour tout cela</h3><p>Pour les personnes qui viendront, pour les trois messages, pour l'équipe.</p>`}
+ {cls:"title",h:`<span class="eyebrow" style="color:var(--core-ink);opacity:.8">20h05 · 15 minutes</span><h3>Prions pour tout cela</h3><p>Pour les personnes qui viendront, pour les trois messages, pour l'équipe.</p>`}
 ];
 const MAPSTEPS=CHURCHES.length; // step 0 = carte vide, step n = n églises affichées
 let sIdx=0, mStep=0, vb=V1.slice(), vbAnim=null;
@@ -975,15 +975,13 @@ function goSlide(i){sIdx=i;if(SLIDES[i].map){mStep=0;vb=V1.slice()}showSlide();d
 
 /* Déroulé */
 const AG=[
- {h:"20h00",t:"Accueil et prière d'ouverture"},
- {h:"20h05",t:"Pourquoi ce week-end ?",d:"Un boost pour chaque GBU, ancrer le GBU dans Metz, ouvrir le week-end à tous.",go:[["Diapos","slide:1"]]},
- {h:"20h20",t:"Le thème et nos objectifs",d:"Viens et vois · Suis-moi · Va et deviens",go:[["Diapos","slide:4"]]},
- {h:"20h30",t:"15 min de prière",go:[["Diapo","slide:8"]]},
- {h:"20h45",t:"La logistique",items:[["Salle principale","Edmond · vendredi soir et samedi à l'Église évangélique de Borny, dimanche matin au FJT Queuleu","v"],["Pôle cuisine","respo recrutement Aline · respo cuisine (?)","c"],["Pôle logement","respo Emma","c"],["Transport","logements à Mission Timothée, place Édouard-Branly, avenue de Strasbourg, près de la gare, Montigny-lès-Metz"]],go:[["Lieu","node:lieu"],["Repas & cuisine","node:repas"],["Logement","page:logement"],["Trajets","anchor:transport"]]},
- {h:"21h00",t:"Le contenu",items:[["Prédicateurs","Edmond et Marion","v"],["Pôle louange","respo Romuald + équipe louange","c"],["Pôle témoignage et sketch","respo Eléa + (?)","c"],["Pôle DAB","Sacha + (?)","c"],["Pôle activités et jeux","respo Emma + Etienne","c"],["Pôle ateliers","respo Edmond + équipe orga","c"],["Planning","tous","c"]],go:[["Équipe & rôles","node:equipe"],["Orateurs","node:orateur"],["Planning","page:planning"],["Ateliers","page:ateliers"]]},
- {h:"21h10",t:"Communication et inscriptions",items:[["Pôle communication","Elisa le S., Eléa et Lena","c"],["Budget et prix","fixés"],["Équipe d'intercession","(?)","c"],["Site internet d'inscription",""]],go:[["Communication","node:villes"],["Budget","page:budget"],["Site d'inscription","url:https://obstraqueur.github.io/weekend-grand-est/inscription/"]]},
- {h:"21h20",t:"Prochaine date et résumé des tâches",d:"Fixer la prochaine réunion, puis chacun repart avec ses tâches.",go:[["À faire","page:taches"]]},
- {h:"21h25",t:"Prière de fin",d:"Fin vers 21h30."}];
+ {h:"20h00",t:"Accueil et présentation : pourquoi ce week-end, le thème",d:"5 min. Un boost pour chaque GBU, ancrer le GBU dans Metz, ouvrir le week-end à tous · Viens et vois, Suis-moi, Va et deviens.",go:[["Diapos","slide:1"],["Thème","slide:4"]]},
+ {h:"20h05",t:"15 min de prière",d:"Jusqu'à 20h20.",go:[["Diapo","slide:8"]]},
+ {h:"20h20",t:"La logistique",items:[["Salle principale","Edmond · vendredi soir et samedi à l'Église évangélique de Borny, dimanche matin au FJT Queuleu","v"],["Pôle cuisine","respo recrutement Aline · respo cuisine (?)","c"],["Pôle logement","respo Emma","c"],["Transport","logements à Mission Timothée, place Édouard-Branly, avenue de Strasbourg, près de la gare, Montigny-lès-Metz"]],go:[["Lieu","node:lieu"],["Repas & cuisine","node:repas"],["Logement","page:logement"],["Trajets","anchor:transport"]]},
+ {h:"20h35",t:"Le contenu",items:[["Prédicateurs","Edmond et Marion","v"],["Pôle louange","respo Romuald + équipe louange","c"],["Pôle témoignage et sketch","respo Eléa + (?)","c"],["Pôle DAB","Sacha + (?)","c"],["Pôle activités et jeux","respo Emma + Etienne","c"],["Pôle ateliers","respo Edmond + équipe orga","c"],["Planning","tous","c"]],go:[["Équipe & rôles","node:equipe"],["Orateurs","node:orateur"],["Planning","page:planning"],["Ateliers","page:ateliers"]]},
+ {h:"20h50",t:"Communication et inscriptions",items:[["Pôle communication","Elisa le S., Eléa et Lena","c"],["Budget et prix","fixés"],["Équipe d'intercession","(?)","c"],["Site internet d'inscription",""]],go:[["Communication","node:villes"],["Budget","page:budget"],["Site d'inscription","url:https://obstraqueur.github.io/weekend-grand-est/inscription/"]]},
+ {h:"21h00",t:"Prochaine date et résumé des tâches",d:"Fixer la prochaine réunion, puis chacun repart avec ses tâches.",go:[["À faire","page:taches"]]},
+ {h:"21h10",t:"Prière de fin",d:"Fin à 21h15."}];
 function renderAgenda(){
   const chip=s=>s?`<span class="st ${s==="v"?"st-fait":"st-cours"}">${s==="v"?"Validé":"En cours"}</span>`:"";
   document.getElementById("agenda").innerHTML=AG.map(a=>`<div class="arow"><span class="h">${a.h}</span><div><div class="t">${a.t}</div>${a.d?`<div class="muted" style="font-size:14px">${a.d}</div>`:""}${a.items?`<ul>${a.items.map(([l,v,s])=>`<li><b>${l}</b>${v?` : ${v}`:""}${chip(s)}</li>`).join("")}</ul>`:""}</div><div class="gos">${(a.go||[]).map(([l,g])=>g.startsWith("url:")?`<a class="go" href="${g.slice(4)}" target="_blank" rel="noopener">${l} ↗</a>`:`<button type="button" class="go" data-go="${g}">${l}</button>`).join("")}</div></div>`).join("");
