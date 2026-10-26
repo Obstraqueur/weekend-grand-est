@@ -1103,7 +1103,7 @@ function renderAppel(){
 
 
 /* ---------- Inscriptions (mis à jour chaque matin par la tâche programmée) ---------- */
-const INSCRITS={"updated":"","list":[]};
+const INSCRITS={"updated": "26 oct. 23h11", "list": [{"id": "6688616907512166602", "d": "2026-10-26", "n": "Edmond J.", "v": "Metz", "a": "etu", "g": "Metzc'estmieux", "gc": "metzc-estmieux-pmf3", "j": "ven", "p": "non", "m": "virement", "c": 0, "al": 0}]};
 const OBJ_VILLES={Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Autre:0};
 let insFilter="tout",insQ="";
 function insTarif(r,groupes){if(r.a==="actif")return 40+(r.d>"2026-11-23"?10:0);const g=r.gc&&groupes[r.gc];return (g&&g.n>=5?30:35)+(r.d>"2026-11-23"?10:0)}
