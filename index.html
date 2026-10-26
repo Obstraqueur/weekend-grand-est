@@ -278,6 +278,9 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
         <div class="simtop"><div><b>Et si on est moins nombreux ?</b><span class="muted" style="display:block;font-size:13px">Solde selon le nombre de participants payants, aux tarifs actuels.</span></div><span class="simres" id="simRes"></span></div>
         <svg id="simChart" viewBox="0 0 1100 170" role="img" aria-label="Solde selon le nombre de participants"></svg>
       </div>
+      <h3 class="bh">Personnes par repas</h3>
+      <p class="muted" style="margin:-4px 0 8px;font-size:13px">Laisse vide pour compter tout le monde. Mets un nombre si certains ne sont pas là à un repas (arrivées, départs, petit-déjeuner chez l'habitant…).</p>
+      <div class="binputs" id="bMeals"></div>
       <h3 class="bh">Tarifs et coûts</h3>
       <div class="binputs" id="bInputs"></div>
     </div>
@@ -583,17 +586,21 @@ document.getElementById("hResetZone").onclick=e=>{const z=document.getElementByI
 const BDEF={eff:{Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Externes:3,"Équipe cuisine":4,Orateur:2}};
 S._b=Object.assign({},S._b||{}); S._b.eff=Object.assign({},BDEF.eff,S._b.eff||{});
 /* Hypothèses = fichier « Budget WER EST 2026 », onglet Prévisionnel */
-const PDEF={t:{plein:35,groupe:30,active:40,charge:0},n:{plein:5,groupe:35,active:4,charge:6},dons:100,repas:1.8,nRepas:3,pdj:1,nPdj:2,gout:10,nGout:3,lieu:400,cuisine:100,orateur:150,entretien:25,cad:7,nCuis:4,imprevus:100};
+const PDEF={t:{plein:35,groupe:30,active:40,charge:0},n:{plein:5,groupe:35,active:4,charge:6},dons:100,repas:1.8,nRepas:3,pdj:1,nPdj:2,gout:10,nGout:3,lieu:400,cuisine:100,orateur:150,entretien:25,cad:7,nCuis:4,imprevus:100,meals:{}};
+const MEALS=[["sp","Samedi · petit-déjeuner","pdj"],["sd","Samedi · déjeuner","repas"],["ss","Samedi · dîner","repas"],["dp","Dimanche · petit-déjeuner","pdj"],["dd","Dimanche · déjeuner","repas"]];
+const mealN=(p,N,k)=>{const v=p.meals&&p.meals[k];return v===null||v===undefined||v===""?N:+v};
+const mealSum=(p,N,type)=>MEALS.filter(m=>m[2]===type).reduce((a,[k])=>a+mealN(p,N,k),0);
 const CATP=[["plein","Étudiants tarif plein"],["groupe","Étudiants tarif groupe"],["active","Vie active"],["charge","Pris en charge (CR, orateur, cuisiniers)"]];
 const clone=o=>JSON.parse(JSON.stringify(o));
 S._p=S._p?Object.assign(clone(PDEF),S._p,{t:Object.assign({},PDEF.t,S._p.t||{}),n:Object.assign({},PDEF.n,S._p.n||{})}):clone(PDEF);
+S._p.meals=Object.assign({},S._p.meals||{});
 S._r=S._r||{n:{},dep:{}};
 const eur=(x,d=0)=>(Math.round(x*100)/100).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d})+" €";
 function prev(p=S._p){
   const N=CATP.reduce((a,[k])=>a+(+p.n[k]||0),0);
   const rev=CATP.map(([k,l])=>({k,l,u:+p.t[k]||0,n:+p.n[k]||0,v:(+p.t[k]||0)*(+p.n[k]||0)}));
   const insc=rev.reduce((a,r)=>a+r.v,0), totRev=insc+(+p.dons||0);
-  const dep={repas:p.repas*N*p.nRepas,pdj:p.pdj*N*p.nPdj,gout:p.gout*p.nGout,lieu:+p.lieu||0,cuisine:+p.cuisine||0,orateur:+p.orateur||0,entretien:+p.entretien||0,cadeau:p.cad*p.nCuis,imprevus:+p.imprevus||0};
+  const dep={repas:p.repas*mealSum(p,N,"repas"),pdj:p.pdj*mealSum(p,N,"pdj"),gout:p.gout*p.nGout,lieu:+p.lieu||0,cuisine:+p.cuisine||0,orateur:+p.orateur||0,entretien:+p.entretien||0,cadeau:p.cad*p.nCuis,imprevus:+p.imprevus||0};
   const courses=dep.repas+dep.pdj+dep.gout, lieux=dep.lieu+dep.cuisine, autres=dep.orateur+dep.entretien+dep.cadeau+dep.imprevus, totDep=courses+lieux+autres;
   const pay=rev.filter(r=>r.u>0).reduce((a,r)=>a+r.n,0);
   return {N,rev,insc,totRev,dep,courses,lieux,autres,totDep,solde:totRev-totDep,pay};
@@ -630,10 +637,13 @@ function renderBudget(){
   renderKpis();
   document.getElementById("bPart").innerHTML=CATP.map(([k,l])=>`<div class="crow"><label for="bp-${k}">${l}</label><input type="range" id="bp-${k}" data-k="${k}" min="0" max="${Math.max(60,+p.n[k]||0)}" step="1" value="${+p.n[k]||0}"><output id="bpo-${k}">${+p.n[k]||0}</output></div>`).join("")
     +`<div class="crow tot"><span>Total</span><span class="muted" style="font-weight:400;font-size:13px">participants</span><output id="bpTot">${prev().N}</output></div>`;
-  document.querySelectorAll("#bPart input").forEach(sl=>sl.oninput=()=>{S._p.n[sl.dataset.k]=+sl.value;document.getElementById("bpo-"+sl.dataset.k).textContent=sl.value;document.getElementById("bpTot").textContent=prev().N;save();renderKpis();renderSim()});
+  document.querySelectorAll("#bPart input").forEach(sl=>sl.oninput=()=>{S._p.n[sl.dataset.k]=+sl.value;document.getElementById("bpo-"+sl.dataset.k).textContent=sl.value;document.getElementById("bpTot").textContent=prev().N;save();renderKpis();renderSim();const n2=prev().N;document.querySelectorAll("#bMeals input").forEach(i=>i.placeholder=n2)});
+  const NN=prev().N;
+  document.getElementById("bMeals").innerHTML=MEALS.map(([k,l,t])=>{const v=p.meals[k];return `<label class="bin" for="bm-${k}"><span>${l}<small>${t==="pdj"?"petit-déjeuner":"repas principal"} · ${eur(t==="pdj"?p.pdj:p.repas,2)} / pers.</small></span><span class="bv"><input type="number" id="bm-${k}" data-m="${k}" value="${v===null||v===undefined?"":v}" placeholder="${NN}" step="1" min="0"> pers.</span></label>`}).join("");
+  document.querySelectorAll("#bMeals input").forEach(i=>i.onchange=()=>{S._p.meals[i.dataset.m]=i.value===""?null:Math.max(0,Math.round(+i.value));save();renderBudget()});
   document.getElementById("bInputs").innerHTML=
     num("t_plein","Tarif étudiant plein",p.t.plein,1," €")+num("t_groupe","Tarif étudiant groupe",p.t.groupe,1," €","inscription avec son GBU local")+num("t_active","Tarif vie active",p.t.active,1," €")+
-    num("dons","Dons",p.dons,10," €")+num("repas","Repas principal / pers.",p.repas,0.1," €",p.nRepas+" repas")+num("pdj","Petit-déjeuner / pers.",p.pdj,0.1," €",p.nPdj+" petits-déjeuners")+
+    num("dons","Dons",p.dons,10," €")+num("repas","Repas principal / pers.",p.repas,0.1," €",mealSum(p,NN,"repas")+" couverts sur 3 repas")+num("pdj","Petit-déjeuner / pers.",p.pdj,0.1," €",mealSum(p,NN,"pdj")+" couverts sur 2 petits-déj.")+
     num("gout","Goûter (forfait)",p.gout,1," €","× "+p.nGout)+num("lieu","Location du lieu",p.lieu,50," €","viser moins de 400 €")+num("cuisine","Location cuisine",p.cuisine,10," €")+
     num("orateur","Don orateur",p.orateur,10," €")+num("entretien","Produits d'entretien",p.entretien,5," €")+num("cad","Cadeau cuisinier",p.cad,1," €","× "+p.nCuis+" cuisiniers")+num("imprevus","Dépenses imprévues",p.imprevus,10," €");
   document.querySelectorAll("#bInputs input").forEach(i=>i.onchange=()=>{const k=i.dataset.k,v=Math.max(0,+i.value||0);if(k.startsWith("t_"))S._p.t[k.slice(2)]=v;else S._p[k]=v;save();renderBudget()});
@@ -655,8 +665,8 @@ function renderCompta(){
   h+=`<tr class="dep"><td class="sec" colspan="6">Dépenses</td></tr>`;
   const sub=(lbl,pr,re)=>`<tr class="sub"><td>${lbl}</td><td></td><td></td><td class="num">${eur(pr,2)}</td><td class="num">${R.started?eur(re,2):""}</td>${R.started?gap(re,pr,false):'<td class="num muted">–</td>'}</tr>`;
   const p=S._p;
-  h+=row("Courses · petit-déj., déj., goûter et dîner",eur(p.repas,2),`${P.N} × ${p.nRepas} repas`,P.dep.repas,inE("repas"),R.dep.repas,false);
-  h+=row("Courses · petits-déjeuners",eur(p.pdj,2),`${P.N} × ${p.nPdj}`,P.dep.pdj,inE("pdj"),R.dep.pdj,false);
+  h+=row("Courses · déjeuners et dîners",eur(p.repas,2),MEALS.filter(m=>m[2]==="repas").map(([k])=>mealN(p,P.N,k)).join(" + ")+" couverts",P.dep.repas,inE("repas"),R.dep.repas,false);
+  h+=row("Courses · petits-déjeuners",eur(p.pdj,2),MEALS.filter(m=>m[2]==="pdj").map(([k])=>mealN(p,P.N,k)).join(" + ")+" couverts",P.dep.pdj,inE("pdj"),R.dep.pdj,false);
   h+=row("Courses · goûter",eur(p.gout,2),`× ${p.nGout}`,P.dep.gout,inE("gout"),R.dep.gout,false);
   h+=sub("Sous-total courses",P.courses,R.courses);
   h+=row("Location du lieu (ou don)","","",P.dep.lieu,inE("lieu"),R.dep.lieu,false);
@@ -676,6 +686,7 @@ function renderCompta(){
 function soldeAt(Np){
   const p=S._p, base=prev(), payBase=base.pay, f=payBase?Np/payBase:0;
   const q=clone(p); CATP.forEach(([k])=>{if((+p.t[k]||0)>0)q.n[k]=(+p.n[k]||0)*f});
+  const r=base.N?prev(q).N/base.N:0; MEALS.forEach(([k])=>{const v=p.meals[k];if(v!==null&&v!==undefined&&v!=="")q.meals[k]=+v*r});
   return prev(q).solde;
 }
 function renderSim(){
@@ -715,13 +726,17 @@ function fillSheet(ws,title,p,nOver,depOver,donsOver){
     ws.getCell("A"+r).value=l;const u=ws.getCell("B"+r);u.value=+p.t[k]||0;u.numFmt=EUR;u.fill=F("FFA4C2F4");ws.getCell("C"+r).value={formula:"B"+src};const e=ws.getCell("E"+r);e.value={formula:`B${r}*C${r}`};e.numFmt=EUR;e.fill=F("FFEFEFEF")});
   ws.getCell("A16").value="Dons";const d=ws.getCell("E16");d.value=donsOver!==undefined?donsOver:(+p.dons||0);d.numFmt=EUR;d.fill=F("FFEFEFEF");
   ws.getCell("A17").value="Total Revenus";ws.getCell("E17").value={formula:"SUM(E12:E16)"};["A17","E17"].forEach(c=>{const x=ws.getCell(c);x.font={bold:true};x.fill=F("FFB6D7A8");x.numFmt=EUR});
-  head(19,["DEPENSES","Coût","Nombre de personnes","Nombre de repas","Budget"],"FFEA9999");
+  head(19,["DEPENSES","Coût","Couverts","Nombre de repas","Budget"],"FFEA9999");
   ws.getCell("A20").value="Courses";ws.getCell("A20").font={bold:true};
   const dep=(r,lbl,unit,nb,nr,key,formula)=>{ws.getCell("A"+r).value=lbl;if(unit!==null){const u=ws.getCell("B"+r);u.value=unit;u.numFmt=EUR;u.fill=F("FF9FC5E8")}
     if(nb!==null)ws.getCell("C"+r).value=nb;if(nr!==null)ws.getCell("D"+r).value=nr;const e=ws.getCell("E"+r);
     e.value=depOver?(depOver[key]??0):(formula?{formula}:null);e.numFmt=EUR;e.fill=F("FFEFEFEF")};
-  dep(21,"Petit déj, déj, goûter et dîner",p.repas,{formula:"B9"},p.nRepas,"repas","B21*C21*D21");
-  dep(22,"Petit déj",p.pdj,{formula:"B9"},p.nPdj,"pdj","B22*C22*D22");
+  ws.getColumn(7).width=30;ws.getColumn(8).width=12;
+  const g=ws.getCell("G19");g.value="Personnes par repas";g.font={bold:true};g.fill=F("FFEA9999");ws.getCell("H19").fill=F("FFEA9999");
+  const order=["sd","ss","dd","sp","dp"];
+  order.forEach((k,i)=>{const m=MEALS.find(x=>x[0]===k),r=20+i,v=p.meals&&p.meals[k];ws.getCell("G"+r).value=m[1];const c=ws.getCell("H"+r);c.value=v===null||v===undefined||v===""?{formula:"B9"}:+v;c.fill=F("FF9FC5E8")});
+  dep(21,"Déjeuners et dîners (3 repas)",p.repas,{formula:"SUM(H20:H22)"},3,"repas","B21*C21");
+  dep(22,"Petits-déjeuners (2)",p.pdj,{formula:"SUM(H23:H24)"},2,"pdj","B22*C22");
   dep(23,"Goûter",p.gout,null,p.nGout,"gout","B23*D23");
   const st=(r,l,f)=>{ws.getCell("A"+r).value=l;ws.getCell("A"+r).font={bold:true};ws.getCell("A"+r).fill=F("FFEA9999");const e=ws.getCell("E"+r);e.value={formula:f};e.font={bold:true};e.fill=F("FFCCCCCC");e.numFmt=EUR};
   st(24,"Sous-total - courses","SUM(E21:E23)");
