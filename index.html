@@ -329,7 +329,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <div class="tmap"><svg id="tMap" class="mapsvg" role="img" aria-label="Carte des trajets entre les logements et la salle"></svg></div>
       <div>
         <div class="tbox"><table class="dtable ttable" id="tTable"></table></div>
-        <p class="muted" style="font-size:13px;margin:8px 0 0">Durées estimées à partir de la distance (environ 4,5 km/h à pied, circulation de ville en voiture). Gare → Borny : Mettis A, environ 20 min, à vérifier sur Le Met'. Samedi soir, dernier départ à 1h00 : à pied seulement pour la place Édouard-Branly et l'avenue de Strasbourg, voitures pour les autres.</p>
+        <p class="muted" style="font-size:13px;margin:8px 0 0">En voiture par défaut. « Sinon » : à pied quand c'est à moins de 20 min, ou le Mettis B depuis la gare (15 min jusqu'à Borny). Durées estimées à partir de la distance. Samedi soir, dernier départ à 1h00 : à pied seulement depuis la place Édouard-Branly, voitures pour les autres.</p>
       </div>
     </div>
   </section>
@@ -995,6 +995,7 @@ const VENUES={borny:["borny","Église de Borny","ven. et sam."],fjt:["fjt","FJT 
 let tView="borny";
 function km(a,b){const [x1,y1]=GEO.pts[a],[x2,y2]=GEO.pts[b];return Math.hypot(x2-x1,y2-y1)/4000*111.2*1.3}
 const walk=k=>Math.round(k/4.5*60), car=k=>Math.round(k/22*60+3);
+const alt=(k,v,d)=>{if(k==="gare"&&v==="borny")return "Mettis B · 15 min";const w=walk(d);return w<=20?`${w} min à pied`:""};
 const dur=m=>m>=60?`${Math.floor(m/60)} h ${String(m%60).padStart(2,"0")}`:`${m} min`;
 function renderTransport(){
   const svg=document.getElementById("tMap"); svg.innerHTML=""; svg.setAttribute("viewBox","360 1262 330 175");
@@ -1006,9 +1007,9 @@ function renderTransport(){
     if(l2){const b=svgEl("text",{x:x+dx,y:up?y+dy-8:y+dy+(pos==="r"?-8:13),"text-anchor":anc,class:"sub"});b.textContent=l2;g.appendChild(b)}};
   Object.values(VENUES).forEach(([k,n,when])=>{const [x,y]=GEO.pts[k],g=svgEl("g",{class:"pin venue"+(k===v?"":" off")});g.appendChild(svgEl("circle",{cx:x,cy:y,r:6}));label(g,x,y,k==="borny"?"r":"b",n,when);svg.appendChild(g)});
   LODG.forEach(([k,n,,pos])=>{const [x,y]=GEO.pts[k],d=km(k,v),g=svgEl("g",{class:"pin lodg"});g.appendChild(svgEl("circle",{cx:x,cy:y,r:4}));
-    label(g,x,y,pos,n,`${dur(walk(d))} à pied · ${car(d)} min en voiture`);svg.appendChild(g)});
-  document.getElementById("tTable").innerHTML=`<thead><tr><th>Depuis</th><th class="num">Distance</th><th class="num">À pied</th><th class="num">Voiture</th></tr></thead><tbody>`+
-    LODG.map(([k,n,sub])=>{const d=km(k,v);return `<tr><td>${n}${sub?`<small>${sub}</small>`:""}</td><td class="num">${d.toFixed(1).replace(".",",")} km</td><td class="num"><b>${dur(walk(d))}</b></td><td class="num"><b>${car(d)} min</b></td></tr>`}).join("")+"</tbody>";
+    label(g,x,y,pos,n,`${car(d)} min en voiture${alt(k,v,d)?" · "+alt(k,v,d):""}`);svg.appendChild(g)});
+  document.getElementById("tTable").innerHTML=`<thead><tr><th>Depuis</th><th class="num">Distance</th><th class="num">Voiture</th><th>Sinon</th></tr></thead><tbody>`+
+    LODG.map(([k,n,sub])=>{const d=km(k,v);return `<tr><td>${n}${sub?`<small>${sub}</small>`:""}</td><td class="num">${d.toFixed(1).replace(".",",")} km</td><td class="num"><b>${car(d)} min</b></td><td>${alt(k,v,d)||'<span class="muted">–</span>'}</td></tr>`}).join("")+"</tbody>";
   document.querySelectorAll(".seg button").forEach(b=>b.classList.toggle("on",b.dataset.v===tView));
 }
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{tView=b.dataset.v;renderTransport()});
