@@ -293,6 +293,12 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 #aMain td.w{width:42%}
 @media (max-width:640px){#aMain td.w{width:auto}#aMain tr{display:grid;grid-template-columns:36px minmax(0,1fr)}#aMain td.w{grid-column:2;padding-top:0}#aMain thead{display:none}#aMain td.n,#aMain td.t{border-bottom:0}}
 .cr{display:grid;gap:6px;max-width:900px}.cr h4{font-family:var(--display);font-weight:800;font-size:1.05rem;margin:10px 0 0;color:var(--accent)}.cr h4:first-child{margin-top:0}.cr ul{margin:0;padding-left:20px;display:grid;gap:4px}.cr li::marker{color:var(--accent)}.cr p{margin:0}
+.ltab{font:600 14px var(--body);background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px;cursor:pointer}
+.ltab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.ltab:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#insTable td.ok{color:var(--new);font-weight:700}#insTable td.ko{color:#c0392b;font-weight:600}
+#insTable small{display:block;color:var(--muted);font-size:12px}
+.gl{display:grid;gap:6px}.gl div{display:flex;justify-content:space-between;gap:10px;font-size:14px;border-top:1px solid var(--line);padding-top:6px}.gl div:first-child{border-top:0;padding-top:0}
 </style>
 
 <div class="wrap">
@@ -368,6 +374,21 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   </section>
 
   <section id="p-logement" class="page" hidden>
+    <nav class="subtabs" role="tablist" aria-label="Vues du logement" style="margin-top:0">
+      <button type="button" class="ltab" role="tab" id="lt-ins" data-v="ins">Inscriptions</button>
+      <button type="button" class="ltab" role="tab" id="lt-heb" data-v="heb">Hébergement</button>
+    </nav>
+    <div id="lv-ins" hidden>
+      <div class="phead" style="margin-top:12px"><div><h2>Inscriptions</h2><p class="muted" id="insSub"></p></div>
+        <a class="btn" href="https://www.jotform.com/inbox/262846622284059" target="_blank" rel="noopener">Toutes les réponses dans Jotform ↗</a></div>
+      <div class="kpis" id="insKpi"></div>
+      <div class="lgrid" id="insCards"></div>
+      <div class="fchips" id="insChips" style="margin-top:14px"></div>
+      <input type="search" id="insSearch" class="asearch" placeholder="Chercher un nom, une ville, un groupe…" aria-label="Chercher une inscription">
+      <div class="tbox"><table class="dtable" id="insTable"></table></div>
+      <p class="muted" style="font-size:13px;margin:8px 0 0">Pour garder la page partageable, on n'affiche que le prénom et l'initiale du nom. E-mails, téléphones, adresses et le détail des allergies sont dans Jotform.</p>
+    </div>
+    <div id="lv-heb" hidden>
     <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Change les places avec les jauges, ajoute ou retire un foyer, et fais varier le nombre de personnes par ville.</p></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="hAdd" style="background:var(--accent);border-color:var(--accent);color:#1b2433">+ Ajouter un foyer</button><span id="hResetZone"><button class="btn" type="button" id="hReset">Revenir aux valeurs de départ</button></span></div></div>
     <div class="kpis" id="hostKpi"></div>
@@ -378,6 +399,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
     <h3 class="bh">Foyers d'accueil</h3>
     <div class="tbox"><table id="hosts" class="dtable"></table></div>
+    </div>
   </section>
 
   <section id="p-ateliers" class="page" hidden>
@@ -592,7 +614,7 @@ function showPage(id){
   if(!PAGES.includes(id)) id="carte";
   PAGES.forEach(p=>{document.getElementById("p-"+p).hidden=p!==id;const t=document.getElementById("t-"+p);t.classList.toggle("on",p===id);t.setAttribute("aria-selected",p===id)});
   try{localStorage.setItem(KEY+".page",id)}catch(e){}
-  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")renderHosts(); if(id==="budget")renderBudget(); if(id==="ateliers")setAView(aView); if(id==="appel")renderAppel();
+  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")setLView(lView); if(id==="budget")renderBudget(); if(id==="ateliers")setAView(aView); if(id==="appel")renderAppel();
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showPage(t.dataset.p));
 
@@ -1079,6 +1101,41 @@ function renderAppel(){
   showSlide();
 }
 
+
+/* ---------- Inscriptions (mis à jour chaque matin par la tâche programmée) ---------- */
+const INSCRITS={"updated":"","list":[]};
+const OBJ_VILLES={Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Autre:0};
+let insFilter="tout",insQ="";
+function insTarif(r,groupes){if(r.a==="actif")return 40+(r.d>"2026-11-23"?10:0);const g=r.gc&&groupes[r.gc];return (g&&g.n>=5?30:35)+(r.d>"2026-11-23"?10:0)}
+function renderIns(){
+  const L=INSCRITS.list, N=L.length, groupes={};
+  L.forEach(r=>{if(r.gc){const g=groupes[r.gc]=groupes[r.gc]||{nom:r.g,n:0};g.n++}});
+  const paid=L.filter(r=>r.p==="oui"), sam=L.filter(r=>r.j==="sam").length, places=L.reduce((a,r)=>a+r.c,0), al=L.filter(r=>r.al).length;
+  const du=L.reduce((a,r)=>a+insTarif(r,groupes),0), recu=paid.reduce((a,r)=>a+insTarif(r,groupes),0);
+  document.getElementById("insSub").textContent=INSCRITS.updated?`Mis à jour chaque matin depuis le formulaire d'inscription. Dernière mise à jour : ${INSCRITS.updated}.`:"Mis à jour chaque matin depuis le formulaire d'inscription.";
+  document.getElementById("insKpi").innerHTML=`
+   <div class="kpi"><span>Inscrits</span><b>${N}</b><small>objectif 50 · ${L.filter(r=>r.a==="actif").length} vie active</small></div>
+   <div class="kpi ${N&&paid.length<N?"":"good"}"><span>Virements reçus (déclarés)</span><b>${paid.length}</b><small>${eur(recu)} sur ${eur(du)} attendus</small></div>
+   <div class="kpi"><span>Arrivées</span><b>${N-sam} · ${sam}</b><small>vendredi · samedi matin</small></div>
+   <div class="kpi"><span>Places en voiture sur place</span><b>${places}</b><small>${L.filter(r=>r.c).length} conducteur${L.filter(r=>r.c).length>1?"s":""} · ${al} allergie${al>1?"s":""} ou régime${al>1?"s":""}</small></div>`;
+  const villes=Object.keys(OBJ_VILLES).map(v=>[v,L.filter(r=>r.v===v).length,OBJ_VILLES[v]]).filter(x=>x[1]||x[2]);
+  const gl=Object.entries(groupes).sort((a,b)=>b[1].n-a[1].n);
+  document.getElementById("insCards").innerHTML=`<div class="card"><h3 class="bh" style="margin-top:4px">Par ville</h3><div class="hgauge" style="border:0;padding:0;margin:0">${villes.map(([v,n,o])=>`<div class="hbar"><span>${v}</span><span class="tr2"><i style="width:${o?Math.min(100,n/o*100):(n?100:0)}%;background:${o&&n>=o?"var(--new)":"var(--accent)"}"></i></span><b>${n}${o?"/"+o:""}</b></div>`).join("")}</div></div>
+   <div class="card"><h3 class="bh" style="margin-top:4px">Groupes</h3>${gl.length?`<div class="gl">${gl.map(([c,g])=>`<div><span>${esc(g.nom||c)}</span><b class="${g.n>=5?"pos":""}" style="color:${g.n>=5?"var(--new)":"var(--muted)"}">${g.n} inscrit${g.n>1?"s":""}${g.n>=5?" · tarif groupe":" · "+g.n+"/5"}</b></div>`).join("")}</div>`:`<p class="muted" style="margin:0">Aucune inscription en groupe pour l'instant.</p>`}</div>`;
+  const F={tout:["Tous",()=>true],nonpaye:["Pas encore payé",r=>r.p!=="oui"],sam:["Arrivée samedi",r=>r.j==="sam"],voiture:["Avec voiture",r=>r.c>0],groupe:["En groupe",r=>!!r.gc],actif:["Vie active",r=>r.a==="actif"]};
+  document.getElementById("insChips").innerHTML=Object.entries(F).map(([k,[l,f]])=>`<button type="button" class="fchip${insFilter===k?" on":""}" data-f="${k}">${l} <b>${L.filter(f).length}</b></button>`).join("");
+  document.querySelectorAll("#insChips .fchip").forEach(b=>b.onclick=()=>{insFilter=b.dataset.f;renderIns()});
+  const q=insQ.trim().toLowerCase(), rows=L.filter(F[insFilter][1]).filter(r=>!q||(r.n+" "+r.v+" "+r.g).toLowerCase().includes(q)).slice().reverse();
+  document.getElementById("insTable").innerHTML=N?`<thead><tr><th>Nom</th><th>Ville</th><th>Statut</th><th>Groupe</th><th>Arrivée</th><th class="num">Tarif</th><th>Payé</th><th class="num">Voiture</th><th>Allergies</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td><b>${esc(r.n)}</b><small>inscrit le ${r.d.split("-").reverse().slice(0,2).join("/")}</small></td><td>${esc(r.v)}</td><td>${r.a==="actif"?"Vie active":"Étudiant"}</td><td>${esc(r.g)||'<span class="muted">seul</span>'}</td><td>${r.j==="sam"?"Samedi 9h":"Vendredi"}</td><td class="num">${insTarif(r,groupes)} €</td><td class="${r.p==="oui"?"ok":"ko"}">${r.p==="oui"?"Oui":(r.m==="place"?"Sur place":"Pas encore")}</td><td class="num">${r.c?r.c+" places":""}</td><td>${r.al?"Oui":""}</td></tr>`).join("")+"</tbody>"
+    :`<tbody><tr><td style="padding:18px"><b>Aucune inscription pour l'instant.</b><br><span class="muted">Les inscriptions arrivent dans Jotform et s'affichent ici chaque matin.</span></td></tr></tbody>`;
+}
+document.getElementById("insSearch").oninput=e=>{insQ=e.target.value;renderIns()};
+let lView="ins"; try{lView=localStorage.getItem(KEY+".lview")||"ins"}catch(e){}
+function setLView(v){lView=v;document.getElementById("lv-ins").hidden=v!=="ins";document.getElementById("lv-heb").hidden=v!=="heb";
+  document.querySelectorAll(".ltab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
+  try{localStorage.setItem(KEY+".lview",v)}catch(e){} if(v==="ins")renderIns(); else renderHosts()}
+document.querySelectorAll(".ltab").forEach(b=>b.onclick=()=>setLView(b.dataset.v));
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
 showPage(startPage);
 </script>
