@@ -76,7 +76,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 #todo input{margin-top:4px;accent-color:var(--accent);flex:none}
 #todo input:checked + span{color:var(--muted);text-decoration:line-through}
 .owner{display:inline-block;font-size:12px;font-weight:600;color:var(--ink);background:var(--accent-soft);border-radius:4px;padding:0 6px;margin-left:4px}
-.info h3{margin-top:10px}.info ul{margin:0;padding-left:18px;display:grid;gap:7px}.info li{color:var(--ink);line-height:1.45}.info li b{font-weight:800;color:var(--ink)}.info li::marker{color:var(--accent)}
+.info h3{margin-top:10px}.info ul{margin:0;padding-left:18px;display:grid;gap:7px}.info li{color:var(--ink);line-height:1.45}.info li b{font-weight:800;color:var(--ink)}.info li::marker{color:var(--accent)}.info .st{display:inline-block;vertical-align:1px}.info .st-cours{background:var(--surface);border:1px solid var(--accent)}.info .st-fait{border:1px solid var(--new)}
 .saved{font-size:12px;color:var(--muted);margin-top:4px;min-height:1em}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--core);color:var(--core-ink);padding:10px 16px;border-radius:8px;font-weight:600}
 @media (max-width:960px){
@@ -334,7 +334,7 @@ const N = [
   info:["Programme validé le 12 octobre","Fin dimanche à 14h30","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 dimanche matin après le culte avec Metz Sud au FJT (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h30 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h15 à 22h30, puis temps libre (dernier départ 1h00)"],
   q:[["Témoignage de 16h20 : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
  {id:"equipe",t:"Équipe & rôles",why:"Qui fait quoi.",
-  info:["Pôle louange : respo Romuald + équipe louange","Pôle témoignage et sketch : respo Eléa + (?)","Pôle activités et jeux : respo Emma + Etienne","Pôle ateliers : respo Edmond + équipe orga","Pôle cuisine : respo recrutement (?) · respo cuisine (?)","Pôle logement : respo Emma","Pôle communication : Elisa le S. et Eléa","Pôle DAB : Sacha + (?)","Salle principale : Edmond","Prédicateurs : Edmond et Marion","Planning : tous"],
+  info:["Pôle louange : respo Romuald + équipe louange [en cours]","Pôle témoignage et sketch : respo Eléa + (?) [en cours]","Pôle activités et jeux : respo Emma + Etienne [en cours]","Pôle ateliers : respo Edmond + équipe orga [en cours]","Pôle cuisine : respo recrutement Aline · respo cuisine (?) [en cours]","Pôle logement : respo Emma [en cours]","Pôle communication : Elisa le S., Eléa et Lena [en cours]","Pôle DAB : Sacha + (?) [en cours]","Salle principale : Edmond [en cours]","Prédicateurs : Edmond et Marion [validé]","Planning : tous [en cours]"],
   q:[]}
 ];
 
@@ -367,7 +367,7 @@ function open(id){
   document.querySelectorAll("#lines line").forEach(e=>e.classList.toggle("on",e.id==="line-"+id));
   const done=n.q.filter((_,i)=>s.c[i]).length;
   panel.innerHTML=`${n.nw?'<span class="tag">Point ajouté</span>':''}<h2>${n.t}</h2><p class="why">${n.why}</p>
-   ${n.info?`<div class="info"><h3>Ce qu'on sait déjà</h3><ul>${n.info.map(x=>{const k=x.indexOf(" : ");return `<li>${k>0?`<b>${x.slice(0,k)}</b> : ${x.slice(k+3)}`:x}</li>`}).join("")}</ul></div>`:""}
+   ${n.info?`<div class="info"><h3>Ce qu'on sait déjà</h3><ul>${n.info.map(x=>{let b="";x=x.replace(/ \[(en cours|validé)\]$/,(_,m)=>{b=` <span class="st ${m==="validé"?"st-fait":"st-cours"}" style="margin-left:4px">${m==="validé"?"Validé":"En cours"}</span>`;return ""});const k=x.indexOf(" : ");return `<li>${k>0?`<b>${x.slice(0,k)}</b> : ${x.slice(k+3)}`:x}${b}</li>`}).join("")}</ul></div>`:""}
    ${n.q.length?`<h3>Reste à régler · <span id="cnt">${done}/${n.q.length}</span></h3><ul class="qs">${n.q.map((q,i)=>`<li><label><input type="checkbox" id="q-${id}-${i}" data-i="${i}" ${s.c[i]?"checked":""}><span>${q[0]}${q[1]?`<span class="owner">${q[1]}</span>`:""}</span></label></li>`).join("")}</ul>`:""}
    ${n.prog?`<h3>Programme actuel</h3><div style="overflow-x:auto"><table class="sched">${PROG.map(r=>r.length===1?`<tr class="day"><td colspan="2">${r[0]}</td></tr>`:`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table></div>`:""}
    <h3><label for="notes-${id}">Notes de l'appel</label></h3>
