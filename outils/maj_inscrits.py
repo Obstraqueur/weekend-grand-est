@@ -22,6 +22,10 @@ def norm(s):
     return re.sub(r"[^a-z0-9]+", " ", s).strip()
 
 subs = json.load(open(sys.argv[1], encoding="utf-8"))
+# Corrections manuelles : prénoms + noms des personnes qui ont un logement sur Metz même si Jotform ne le dit pas.
+import os
+_f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logement_metz.json")
+LOGES = {norm(n) for n in json.load(open(_f, encoding="utf-8"))} if os.path.exists(_f) else set()
 latest = {}
 for s in subs:
     if "TEST" in (s.get("prenom", "") + s.get("nom", "")).upper():
@@ -54,7 +58,7 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "p": "oui" if (s.get("paye") or "").lower().startswith("oui") else "non",
         "m": "virement" if "virement" in (s.get("paiement") or "").lower() else "place",
         "c": int(places) if (s.get("voiture") or "").lower().startswith("oui") and places else 0,
-        "lg": 1 if (s.get("logement") or "").lower().startswith("oui") else 0,
+        "lg": 1 if (s.get("logement") or "").lower().startswith("oui") or norm(s.get("prenom", "") + " " + s.get("nom", "")) in LOGES else 0,
         "al": 1 if (s.get("allergies") or "").strip() not in ("", "-", "non", "Non", "aucune", "Aucune", "RAS") else 0,
     })
 
