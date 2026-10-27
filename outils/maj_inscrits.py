@@ -8,7 +8,7 @@ une entrée par soumission, avec les réponses en texte :
   "statut": "Étudiant(e) ..." | "Vie active ...", "groupe": "GBU Nancy (gbu-nancy-ab12)" | "",
   "arrivee": "Vendredi ..." | "Samedi ...", "paiement": "Virement" | "Sur place à l'accueil",
   "paye": "Oui" | "Pas encore", "voiture": "Oui" | "Non", "places": "3", "covoiturage": "...",
-  "allergies": "texte libre ou vide", "don": "0"}]
+  "allergies": "texte libre ou vide", "logement": "Oui" | "Non"}]
 
 Données réduites volontairement (la page est partagée par lien) : prénom + initiale du nom,
 pas d'e-mail, de téléphone, d'adresse ni de date de naissance, et seulement « oui/non » pour
@@ -54,6 +54,7 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "p": "oui" if (s.get("paye") or "").lower().startswith("oui") else "non",
         "m": "virement" if "virement" in (s.get("paiement") or "").lower() else "place",
         "c": int(places) if (s.get("voiture") or "").lower().startswith("oui") and places else 0,
+        "lg": 1 if (s.get("logement") or "").lower().startswith("oui") else 0,
         "al": 1 if (s.get("allergies") or "").strip() not in ("", "-", "non", "Non", "aucune", "Aucune", "RAS") else 0,
     })
 
