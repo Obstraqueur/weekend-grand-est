@@ -3,12 +3,24 @@
   "code": "gbu-strasbourg-vnxn",
   "nom": "GBU Strasbourg !",
   "ville": "Strasbourg",
-  "n": 7
+  "n": 8
+ },
+ {
+  "code": "gdj-borny-tziw",
+  "nom": "GDJ Borny",
+  "ville": "Metz",
+  "n": 5
+ },
+ {
+  "code": "louange-w1sl",
+  "nom": "Louange",
+  "ville": "Metz",
+  "n": 5
  },
  {
   "code": "metzc-estmieux-pmf3",
   "nom": "Metzc'estmieux",
   "ville": "Metz",
-  "n": 7
+  "n": 13
  }
 ]
