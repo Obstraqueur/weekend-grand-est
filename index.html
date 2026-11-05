@@ -376,6 +376,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   <section id="p-logement" class="page" hidden>
     <nav class="subtabs" role="tablist" aria-label="Vues du logement" style="margin-top:0">
       <button type="button" class="ltab" role="tab" id="lt-ins" data-v="ins">Inscriptions</button>
+      <button type="button" class="ltab" role="tab" id="lt-int" data-v="int">Intervenants</button>
       <button type="button" class="ltab" role="tab" id="lt-heb" data-v="heb">Hébergement</button>
     </nav>
     <div id="lv-ins" hidden>
@@ -387,6 +388,13 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <input type="search" id="insSearch" class="asearch" placeholder="Chercher un nom, une ville, un groupe…" aria-label="Chercher une inscription">
       <div class="tbox"><table class="dtable" id="insTable"></table></div>
       <p class="muted" style="font-size:13px;margin:8px 0 0">Pour garder la page partageable, on n'affiche que le prénom et l'initiale du nom. E-mails, téléphones, adresses et le détail des allergies sont dans Jotform.</p>
+    </div>
+    <div id="lv-int" hidden>
+      <div class="phead" style="margin-top:12px"><div><h2>Intervenants</h2><p class="muted" id="intSub"></p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="https://obstraqueur.github.io/weekend-grand-est/intervenants/" target="_blank" rel="noopener">Page à leur envoyer ↗</a><a class="btn" href="https://www.jotform.com/inbox/263074696052057" target="_blank" rel="noopener">Réponses dans Jotform ↗</a></div></div>
+      <div class="kpis" id="intKpi"></div>
+      <div class="card" style="margin-bottom:14px"><h3 class="bh" style="margin-top:4px">Présents à chaque moment (repas à prévoir)</h3><div class="hgauge" id="intMoments" style="border:0;padding:0;margin:0"></div></div>
+      <div class="tbox"><table class="dtable" id="intTable"></table></div>
     </div>
     <div id="lv-heb" hidden>
     <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Change les places avec les jauges, ajoute ou retire un foyer, et fais varier le nombre de personnes par ville.</p></div>
@@ -1131,10 +1139,31 @@ function renderIns(){
     :`<tbody><tr><td style="padding:18px"><b>Aucune inscription pour l'instant.</b><br><span class="muted">Les inscriptions arrivent dans Jotform et s'affichent ici chaque matin.</span></td></tr></tbody>`;
 }
 document.getElementById("insSearch").oninput=e=>{insQ=e.target.value;renderIns()};
+
+/* ---------- Intervenants (mis à jour chaque matin par la tâche programmée) ---------- */
+const INTERV={"updated":"","list":[]};
+const MOMENTS=["Vendredi soir","Samedi matin + midi","Samedi midi + après-midi","Samedi après-midi + dîner","Samedi dîner + soirée louange","Dimanche matin + midi"];
+const MOM_COURT=["Ven. soir","Sam. matin","Sam. midi","Sam. aprem","Sam. soir","Dim."];
+function renderInt(){
+  const L=INTERV.list,N=L.length,role=i=>L.filter(r=>r.r[i]).length;
+  document.getElementById("intSub").textContent=`Orateurs, animateurs d'ateliers et témoins. Mis à jour chaque matin depuis le formulaire intervenants${INTERV.updated?" · dernière mise à jour : "+INTERV.updated:""}.`;
+  document.getElementById("intKpi").innerHTML=`
+   <div class="kpi"><span>Intervenants</span><b>${N}</b><small>${role(0)} prédication · ${role(1)} atelier · ${role(2)} témoignage</small></div>
+   <div class="kpi"><span>À loger</span><b>${L.filter(r=>!r.lg).length}</b><small>sans logement sur Metz</small></div>
+   <div class="kpi"><span>Allergies ou régimes</span><b>${L.filter(r=>r.al).length}</b><small>détail dans Jotform</small></div>
+   <div class="kpi"><span>Matériel demandé</span><b>${L.filter(r=>r.mat).length}</b><small>voir la colonne Matériel</small></div>`;
+  const mx=Math.max(1,...MOMENTS.map((_,i)=>L.filter(r=>r.pr[i]).length));
+  document.getElementById("intMoments").innerHTML=MOMENTS.map((m,i)=>{const n=L.filter(r=>r.pr[i]).length;return `<div class="hbar" style="grid-template-columns:200px minmax(0,1fr) 44px"><span>${m}</span><span class="tr2"><i style="width:${n/mx*100}%;background:var(--accent)"></i></span><b>${n}</b></div>`}).join("");
+  const tag=(on,t)=>on?`<span class="st st-cours" style="margin:0 4px 2px 0;display:inline-block">${t}</span>`:"";
+  document.getElementById("intTable").innerHTML=N?`<thead><tr><th>Nom</th><th>Intervient pour</th><th>Présent</th><th>Logement</th><th>Matériel</th></tr></thead><tbody>`+
+    L.slice().reverse().map(r=>`<tr><td><b>${esc(r.n)}</b>${r.e?`<small>${esc(r.e)}</small>`:""}${r.al?`<small>allergie ou régime</small>`:""}</td><td>${tag(r.r[0],"Prédication")}${tag(r.r[1],"Atelier")}${tag(r.r[2],"Témoignage")}${r.at?`<small>${esc(r.at)}</small>`:""}</td><td>${MOM_COURT.filter((_,i)=>r.pr[i]).join(" · ")||'<span class="muted">non précisé</span>'}</td><td>${r.lg?"A un logement":"À loger"}</td><td>${esc(r.mat)}</td></tr>`).join("")+"</tbody>"
+    :`<tbody><tr><td style="padding:18px"><b>Aucun intervenant inscrit pour l'instant.</b><br><span class="muted">Envoie-leur la page intervenants : leurs réponses s'afficheront ici chaque matin.</span></td></tr></tbody>`;
+}
 let lView="ins"; try{lView=localStorage.getItem(KEY+".lview")||"ins"}catch(e){}
 function setLView(v){lView=v;document.getElementById("lv-ins").hidden=v!=="ins";document.getElementById("lv-heb").hidden=v!=="heb";
+  document.getElementById("lv-int").hidden=v!=="int";
   document.querySelectorAll(".ltab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
-  try{localStorage.setItem(KEY+".lview",v)}catch(e){} if(v==="ins")renderIns(); else renderHosts()}
+  try{localStorage.setItem(KEY+".lview",v)}catch(e){} if(v==="ins")renderIns(); else if(v==="int")renderInt(); else renderHosts()}
 document.querySelectorAll(".ltab").forEach(b=>b.onclick=()=>setLView(b.dataset.v));
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
 showPage(startPage);
