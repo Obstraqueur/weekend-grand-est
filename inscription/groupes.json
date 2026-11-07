@@ -3,11 +3,17 @@
   "code": "gbu-strasbourg-vnxn",
   "nom": "GBU Strasbourg !",
   "ville": "Strasbourg",
-  "n": 8
+  "n": 9
  },
  {
   "code": "gdj-borny-tziw",
   "nom": "GDJ Borny",
+  "ville": "Metz",
+  "n": 5
+ },
+ {
+  "code": "grains-de-ble-418j",
+  "nom": "Grains de Blé",
   "ville": "Metz",
   "n": 5
  },
