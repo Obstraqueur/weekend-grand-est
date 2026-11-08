@@ -5,7 +5,8 @@ Usage : python3 maj_intervenants.py intervenants.json page1.html [page2.html ...
 intervenants.json : soumissions du formulaire Jotform 263074696052057 (« Orateurs et intervenants »),
 [{"id": "...", "date": "2026-11-05 10:00:00", "prenom": "...", "nom": "...", "eglise": "...",
   "roles": "Prédication, Atelier" (texte des cases cochées), "atelier": "titre ou vide",
-  "presence": "Vendredi soir, Samedi matin + midi" (texte des cases cochées),
+  "tout": "Oui" | "Non" (Je participe à tout le week-end),
+  "presence": "Vendredi soir, Samedi matin + midi" (texte des cases cochées, vide si « tout » = Oui),
   "logement": "Oui" | "Non", "allergies": "texte", "materiel": "texte"}]
 
 Pas d'e-mail ni de téléphone dans la page. Allergies : seulement oui/non.
@@ -38,7 +39,7 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "e": (s.get("eglise") or "").strip(),
         "r": [int("predication" in roles), int("atelier" in roles), int("temoignage" in roles)],
         "at": (s.get("atelier") or "").strip(),
-        "pr": [int(norm(m) in pres) for m in MOMENTS],
+        "pr": [1]*len(MOMENTS) if (s.get("tout") or "").lower().startswith("oui") else [int(norm(m) in pres) for m in MOMENTS],
         "lg": 1 if (s.get("logement") or "").lower().startswith("oui") else 0,
         "al": 1 if (s.get("allergies") or "").strip().lower() not in ("", "-", "non", "aucune", "ras", "rien") else 0,
         "mat": (s.get("materiel") or "").strip()[:140],
