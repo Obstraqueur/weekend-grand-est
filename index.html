@@ -365,7 +365,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
   </section>
   <section id="p-planning" class="page" hidden>
-    <iframe id="planFrame" title="Planning du week-end : agenda et planning détaillé" data-src="planning.html?v=2610b" style="width:100%;border:0;display:block;min-height:900px;background:transparent"></iframe>
+    <iframe id="planFrame" title="Planning du week-end : agenda et planning détaillé" data-src="planning.html?v=0811" style="width:100%;border:0;display:block;min-height:900px;background:transparent"></iframe>
   </section>
   <section id="p-taches" class="page" hidden>
     <div class="phead"><div><h2>À faire</h2><p class="muted">Mis à jour après l'appel du 26 octobre. Coche une tâche quand elle est faite.</p></div></div>
@@ -470,11 +470,11 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 
 <script>
 const PROG = [
- ["Vendredi 27 nov · équipe et premiers arrivants"],["17h00","Prise des locaux"],["18h00","Installation sono"],["19h00–21h00","Répétition louange (si besoin)"],["20h00","Installation des chaises dans la salle"],["20h30","Point d'équipe, prière, accueil des premiers arrivants"],
- ["Samedi 28 nov"],["08h00–08h30","Petit-déjeuner"],["08h30–09h00","Finalisation & prière"],["09h00–09h45","Accueil au stand & répartition des chambres"],["09h45–11h20","Louange / sketch + Message 1 « Viens et vois » en DAB (Jean 4)"],["11h20–11h45","Présentation des ateliers (inscription par QR code)"],["12h00","Repas"],
- ["14h00–15h30","Sports & balade"],["15h30–16h00","Douches & quatre-heures"],["16h20–17h45","Témoignage & Ateliers"],["18h20","Repas"],
- ["19h45–20h50","Message 2 « Suis-moi »"],["21h05–22h30","Soirée louange, témoignages, prière"],["22h30–23h30","Libre"],
- ["Dimanche 29 nov"],["08h00–09h00","Petit-déjeuner"],["10h00","Culte à l'Église de Borny + Message 3 « Va et deviens » (Jean 17)"],["12h20","Repas tous ensemble à l'église"],["14h00","Fin du week-end"],["14h00–16h00","Nettoyage (équipe)"]
+ ["Vendredi 27 nov"],["16h00","Prise des locaux (équipe)"],["17h00–19h00","Répétition louange"],["18h00–19h30","Arrivée des participants"],["19h00–20h00","Repas tiré du sac"],["20h00–20h30","Jeux brise-glace"],["20h30–20h40","Détails pratiques"],["20h40–21h50","Louange, témoignage, vue d'ensemble du thème, 2 derniers chants"],["23h30","Dernier départ"],
+ ["Samedi 28 nov"],["08h30–09h15","Petit-déjeuner"],["09h15–09h30","Accueil des arrivants du samedi"],["09h35–10h10","Louange, sketch"],["10h15–11h30","Message 1 « Viens et vois » en DAB (Jean 4)"],["11h30–11h45","Présentation des ateliers"],["12h15–13h30","Repas"],
+ ["14h00–15h45","Grand jeu"],["15h45–16h30","Quatre-heures"],["16h30–17h30","Sketch + Message 2 « Suis-moi » (Luc 5)"],["17h45–18h50","Ateliers au choix"],["19h15–20h45","Repas"],
+ ["21h00–21h15","Témoignage"],["21h15–22h30","Soirée louange, témoignages, prière"],["22h30–23h30","Libre"],["01h00","Dernier départ"],
+ ["Dimanche 29 nov"],["Matin","Petit-déjeuner chez l'habitant"],["10h00–11h00","Culte avec Metz Sud au FJT"],["11h00–11h45","Message 3 « Va et deviens » (Jean 17)"],["12h00–13h30","Repas tous ensemble"],["14h30","Fin du week-end"],["14h30–16h00","Nettoyage et débrief (équipe)"]
 ];
 const N = [
  {id:"date",t:"Date",why:"Dates fixées, calendrier des inscriptions.",
@@ -487,16 +487,16 @@ const N = [
   info:["Retenu : vendredi soir et samedi à l'Église évangélique de Borny (don de 200 €), dimanche matin au FJT Queuleu [validé]","Plan A : FJT Queuleu + cuisine du Grand Séminaire","Plan B : Grand Séminaire (salle et cuisine)","Plan C : Église de Borny + cuisine chez Edmond","Grand jeu dehors ; s'il pleut, prévoir une solution à l'intérieur","Budget : payer la location, en visant moins de 400 €","Culte du dimanche avec l'implantation Metz Sud au FJT","Clés dès vendredi 16h · nettoyage dimanche 14h30–15h30"],
   q:[["Plan A : confirmer le FJT Queuleu et la cuisine du Grand Séminaire",""],["Grand jeu : quelle solution à l'intérieur s'il pleut ?",""],["Coût exact, acompte et annulation du lieu retenu",""],["Qui fait partie de l'équipe de nettoyage dimanche ?",""]]},
  {id:"theme",t:"Thème",why:"Le fil rouge des prédications, de la com et du visuel.",
-  info:["Titre : Rencontrer Jésus aujourd'hui ?","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi soir","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte avec Metz Sud au FJT"],
+  info:["Titre : Rencontrer Jésus aujourd'hui ?","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi 16h30–17h30","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte avec Metz Sud au FJT"],
   q:[]},
  {id:"orateur",t:"Orateurs & ateliers",why:"Les messages, la DAB et les ateliers du samedi.",
-  info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi soir : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : en attente (vote en cours, onglet Ateliers)","Intervenants des ateliers : en attente"],
+  info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi (Message 2, 16h30) : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : en attente (vote en cours, onglet Ateliers)","Intervenants des ateliers : en attente"],
   q:[["Thèmes des ateliers",""],["Intervenants des ateliers",""]]},
  {id:"louange",t:"Louange & technique",why:"Louange du week-end, son et image.",
-  info:["Responsable louange : Romuald (GBU Metz)","Répétition : vendredi 17h–19h","Vendredi : temps de louange 20h40–21h10, 2 derniers chants 21h40–21h50","Samedi : louange 9h35–10h, 2-3 chants 20h25–20h35, soirée louange, témoignages et prière 21h15–22h30","Dimanche : culte avec Metz Sud au FJT 10h–11h (louange par l'équipe du week-end)"],
+  info:["Responsable louange : Romuald (GBU Metz)","Répétition : vendredi 17h–19h","Vendredi : temps de louange 20h40–21h10, 2 derniers chants 21h40–21h50","Samedi : louange 9h35–10h, 2-3 chants avant le Message 2 (16h35–16h45), soirée louange, témoignages et prière 21h15–22h30","Dimanche : culte avec Metz Sud au FJT 10h–11h (louange par l'équipe du week-end)"],
   q:[["Demander la sono à S&Metz",""],["Projecteur et paroles : qui s'en charge ?",""]]},
  {id:"repas",t:"Repas & cuisine",why:"Repas du week-end, quatre-heures et courses.",
-  info:["Respo cuisine : à trouver","Respo pour trouver une équipe cuisine : à confirmer","Courses : demander à Jhonby","Allergies et régimes : demandés sur le site d'inscription","Vendredi : repas tiré du sac 19h–20h","Samedi : petit-déjeuner 8h30–9h15, repas 12h15–13h30 et 18h45–20h15, quatre-heures 15h45","Vaisselle : 30 min, en commençant 30 min avant la fin de chaque repas (groupes à tour de rôle)","Dimanche : petit-déjeuner chez l'habitant, repas tous ensemble 12h–13h30"],
+  info:["Respo cuisine : à trouver","Respo pour trouver une équipe cuisine : à confirmer","Courses : demander à Jhonby","Allergies et régimes : demandés sur le site d'inscription","Vendredi : repas tiré du sac 19h–20h","Samedi : petit-déjeuner 8h30–9h15, repas 12h15–13h30 et 19h15–20h45, quatre-heures 15h45–16h30","Vaisselle : 30 min, en commençant 30 min avant la fin de chaque repas (groupes à tour de rôle)","Dimanche : petit-déjeuner chez l'habitant, repas tous ensemble 12h–13h30"],
   q:[["Trouver le respo cuisine",""],["Trouver le respo qui monte l'équipe cuisine",""]]},
  {id:"couchage",t:"Logement",go:"logement",why:"Nuits de vendredi et samedi.",
   info:["Chez l'habitant : 12 foyers pour 50 places (Mattias 10, Edmond 8, Emma 6, Agirla, Romuald, Leuba, Lydie 4, Marine, Aline, Terence, Benoit, Tigran 2) : voir la page Logement","Autre piste : auberge de jeunesse Metz-Plage (voir le comparatif d'hébergement)","À apporter : sac de couchage ou drap, linge, et un matelas selon le lieu"],
@@ -505,8 +505,8 @@ const N = [
   info:["Dépenses : lieu (viser moins de 400 €), repas, don à l'orateur (100–200 €)","Tarif de base · −10 % dès 5 inscrits d'une même ville · +10 € après le 23 novembre","Don libre possible en plus de l'inscription","Paiement : virement ou sur place","Site d'inscription : Edmond","Infos demandées : nom, prénom, date de naissance, e-mail, téléphone, ville, jour d'arrivée, allergies, besoin de covoiturage","Soutien possible des églises (ex. Borny), par exemple pour l'orateur"],
   q:[["Prix de base de l'inscription ?","Marion, Joël"],["Seuil minimum de participants pour équilibrer le budget","Marion, Joël"],["Qui demande le soutien des églises ?",""]]},
  {id:"planning",t:"Planning",go:"planning",why:"Le programme du week-end, créneau par créneau.",
-  info:["Programme validé le 12 octobre","Fin dimanche à 14h30","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi soir · Message 3 dimanche matin après le culte avec Metz Sud au FJT (Jean 17)","Ateliers seulement samedi après-midi, présentés à 11h30 avec inscription par QR code","Samedi soir : louange, témoignages et prière de 21h15 à 22h30, puis temps libre (dernier départ 1h00)"],
-  q:[["Témoignage de 16h20 : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
+  info:["Programme validé le 12 octobre","Fin dimanche à 14h30","Message 1 en DAB samedi matin (Jean 4) · Message 2 samedi 16h30–17h30 (Luc 5) · Message 3 dimanche matin après le culte avec Metz Sud au FJT (Jean 17)","Ateliers samedi de 17h45 à 18h50, présentés à 11h30 avec inscription par QR code","Samedi soir : repas 19h15–20h45, témoignage à 21h, louange, témoignages et prière de 21h15 à 22h30, puis temps libre (dernier départ 1h00)"],
+  q:[["Témoignage de 21h : qui ?","Les jeunes"],["Sketch de samedi matin : qui le prépare ?","Pôle prédication et sketch"]],prog:true},
  {id:"equipe",t:"Équipe & rôles",why:"Qui fait quoi.",
   info:["Pôle louange : respo Romuald + équipe louange · soirée louange avec Romuald : (?) · besoin d'instrumentistes : Eléa demande [en cours]", "Pôle témoignage et sketch : respo Eléa · envoyez-lui vos idées de témoignages et les personnes motivées pour les sketchs [en cours]", "Pôle activités et jeux : respo Emma + Etienne · présentation au prochain appel [en cours]", "Pôle ateliers : respo Edmond + équipe orga · 12 ateliers proposés par Marion · intervenants à contacter avant le prochain appel (Edmond et ceux de Metz) [en cours]", "Pôle cuisine : respo recrutement Aline · respo cuisine (?) · salle pour cuisiner et équipe cuisine : Edmond et Aline [en cours]", "Pôle logement : respo Emma · trouver d'autres logements chez l'habitant [en cours]", "Pôle communication : Elisa le S., Eléa et Lena · vidéo en fin de semaine (Elisa), com à Metz (Lena) [en cours]", "Pôle DAB : Sacha, Lena, Jhonby, Mattias, une personne de Campus Central + (?) · ligne directrice : Edmond [en cours]", "Équipe d'intercession : (?) [en cours]", "Salle principale : Edmond [validé]", "Sono, micros et consignes : Edmond [en cours]", "Présidence du culte du dimanche : (?) · Edmond voit avec Metz Sud [en cours]", "Prédicateurs : Edmond et Marion · Alain et Hugo présents au prochain appel [validé]", "Planning : tous · responsables de journée à valider (Edmond) [en cours]"],
   q:[]}
@@ -584,7 +584,7 @@ function renderAteliers(){
   document.getElementById("aKpi").innerHTML=`
    <div class="kpi"><span>Ateliers proposés</span><b>${ATELIERS.length}</b><small>sélection de l'équipe</small></div>
    <div class="kpi"><span>Votants</span><b>${nv}</b><small>12 ateliers chacun</small></div>
-   <div class="kpi"><span>Créneau</span><b>1</b><small>samedi à 16h20</small></div>
+   <div class="kpi"><span>Créneau</span><b>1</b><small>samedi 17h45–18h50</small></div>
    <div class="kpi"><span>Dernière mise à jour</span><b style="font-size:1.2rem">${VOTES.updated||"–"}</b><small>des votes</small></div>`;
   const max=Math.max(1,...ranked.map(a=>a.v));
   document.getElementById("aRank").innerHTML=nv?ranked.filter(a=>a.v>0).map((a,i)=>`<div class="rk${i<12?" top":""}"><span class="n">${i+1}</span><span><span class="cdot" style="background:${ACATS[a.c][1]}"></span>${a.t}<span class="bar"><i style="width:${a.v/max*100}%"></i></span></span><b>${a.v}</b></div>`).join("")+`<p class="muted" style="font-size:13px;margin:10px 0 0">Votants : ${VOTES.voters.join(", ")}</p>`
