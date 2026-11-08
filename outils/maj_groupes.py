@@ -6,7 +6,14 @@ groupes_soumissions.json : [{"id": "...", "type": "Nouveau groupe" | "Ajout à u
 La liste publique ne contient que le code, le nom, la ville et le nombre de prénoms (pas les prénoms).
 Les groupes dont le nom contient « TEST » sont ignorés.
 """
-import json, sys
+import json, os, re, sys, unicodedata
+
+def norm(s):
+    s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z0-9]+", " ", s).strip()
+
+_a = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groupes_alias.json")
+ALIAS = {norm(k): v for k, v in json.load(open(_a, encoding="utf-8")).items() if not k.startswith("_")} if os.path.exists(_a) else {}
 
 subs = json.load(open(sys.argv[1], encoding="utf-8"))
 groupes = {}
@@ -21,7 +28,7 @@ for s in sorted(subs, key=lambda s: int(s.get("id") or 0)):
         g["ville"] = (s.get("ville") or g["ville"]).strip()
     g["prenoms"] += [p for p in prenoms if p not in g["prenoms"]]
 
-out = sorted(({"code": g["code"], "nom": g["nom"], "ville": g["ville"], "n": len(g["prenoms"])} for g in groupes.values()),
+out = sorted(({"code": g["code"], "nom": ALIAS.get(norm(g["nom"]), g["nom"]), "ville": g["ville"], "n": len(g["prenoms"])} for g in groupes.values()),
              key=lambda g: g["nom"].lower())
 path = sys.argv[2]
 try:

@@ -38,10 +38,14 @@ for s in subs:
 
 def code_groupe(g):
     m = re.search(r"\(([^()]+)\)\s*$", g or "")
-    return m.group(1).strip() if m else (g or "").strip()
+    return m.group(1).strip() if m else nom_groupe(g)
+
+_a = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groupes_alias.json")
+ALIAS = {norm(k): v for k, v in json.load(open(_a, encoding="utf-8")).items() if not k.startswith("_")} if os.path.exists(_a) else {}
 
 def nom_groupe(g):
-    return re.sub(r"\s*\([^()]*\)\s*$", "", g or "").strip()
+    n = re.sub(r"\s*\([^()]*\)\s*$", "", g or "").strip()
+    return ALIAS.get(norm(n), n)
 
 rows = []
 for s in sorted(latest.values(), key=lambda s: int(s["id"])):
