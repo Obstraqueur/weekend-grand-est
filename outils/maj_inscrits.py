@@ -66,6 +66,15 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "al": 1 if (s.get("allergies") or "").strip() not in ("", "-", "non", "Non", "aucune", "Aucune", "RAS") else 0,
     })
 
+# Un groupe saisi sans code (ex. « Metz » → alias « Metzc'estmieux ») reprend le code du groupe du même nom.
+codes = {}
+for r in rows:
+    if r["g"] and r["gc"] != r["g"]:
+        codes.setdefault(norm(r["g"]), r["gc"])
+for r in rows:
+    if r["g"] and r["gc"] == r["g"]:
+        r["gc"] = codes.get(norm(r["g"]), r["gc"])
+
 mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=1)))
 data = {"updated": f"{now.day} {mois[now.month-1]} {now:%Hh%M}", "list": rows}
