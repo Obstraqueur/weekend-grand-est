@@ -414,7 +414,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <div class="phead"><div><h2>Ateliers</h2><p class="muted">Les 12 ateliers retenus pour le samedi après-midi. Indique à côté de chacun qui l'anime.</p></div></div>
     <nav class="subtabs" role="tablist" aria-label="Vues des ateliers">
       <button type="button" class="atab on" role="tab" id="at-main" data-v="main" aria-selected="true">Ateliers retenus</button>
-      <button type="button" class="atab" role="tab" id="at-vote" data-v="vote" aria-selected="false">Vote des ateliers</button>
+      <button type="button" class="atab" role="tab" id="at-vote" data-v="vote" aria-selected="false" hidden>Vote des ateliers</button>
     </nav>
     <div id="av-main">
       <div class="tbox" style="margin-top:12px"><table class="dtable" id="aMain"></table></div>
@@ -490,7 +490,7 @@ const N = [
   info:["Titre : Rencontrer Jésus aujourd'hui ?","Public chrétiens et non-chrétiens : messages, discussions et com accessibles","Prédication 1 « Viens et vois » (la Samaritaine, Jean 4) : en DAB samedi matin","Prédication 2 « Suis-moi » (Pierre) : samedi 16h30–17h30","Prédication 3 « Va et deviens » (Jean 17) : dimanche au culte avec Metz Sud au FJT"],
   q:[]},
  {id:"orateur",t:"Orateurs & ateliers",why:"Les messages, la DAB et les ateliers du samedi.",
-  info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi (Message 2, 16h30) : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : en attente (vote en cours, onglet Ateliers)","Intervenants des ateliers : en attente"],
+  info:["Animateurs DAB samedi matin : Sacha et …","Orateur samedi (Message 2, 16h30) : Alain Stirnemann (Metz Sud)","Orateur dimanche matin : Hugo De la Costa (Metz Sud)","Thèmes des ateliers : vote clos, voir l'onglet Ateliers","Intervenants des ateliers : en attente"],
   q:[["Thèmes des ateliers",""],["Intervenants des ateliers",""]]},
  {id:"louange",t:"Louange & technique",why:"Louange du week-end, son et image.",
   info:["Responsable louange : Romuald (GBU Metz)","Répétition : vendredi 17h–19h","Vendredi : temps de louange 20h40–21h10, 2 derniers chants 21h40–21h50","Samedi : louange 9h35–10h, 2-3 chants avant le Message 2 (16h35–16h45), soirée louange, témoignages et prière 21h15–22h30","Dimanche : culte avec Metz Sud au FJT 10h–11h (louange par l'équipe du week-end)"],
@@ -610,7 +610,7 @@ function renderRetenus(){
 }
 document.getElementById("aCopy").onclick=()=>{const txt="Ateliers du samedi après-midi\n"+RETENUS.map(([n,titre])=>{const v=S._interv[n]||{};return `${n}. ${titre||v.t||"(à définir)"} : ${v.who||"intervenant à trouver"}`}).join("\n");
   const b=document.getElementById("aCopy");navigator.clipboard.writeText(txt).then(()=>{b.textContent="Liste copiée";setTimeout(()=>b.textContent="Copier la liste",1600)},()=>{b.textContent="Copie impossible ici"})};
-let aView="main"; try{aView=localStorage.getItem(KEY+".aview")||"main"}catch(e){}
+let aView="main"; /* vote des ateliers clos */
 function setAView(v){aView=v;document.getElementById("av-main").hidden=v!=="main";document.getElementById("av-vote").hidden=v!=="vote";
   document.querySelectorAll(".atab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
   try{localStorage.setItem(KEY+".aview",v)}catch(e){} if(v==="main")renderRetenus(); else renderAteliers()}
