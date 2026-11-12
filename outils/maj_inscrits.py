@@ -10,9 +10,9 @@ une entrée par soumission, avec les réponses en texte :
   "paye": "Oui" | "Pas encore", "voiture": "Oui" | "Non", "places": "3", "covoiturage": "...",
   "allergies": "texte libre ou vide", "logement": "Oui" | "Non"}]
 
-Données réduites volontairement (la page est partagée par lien) : prénom + initiale du nom,
-pas d'e-mail, de téléphone, d'adresse ni de date de naissance, et seulement « oui/non » pour
-les allergies. Les détails restent dans Jotform.
+Champs facultatifs en plus : "covoiturage", "places_proposees", "don", "remarque".
+La page montre le détail complet des réponses (nom complet, allergies, covoiturage, don, remarque),
+mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
 Si une personne s'est inscrite deux fois (même prénom + nom), seule la soumission la plus récente compte.
 """
 import json, re, sys, unicodedata, datetime
@@ -64,6 +64,13 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "c": int(places) if (s.get("voiture") or "").lower().startswith("oui") and places else 0,
         "lg": 1 if (s.get("logement") or "").lower().startswith("oui") or norm(s.get("prenom", "") + " " + s.get("nom", "")) in LOGES else 0,
         "al": 1 if (s.get("allergies") or "").strip() not in ("", "-", "non", "Non", "aucune", "Aucune", "RAS") else 0,
+        # Détail complet des réponses (sans e-mail, téléphone, adresse ni date de naissance)
+        "nf": " ".join(w[:1].upper() + w[1:].lower() for w in ((s.get("prenom") or "").strip() + " " + nom).split()),
+        "alt": (s.get("allergies") or "").strip(),
+        "cov": (s.get("covoiturage") or "").strip(),
+        "cp": re.sub(r"[^0-9]", "", str(s.get("places_proposees") or "")),
+        "don": re.sub(r"[^0-9,.]", "", str(s.get("don") or "")),
+        "rq": (s.get("remarque") or "").strip(),
     })
 
 # Un groupe saisi sans code (ex. « Metz » → alias « Metzc'estmieux ») reprend le code du groupe du même nom.
