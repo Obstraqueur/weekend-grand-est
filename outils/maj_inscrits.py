@@ -10,7 +10,9 @@ une entrée par soumission, avec les réponses en texte :
   "paye": "Oui" | "Pas encore", "voiture": "Oui" | "Non", "places": "3", "covoiturage": "...",
   "allergies": "texte libre ou vide", "logement": "Oui" | "Non"}]
 
-Champs facultatifs en plus : "covoiturage", "places_proposees", "don", "remarque".
+Champs facultatifs en plus : "covoiturage", "places_proposees", "don", "remarque",
+"prix_libre" (Montant du prix libre en €). Si "paye" vaut « Prix libre », le tarif compté est ce montant
+(0 € si vide) au lieu du tarif étudiant / vie active / groupe.
 La page montre le détail complet des réponses (nom complet, allergies, covoiturage, don, remarque),
 mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
 Si une personne s'est inscrite deux fois (même prénom + nom), seule la soumission la plus récente compte.
@@ -72,6 +74,11 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "don": re.sub(r"[^0-9,.]", "", str(s.get("don") or "")),
         "rq": (s.get("remarque") or "").strip(),
     })
+    if (s.get("paye") or "").strip().lower().startswith("prix libre"):
+        m = re.search(r"\d+(?:[.,]\d+)?", str(s.get("prix_libre") or ""))
+        rows[-1]["pl"] = float(m.group().replace(",", ".")) if m else 0
+        if rows[-1]["pl"] == int(rows[-1]["pl"]):
+            rows[-1]["pl"] = int(rows[-1]["pl"])
 
 # Un groupe saisi sans code (ex. « Metz » → alias « Metzc'estmieux ») reprend le code du groupe du même nom.
 codes = {}
