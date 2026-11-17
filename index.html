@@ -297,6 +297,9 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 .ltab.on{color:var(--ink);border-bottom-color:var(--accent)}
 .ltab:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 #insTable td.ok{color:var(--new);font-weight:700}#insTable td.ko{color:#c0392b;font-weight:600}
+.paybtn{font:600 13px var(--body);border:1px solid var(--line);background:var(--surface);color:#c0392b;border-radius:999px;padding:4px 10px;cursor:pointer;white-space:nowrap}
+.paybtn.on{color:var(--new);border-color:var(--new);background:var(--new-soft)}
+.paybtn:hover{border-color:var(--accent)}.paybtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 #insTable small{display:block;color:var(--muted);font-size:12px}
 .gl{display:grid;gap:6px}.gl div{display:flex;justify-content:space-between;gap:10px;font-size:14px;border-top:1px solid var(--line);padding-top:6px}.gl div:first-child{border-top:0;padding-top:0}
 </style>
@@ -387,7 +390,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <div class="fchips" id="insChips" style="margin-top:14px"></div>
       <input type="search" id="insSearch" class="asearch" placeholder="Chercher un nom, une ville, un groupe…" aria-label="Chercher une inscription">
       <div class="tbox"><table class="dtable" id="insTable"></table></div>
-      <p class="muted" style="font-size:13px;margin:8px 0 0">Détail complet des réponses au formulaire. Les e-mails, téléphones, adresses et dates de naissance ne sont pas publiés ici : ils restent dans Jotform.</p>
+      <p class="muted" style="font-size:13px;margin:8px 0 0">Clique sur la case « Payé » d'une personne pour changer son statut : c'est enregistré tout de suite ici, et pour tout le monde à la mise à jour du lendemain matin. Détail complet des réponses au formulaire. Les e-mails, téléphones, adresses et dates de naissance ne sont pas publiés ici : ils restent dans Jotform.</p>
     </div>
     <div id="lv-int" hidden>
       <div class="phead" style="margin-top:12px"><div><h2>Intervenants</h2><p class="muted" id="intSub"></p></div>
@@ -496,7 +499,7 @@ const N = [
   info:["Responsable louange : Romuald (GBU Metz)","Répétition : vendredi 17h–19h","Vendredi : temps de louange 20h40–21h10, 2 derniers chants 21h40–21h50","Samedi : louange 9h35–10h, 2-3 chants avant le Message 2 (16h35–16h45), soirée louange, témoignages et prière 21h15–22h30","Dimanche : culte avec Metz Sud au FJT 10h–11h (louange par l'équipe du week-end)"],
   q:[["Demander la sono à S&Metz",""],["Projecteur et paroles : qui s'en charge ?",""]]},
  {id:"repas",t:"Repas & cuisine",why:"Repas du week-end, quatre-heures et courses.",
-  info:["Respo cuisine : à trouver","Respo pour trouver une équipe cuisine : à confirmer","Courses : demander à Jhonby","Allergies et régimes : demandés sur le site d'inscription","Vendredi : repas tiré du sac 19h–20h","Samedi : petit-déjeuner 8h30–9h15, repas 12h15–13h30 et 19h15–20h45, quatre-heures 15h45–16h30","Vaisselle : 30 min, en commençant 30 min avant la fin de chaque repas (groupes à tour de rôle)","Dimanche : petit-déjeuner chez l'habitant, repas tous ensemble 12h–13h30"],
+  info:["Organisation des repas : <a href=\"https://claude.ai/artifact/1HGegg5mbgzyRw2sT8mikt\" target=\"_blank\" rel=\"noopener\" style=\"color:inherit;font-weight:700\">ouvrir le doc</a> (menu, qui prépare quoi, horaires, matériel, liste de courses et budget)","Respo cuisine : à trouver","Respo pour trouver une équipe cuisine : à confirmer","Courses : demander à Jhonby","Allergies et régimes : demandés sur le site d'inscription","Vendredi : repas tiré du sac 19h–20h","Samedi : petit-déjeuner 8h30–9h15, repas 12h15–13h30 et 19h15–20h45, quatre-heures 15h45–16h30","Vaisselle : 30 min, en commençant 30 min avant la fin de chaque repas (groupes à tour de rôle)","Dimanche : petit-déjeuner chez l'habitant, repas tous ensemble 12h–13h30"],
   q:[["Trouver le respo cuisine",""],["Trouver le respo qui monte l'équipe cuisine",""]]},
  {id:"couchage",t:"Logement",go:"logement",why:"Nuits de vendredi et samedi.",
   info:["Chez l'habitant : 12 foyers pour 50 places (Mattias 10, Edmond 8, Emma 6, Agirla, Romuald, Leuba, Lydie 4, Marine, Aline, Terence, Benoit, Tigran 2) : voir la page Logement","Autre piste : auberge de jeunesse Metz-Plage (voir le comparatif d'hébergement)","À apporter : sac de couchage ou drap, linge, et un matelas selon le lieu"],
@@ -1119,7 +1122,21 @@ const INSCRITS={"updated": "17 nov. 10h24", "list": [{"id": "6688616907512166602
 const OBJ_VILLES={Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Autre:0};
 let insFilter="tout",insQ="";
 function insTarif(r,groupes){if(r.pl!=null)return +r.pl||0;if(r.a==="actif")return 40+(r.d>"2026-11-23"?10:0);const g=r.gc&&groupes[r.gc];return (g&&g.n>=5?30:35)+(r.d>"2026-11-23"?10:0)}
+/* Statut « payé » modifiable : enregistré tout de suite dans ce navigateur et envoyé au formulaire Jotform « Statut de paiement »,
+   que la mise à jour de chaque matin reporte pour tout le monde. */
+const PFORM="263205671898064";
+INSCRITS.list.forEach(r=>r._p0=r.p);
+function applyPay(){const o=S._pay||{};INSCRITS.list.forEach(r=>{const v=o[r.id];if(!v)return;if(v.d&&INSCRITS.updated&&v.p===r._p0&&v.d!==INSCRITS.updated){delete o[r.id];return}r.p=v.p})}
+function sendPay(r,p){try{let fr=document.querySelector('iframe[name="jfPay"]');if(!fr){fr=document.createElement("iframe");fr.name="jfPay";fr.hidden=true;document.body.appendChild(fr)}
+  const f=document.createElement("form");f.method="post";f.action=`https://submit.jotform.com/submit/${PFORM}/`;f.target="jfPay";f.hidden=true;
+  const v={formID:PFORM,simple_spc:PFORM+"-"+PFORM,website:"",q2_textbox0:r.id,q4_radio2:p==="oui"?"Oui":"Non"};
+  Object.entries(v).forEach(([k,x])=>{const i=document.createElement("input");i.type="hidden";i.name=k;i.value=x;f.appendChild(i)});
+  document.body.appendChild(f);f.submit();setTimeout(()=>f.remove(),4000);return true}catch(e){return false}}
+function setPay(id){const r=INSCRITS.list.find(x=>x.id===id);if(!r)return;const p=r.p==="oui"?"non":"oui";r.p=p;
+  S._pay=S._pay||{};S._pay[id]={p,d:INSCRITS.updated||""};save();const ok=sendPay(r,p);renderIns();
+  toastB(`${r.nf||r.n} : ${p==="oui"?"payé":"pas encore payé"}${ok?". Les autres le verront après la mise à jour de demain matin.":"."}`)}
 function renderIns(){
+  applyPay();
   const L=INSCRITS.list, N=L.length, groupes={};
   L.forEach(r=>{if(r.gc){const g=groupes[r.gc]=groupes[r.gc]||{nom:r.g,n:0};g.n++}});
   const paid=L.filter(r=>r.p==="oui"), sam=L.filter(r=>r.j==="sam").length, places=L.reduce((a,r)=>a+r.c,0), al=L.filter(r=>r.al).length;
@@ -1127,7 +1144,7 @@ function renderIns(){
   document.getElementById("insSub").textContent=INSCRITS.updated?`Mis à jour chaque matin depuis le formulaire d'inscription. Dernière mise à jour : ${INSCRITS.updated}.`:"Mis à jour chaque matin depuis le formulaire d'inscription.";
   document.getElementById("insKpi").innerHTML=`
    <div class="kpi"><span>Inscrits</span><b>${N}</b><small>objectif 50 · ${L.filter(r=>r.a==="actif").length} vie active</small></div>
-   <div class="kpi ${N&&paid.length<N?"":"good"}"><span>Virements reçus (déclarés)</span><b>${paid.length}</b><small>${eur(recu)} sur ${eur(du)} attendus</small></div>
+   <div class="kpi ${N&&paid.length<N?"":"good"}"><span>Payés</span><b>${paid.length}</b><small>${eur(recu)} sur ${eur(du)} attendus</small></div>
    <div class="kpi"><span>Lits à prévoir</span><b>${N-L.filter(r=>r.lg).length}</b><small>${L.filter(r=>r.lg).length} logé${L.filter(r=>r.lg).length>1?"s":""} sur Metz · arrivées ${N-sam} ven. · ${sam} sam.</small></div>
    <div class="kpi"><span>Places en voiture sur place</span><b>${places}</b><small>${L.filter(r=>r.c).length} conducteur${L.filter(r=>r.c).length>1?"s":""} · ${al} allergie${al>1?"s":""} ou régime${al>1?"s":""}</small></div>`;
   const villes=Object.keys(OBJ_VILLES).map(v=>[v,L.filter(r=>r.v===v).length,OBJ_VILLES[v]]).filter(x=>x[1]||x[2]);
@@ -1139,8 +1156,9 @@ function renderIns(){
   document.querySelectorAll("#insChips .fchip").forEach(b=>b.onclick=()=>{insFilter=b.dataset.f;renderIns()});
   const q=insQ.trim().toLowerCase(), rows=L.filter(F[insFilter][1]).filter(r=>!q||((r.nf||r.n)+" "+r.v+" "+r.g+" "+(r.alt||"")+" "+(r.rq||"")).toLowerCase().includes(q)).slice().reverse();
   document.getElementById("insTable").innerHTML=N?`<thead><tr><th>Nom</th><th>Ville</th><th>Statut</th><th>Groupe</th><th>Arrivée</th><th>Logement</th><th class="num">Tarif</th><th>Payé</th><th class="num">Voiture à Metz</th><th>Covoiturage</th><th class="num">Don</th><th>Allergies / régime</th><th>Remarque</th></tr></thead><tbody>`+
-    rows.map(r=>`<tr><td><b>${esc(r.nf||r.n)}</b><small>inscrit le ${r.d.split("-").reverse().slice(0,2).join("/")}</small></td><td>${esc(r.v)}</td><td>${r.a==="actif"?"Vie active":"Étudiant"}</td><td>${esc(r.g)||'<span class="muted">seul</span>'}</td><td>${r.j==="sam"?"Samedi 9h":"Vendredi"}</td><td>${r.lg?"A un logement":"À loger"}</td><td class="num">${insTarif(r,groupes)} €${r.pl!=null?"<small>prix libre</small>":""}</td><td class="${r.p==="oui"?"ok":"ko"}">${r.p==="oui"?"Oui":(r.m==="place"?"Sur place":"Pas encore")}</td><td class="num">${r.c?r.c+" places":""}</td><td>${esc(r.cov||"")}${r.cp?`<small>${r.cp} place${r.cp>1?"s":""} proposée${r.cp>1?"s":""}</small>`:""}</td><td class="num">${r.don&&r.don!=="0"?esc(r.don)+" €":""}</td><td style="min-width:160px">${r.al?esc(r.alt||"Oui"):""}</td><td style="min-width:240px">${esc(r.rq||"")}</td></tr>`).join("")+"</tbody>"
+    rows.map(r=>`<tr><td><b>${esc(r.nf||r.n)}</b><small>inscrit le ${r.d.split("-").reverse().slice(0,2).join("/")}</small></td><td>${esc(r.v)}</td><td>${r.a==="actif"?"Vie active":"Étudiant"}</td><td>${esc(r.g)||'<span class="muted">seul</span>'}</td><td>${r.j==="sam"?"Samedi 9h":"Vendredi"}</td><td>${r.lg?"A un logement":"À loger"}</td><td class="num">${insTarif(r,groupes)} €${r.pl!=null?"<small>prix libre</small>":""}</td><td><button type="button" class="paybtn${r.p==="oui"?" on":""}" data-pay="${r.id}" aria-pressed="${r.p==="oui"}" title="Cliquer pour changer">${r.p==="oui"?"✓ Payé":(r.m==="place"?"Sur place · pas encore":"Pas encore")}</button></td><td class="num">${r.c?r.c+" places":""}</td><td>${esc(r.cov||"")}${r.cp?`<small>${r.cp} place${r.cp>1?"s":""} proposée${r.cp>1?"s":""}</small>`:""}</td><td class="num">${r.don&&r.don!=="0"?esc(r.don)+" €":""}</td><td style="min-width:160px">${r.al?esc(r.alt||"Oui"):""}</td><td style="min-width:240px">${esc(r.rq||"")}</td></tr>`).join("")+"</tbody>"
     :`<tbody><tr><td style="padding:18px"><b>Aucune inscription pour l'instant.</b><br><span class="muted">Les inscriptions arrivent dans Jotform et s'affichent ici chaque matin.</span></td></tr></tbody>`;
+  document.querySelectorAll("#insTable [data-pay]").forEach(b=>b.onclick=()=>setPay(b.dataset.pay));
 }
 document.getElementById("insSearch").oninput=e=>{insQ=e.target.value;renderIns()};
 

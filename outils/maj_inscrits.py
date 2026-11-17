@@ -1,6 +1,11 @@
 """Met à jour le tableau des inscriptions dans une page d'orga (constante INSCRITS).
 
-Usage : python3 maj_inscrits.py inscrits.json page1.html [page2.html ...]
+Usage : python3 maj_inscrits.py inscrits.json [--paiements paiements.json] page1.html [page2.html ...]
+
+paiements.json (facultatif) : soumissions du formulaire Jotform 263205671898064 « Statut de paiement »,
+envoyées depuis la page d'orga quand quelqu'un clique sur la case « Payé » :
+[{"id": "<id de la soumission>", "inscription": "<id de l'inscription>", "paye": "Oui" | "Non"}]
+Pour chaque inscription, la réponse la plus récente compte, si elle est plus récente que l'inscription elle-même.
 
 inscrits.json : liste des soumissions du formulaire d'inscription Jotform 262846622284059,
 une entrée par soumission, avec les réponses en texte :
@@ -23,7 +28,17 @@ def norm(s):
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode().lower()
     return re.sub(r"[^a-z0-9]+", " ", s).strip()
 
-subs = json.load(open(sys.argv[1], encoding="utf-8"))
+args = sys.argv[1:]
+PAY = {}
+if "--paiements" in args:
+    i = args.index("--paiements")
+    for s in sorted(json.load(open(args[i + 1], encoding="utf-8")), key=lambda s: int(s.get("id") or 0)):
+        ins = str(s.get("inscription") or "").strip()
+        if ins:
+            PAY[ins] = (int(s.get("id") or 0), "oui" if str(s.get("paye") or "").lower().startswith("oui") else "non")
+    del args[i:i + 2]
+subs = json.load(open(args[0], encoding="utf-8"))
+PAGES = args[1:]
 # Corrections manuelles : prénoms + noms des personnes qui ont un logement sur Metz même si Jotform ne le dit pas.
 import os
 _f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logement_metz.json")
@@ -61,7 +76,7 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "a": "actif" if "vie active" in (s.get("statut") or "").lower() else "etu",
         "g": nom_groupe(s.get("groupe")), "gc": code_groupe(s.get("groupe")),
         "j": "sam" if (s.get("arrivee") or "").lower().startswith("samedi") else "ven",
-        "p": "oui" if (s.get("paye") or "").lower().startswith("oui") else "non",
+        "p": PAY[str(s["id"])][1] if str(s["id"]) in PAY and PAY[str(s["id"])][0] > int(s["id"]) else ("oui" if (s.get("paye") or "").lower().startswith("oui") else "non"),
         "m": "virement" if "virement" in (s.get("paiement") or "").lower() else "place",
         "c": int(places) if (s.get("voiture") or "").lower().startswith("oui") and places else 0,
         "lg": 1 if (s.get("logement") or "").lower().startswith("oui") or norm(s.get("prenom", "") + " " + s.get("nom", "")) in LOGES else 0,
@@ -92,7 +107,7 @@ for r in rows:
 mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=1)))
 data = {"updated": f"{now.day} {mois[now.month-1]} {now:%Hh%M}", "list": rows}
-for path in sys.argv[2:]:
+for path in PAGES:
     html = open(path, encoding="utf-8").read()
     old = json.loads(re.search(r"^const INSCRITS=(\{.*\});$", html, re.M).group(1))
     changed = old.get("list") != rows
