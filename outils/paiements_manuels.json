@@ -1,0 +1,8 @@
+{
+ "_comment": "Statuts de paiement fixés à la main (id d'inscription Jotform) : ils priment sur le formulaire et sur la case « Payé ».",
+ "6708094307817714768": {
+  "p": "oui",
+  "note": "Payé par un don",
+  "qui": "Tatiana Aguessi"
+ }
+}

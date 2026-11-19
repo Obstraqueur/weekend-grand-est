@@ -20,6 +20,8 @@ Champs facultatifs en plus : "covoiturage", "places_proposees", "don", "remarque
 (0 € si vide) au lieu du tarif étudiant / vie active / groupe.
 La page montre le détail complet des réponses (nom complet, allergies, covoiturage, don, remarque),
 mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
+paiements_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": {"p": "oui", "note": "Payé par un don"}}
+fixe le statut payé à la main (la note s'affiche sur le bouton « Payé »).
 Si une personne s'est inscrite deux fois (même prénom + nom), seule la soumission la plus récente compte.
 """
 import json, re, sys, unicodedata, datetime
@@ -94,6 +96,16 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         rows[-1]["pl"] = float(m.group().replace(",", ".")) if m else 0
         if rows[-1]["pl"] == int(rows[-1]["pl"]):
             rows[-1]["pl"] = int(rows[-1]["pl"])
+
+# Statuts de paiement fixés à la main (outils/paiements_manuels.json) : ils priment sur tout le reste.
+_m = os.path.join(os.path.dirname(os.path.abspath(__file__)), "paiements_manuels.json")
+MANU = {k: v for k, v in json.load(open(_m, encoding="utf-8")).items() if not k.startswith("_")} if os.path.exists(_m) else {}
+for r in rows:
+    x = MANU.get(r["id"])
+    if x:
+        r["p"] = "oui" if str(x.get("p", "oui")).lower().startswith("oui") else "non"
+        if x.get("note"):
+            r["pn"] = x["note"]
 
 # Un groupe saisi sans code (ex. « Metz » → alias « Metzc'estmieux ») reprend le code du groupe du même nom.
 codes = {}
