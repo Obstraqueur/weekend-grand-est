@@ -11,6 +11,10 @@ intervenants.json : soumissions du formulaire Jotform 263074696052057 (« Orateu
 
 Pas d'e-mail ni de téléphone dans la page. Allergies : seulement oui/non.
 Si une personne a répondu deux fois (même prénom + nom), seule la réponse la plus récente compte.
+
+intervenants_extra.json (à côté de ce script, facultatif) : ajouts manuels par personne (prénom + nom),
+par ex. des invités à compter aux repas : {"hugo vieira da costa": {"inv": [0,0,0,0,0,3], "note": "texte"}}
+« inv » donne le nombre d'invités pour chaque moment de MOMENTS.
 """
 import json, re, sys, unicodedata, datetime
 
@@ -30,6 +34,10 @@ for s in subs:
     if k and (k not in latest or int(s["id"]) > int(latest[k]["id"])):
         latest[k] = s
 
+import os
+_x = os.path.join(os.path.dirname(os.path.abspath(__file__)), "intervenants_extra.json")
+EXTRA = {norm(k): v for k, v in json.load(open(_x, encoding="utf-8")).items()} if os.path.exists(_x) else {}
+
 rows = []
 for s in sorted(latest.values(), key=lambda s: int(s["id"])):
     roles, pres = norm(s.get("roles")), norm(s.get("presence"))
@@ -44,6 +52,10 @@ for s in sorted(latest.values(), key=lambda s: int(s["id"])):
         "al": 1 if (s.get("allergies") or "").strip().lower() not in ("", "-", "non", "aucune", "ras", "rien") else 0,
         "mat": (s.get("materiel") or "").strip()[:140],
     })
+    x = EXTRA.get(norm((s.get("prenom") or "") + " " + (s.get("nom") or "")))
+    if x:
+        rows[-1]["inv"] = [int(v or 0) for v in x.get("inv", [])][:len(MOMENTS)]
+        rows[-1]["nt"] = (x.get("note") or "").strip()
 
 mois = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
 now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=1)))
