@@ -418,11 +418,21 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <nav class="subtabs" role="tablist" aria-label="Vues des ateliers">
       <button type="button" class="atab on" role="tab" id="at-main" data-v="main" aria-selected="true">Ateliers retenus</button>
       <button type="button" class="atab" role="tab" id="at-vote" data-v="vote" aria-selected="false" hidden>Vote des ateliers</button>
+      <button type="button" class="atab" role="tab" id="at-choix" data-v="choix" aria-selected="false" hidden>Choix des participants</button>
     </nav>
     <div id="av-main">
       <div class="tbox" style="margin-top:12px"><table class="dtable" id="aMain"></table></div>
       <p class="muted" style="font-size:13px;margin:8px 0 0">Les intervenants que tu écris sont gardés dans ce navigateur. « Copier la liste » permet de la partager à l'équipe.</p>
       <div style="margin-top:10px"><button class="btn" type="button" id="aCopy">Copier la liste</button></div>
+    </div>
+    <div id="av-choix" hidden>
+      <div class="phead" style="margin-top:12px"><div><p class="muted" id="chSub"></p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="https://form.jotform.com/263234224375050" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Formulaire de choix ↗</a><a class="btn" href="https://www.jotform.com/inbox/263234224375050" target="_blank" rel="noopener">Réponses dans Jotform ↗</a></div></div>
+      <div class="kpis" id="chKpi"></div>
+      <div class="agrid">
+        <div><h3 class="bh" style="margin-top:0">Choix 1 et choix 2</h3><div class="card" id="chBars"></div></div>
+        <div><h3 class="bh" style="margin-top:0">Répartition proposée</h3><p class="muted" style="margin:-4px 0 8px;font-size:13px">Chacun va dans son choix 1 ; quand un atelier est plein, on passe au choix 2. Places par atelier : <input type="number" id="chCap" min="1" max="40" style="width:56px;font:inherit"></p><div id="chGroups" class="alist"></div></div>
+      </div>
     </div>
     <div id="av-vote" hidden>
       <div class="phead" style="margin-top:12px"><div><p class="muted">La sélection de départ et le classement des votes. Chacun votait pour ses 12 préférés.</p></div>
@@ -613,10 +623,30 @@ function renderRetenus(){
 }
 document.getElementById("aCopy").onclick=()=>{const txt="Ateliers du samedi après-midi\n"+RETENUS.map(([n,titre])=>{const v=S._interv[n]||{};return `${n}. ${titre||v.t||"(à définir)"} : ${v.who||"intervenant à trouver"}`}).join("\n");
   const b=document.getElementById("aCopy");navigator.clipboard.writeText(txt).then(()=>{b.textContent="Liste copiée";setTimeout(()=>b.textContent="Copier la liste",1600)},()=>{b.textContent="Copie impossible ici"})};
+/* Choix des ateliers par les participants (formulaire Jotform 263234224375050), mis à jour par outils/maj_choix.py */
+const CHOIX_AT=["Choisir le pardon pour avancer","Servir Dieu : par où ou par quoi commencer ?","Avancer dans les épreuves","Comment le célibat aide-t-il à cheminer avec Dieu ?","Avancer avec Dieu grâce à la prière et la lecture de la Bible","La communion fraternelle est-elle une nécessité ou une option ?"];
+const CHOIX={"updated": "", "list": []};
+function renderChoix(){
+  const L=CHOIX.list, N=L.length, K=CHOIX_AT.length;
+  const capIn=document.getElementById("chCap"); const defCap=Math.max(1,Math.ceil(N/K)+2);
+  const cap=+(S._chCap||0)||defCap; capIn.value=cap; capIn.placeholder=defCap;
+  capIn.onchange=()=>{S._chCap=+capIn.value||0;save();renderChoix()};
+  document.getElementById("chSub").textContent=N?`${N} réponse${N>1?"s":""} · mis à jour le ${CHOIX.updated}`:"Pas encore de réponse. Les choix s'affichent ici dès que la mise à jour est lancée.";
+  const c1=Array(K).fill(0),c2=Array(K).fill(0); L.forEach(r=>{if(r.c1)c1[r.c1-1]++;if(r.c2)c2[r.c2-1]++});
+  const max=Math.max(1,...c1.map((v,i)=>v+c2[i]));
+  // répartition : choix 1 tant qu'il reste de la place, sinon choix 2, sinon l'atelier le moins rempli
+  const grp=CHOIX_AT.map(()=>[]); const order=L.slice().sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+  order.forEach(r=>{let g=r.c1&&grp[r.c1-1].length<cap?r.c1-1:(r.c2&&grp[r.c2-1].length<cap?r.c2-1:-1);
+    if(g<0){g=grp.reduce((m,x,i)=>x.length<grp[m].length?i:m,0)}grp[g].push(Object.assign({k:g===r.c1-1?1:(g===r.c2-1?2:0)},r))});
+  const got1=grp.reduce((a,x)=>a+x.filter(r=>r.k===1).length,0), got2=grp.reduce((a,x)=>a+x.filter(r=>r.k===2).length,0);
+  document.getElementById("chKpi").innerHTML=`<div class="kpi"><span>Réponses</span><b>${N}</b></div><div class="kpi"><span>Ont leur choix 1</span><b>${got1}</b></div><div class="kpi"><span>Ont leur choix 2</span><b>${got2}</b></div><div class="kpi${N-got1-got2?" bad":""}"><span>Ni l'un ni l'autre</span><b>${N-got1-got2}</b></div>`;
+  document.getElementById("chBars").innerHTML=CHOIX_AT.map((t,i)=>`<div class="rk"><span class="n">${i+1}</span><span>${esc(t)}<span class="bar" style="display:flex"><i style="width:${c1[i]/max*100}%"></i><i style="width:${c2[i]/max*100}%;background:var(--accent-soft)"></i></span><small class="muted">choix 1 : ${c1[i]} · choix 2 : ${c2[i]}</small></span><b>${c1[i]}</b></div>`).join("");
+  document.getElementById("chGroups").innerHTML=CHOIX_AT.map((t,i)=>`<div class="acat"><h4>${i+1}. ${esc(t)} <small>${grp[i].length}/${cap}</small></h4>${grp[i].length?`<ul>${grp[i].map(r=>`<li><span>${esc(r.n)}</span><span class="vc">${r.k===1?"choix 1":r.k===2?"choix 2":"placé"}</span></li>`).join("")}</ul>`:'<p class="muted" style="margin:0;font-size:13px">Personne pour l\'instant.</p>'}</div>`).join("");
+}
 let aView="main"; /* vote des ateliers clos */
-function setAView(v){aView=v;document.getElementById("av-main").hidden=v!=="main";document.getElementById("av-vote").hidden=v!=="vote";
+function setAView(v){aView=v;document.getElementById("av-main").hidden=v!=="main";document.getElementById("av-vote").hidden=v!=="vote";document.getElementById("av-choix").hidden=v!=="choix";
   document.querySelectorAll(".atab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
-  try{localStorage.setItem(KEY+".aview",v)}catch(e){} if(v==="main")renderRetenus(); else renderAteliers()}
+  try{localStorage.setItem(KEY+".aview",v)}catch(e){} if(v==="main")renderRetenus(); else if(v==="choix")renderChoix(); else renderAteliers()}
 document.querySelectorAll(".atab").forEach(b=>b.onclick=()=>setAView(b.dataset.v));
 
 const PAGES=["appel","carte","planning","taches","logement","budget","ateliers"];
