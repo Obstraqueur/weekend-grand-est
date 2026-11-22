@@ -15,6 +15,9 @@ Si une personne a répondu deux fois (même prénom + nom), seule la réponse la
 intervenants_extra.json (à côté de ce script, facultatif) : ajouts manuels par personne (prénom + nom),
 par ex. des invités à compter aux repas : {"hugo vieira da costa": {"inv": [0,0,0,0,0,3], "note": "texte"}}
 « inv » donne le nombre d'invités pour chaque moment de MOMENTS.
+
+intervenants_manuels.json (à côté de ce script, facultatif) : intervenants ajoutés à la main, qui n'ont pas
+rempli le formulaire, au même format que intervenants.json (id « manuel-… »).
 """
 import json, re, sys, unicodedata, datetime
 
@@ -26,12 +29,18 @@ def norm(s):
     return re.sub(r"[^a-z0-9]+", " ", s).strip()
 
 subs = json.load(open(sys.argv[1], encoding="utf-8"))
+import os
+_m = os.path.join(os.path.dirname(os.path.abspath(__file__)), "intervenants_manuels.json")
+MANUELS = json.load(open(_m, encoding="utf-8")) if os.path.exists(_m) else []
+def sid(s):
+    v = str(s.get("id") or "")
+    return int(v) if v.isdigit() else 0
 latest = {}
-for s in subs:
+for s in subs + MANUELS:
     if "TEST" in (s.get("prenom", "") + s.get("nom", "")).upper():
         continue
     k = norm(s.get("prenom", "") + " " + s.get("nom", ""))
-    if k and (k not in latest or int(s["id"]) > int(latest[k]["id"])):
+    if k and (k not in latest or sid(s) > sid(latest[k])):
         latest[k] = s
 
 import os
@@ -39,7 +48,7 @@ _x = os.path.join(os.path.dirname(os.path.abspath(__file__)), "intervenants_extr
 EXTRA = {norm(k): v for k, v in json.load(open(_x, encoding="utf-8")).items()} if os.path.exists(_x) else {}
 
 rows = []
-for s in sorted(latest.values(), key=lambda s: int(s["id"])):
+for s in sorted(latest.values(), key=lambda s: (sid(s) == 0, sid(s))):
     roles, pres = norm(s.get("roles")), norm(s.get("presence"))
     rows.append({
         "id": str(s["id"]), "d": (s.get("date") or "")[:10],
