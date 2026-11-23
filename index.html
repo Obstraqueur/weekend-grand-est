@@ -381,6 +381,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <button type="button" class="ltab" role="tab" id="lt-ins" data-v="ins">Inscriptions</button>
       <button type="button" class="ltab" role="tab" id="lt-int" data-v="int">Intervenants</button>
       <button type="button" class="ltab" role="tab" id="lt-heb" data-v="heb">Hébergement</button>
+      <button type="button" class="ltab" role="tab" id="lt-rep" data-v="rep">Répartition</button>
     </nav>
     <div id="lv-ins" hidden>
       <div class="phead" style="margin-top:12px"><div><h2>Inscriptions</h2><p class="muted" id="insSub"></p></div>
@@ -398,6 +399,12 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <div class="kpis" id="intKpi"></div>
       <div class="card" style="margin-bottom:14px"><h3 class="bh" style="margin-top:4px">Présents à chaque moment (repas à prévoir)</h3><div class="hgauge" id="intMoments" style="border:0;padding:0;margin:0"></div></div>
       <div class="tbox"><table class="dtable" id="intTable"></table></div>
+    </div>
+    <div id="lv-rep" hidden>
+      <div class="phead" style="margin-top:12px"><div><h2>Répartition chez l'habitant</h2><p class="muted" id="repSub"></p></div>
+        <a class="btn" href="https://github.com/Obstraqueur/weekend-grand-est/blob/main/hebergement/repartition.csv" target="_blank" rel="noopener">Fichier CSV ↗</a></div>
+      <div class="kpis" id="repKpi"></div>
+      <div class="alist" id="repList"></div>
     </div>
     <div id="lv-heb" hidden>
     <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Change les places avec les jauges, ajoute ou retire un foyer, et fais varier le nombre de personnes par ville.</p></div>
@@ -684,6 +691,12 @@ function setAView(v){aView=v;document.getElementById("av-main").hidden=v!=="main
   try{localStorage.setItem(KEY+".aview",v)}catch(e){} if(v==="main")renderRetenus(); else if(v==="choix")renderChoix(); else renderAteliers()}
 document.querySelectorAll(".atab").forEach(b=>b.onclick=()=>setAView(b.dataset.v));
 
+/* Répartition chez l'habitant (fichier hebergement/repartition.csv) */
+const REPART={"updated": "23 nov. 2026", "places": {"Romuald": "2 filles + 2 garçons", "Emma": "6 filles", "Agirla": "5 filles", "Mattias": "7 garçons"}, "list": [{"f": "Romuald", "n": "Naomi Nardi", "s": "F", "g": "Louange · Metz", "nu": "ven + sam", "rq": ""}, {"f": "Romuald", "n": "Inna Halych", "s": "F", "g": "Metz", "nu": "sam", "rq": "arrive samedi : nuit de samedi seulement"}, {"f": "Romuald", "n": "Noé Erin", "s": "G", "g": "Louange · Metz", "nu": "ven + sam", "rq": ""}, {"f": "Romuald", "n": "Jaïck Luder", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": ""}, {"f": "Emma", "n": "Romane Leuba", "s": "F", "g": "Metz", "nu": "ven + sam", "rq": ""}, {"f": "Emma", "n": "Louise Leuba", "s": "F", "g": "Metz", "nu": "ven + sam", "rq": "a indiqué un logement sur Metz ; placée chez Emma avec sa sœur"}, {"f": "Emma", "n": "Elea Robin", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Emma", "n": "Elisa Souille", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Emma", "n": "Johanna Ollier", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Emma", "n": "Yael Metzger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Agirla", "n": "Narmina Khalilova", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Agirla", "n": "Miriam Del", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Agirla", "n": "Salomé Willegger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Agirla", "n": "Jeanne Winkelsass", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Agirla", "n": "Justine Courderot", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Mattias", "n": "Etienne Del", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Mattias", "n": "Léo Gosselin", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "Mattias", "n": "Josh Dixon", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "À placer", "n": "Qetoura Brinkert", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "À placer", "n": "Stephanie Egeler", "s": "F", "g": "Strasbourg", "nu": "ven + sam", "rq": ""}, {"f": "À placer", "n": "Elisa Clolot", "s": "F", "g": "Strasbourg", "nu": "ven + sam", "rq": ""}]};
+function renderRep(){const L=REPART.list,F=[...new Set(L.map(r=>r.f))];const out=L.filter(r=>r.f==="À placer").length;
+  document.getElementById("repSub").textContent=`Participants inscrits qui n'ont pas de logement sur Metz · mis à jour le ${REPART.updated}`;
+  document.getElementById("repKpi").innerHTML=`<div class="kpi"><span>À loger</span><b>${L.length}</b></div><div class="kpi"><span>Filles</span><b>${L.filter(r=>r.s==="F").length}</b></div><div class="kpi"><span>Garçons</span><b>${L.filter(r=>r.s==="G").length}</b></div><div class="kpi${out?" bad":" good"}"><span>Encore à placer</span><b>${out}</b></div>`;
+  document.getElementById("repList").innerHTML=F.map(f=>{const g=L.filter(r=>r.f===f);return `<div class="acat"><h4>${esc(f)} <small>${g.length} personne${g.length>1?"s":""}${REPART.places[f]?" · prévu : "+esc(REPART.places[f]):""}</small></h4><ul>${g.map(r=>`<li><span>${esc(r.n)}<small>${esc(r.g)}${r.rq?" · "+esc(r.rq):""}</small></span><span class="vc">${r.s==="F"?"fille":"garçon"} · ${esc(r.nu)}</span></li>`).join("")}</ul></div>`}).join("")}
 const PAGES=["appel","carte","planning","taches","logement","budget","ateliers"];
 window.addEventListener("message",e=>{const h=e.data&&e.data.wePlanningHeight;if(h){const f=document.getElementById("planFrame");if(f&&e.source===f.contentWindow)f.style.height=Math.max(600,h+8)+"px"}});
 function showPage(id){
@@ -1249,9 +1262,9 @@ function renderInt(){
 }
 let lView="ins"; try{lView=localStorage.getItem(KEY+".lview")||"ins"}catch(e){}
 function setLView(v){lView=v;document.getElementById("lv-ins").hidden=v!=="ins";document.getElementById("lv-heb").hidden=v!=="heb";
-  document.getElementById("lv-int").hidden=v!=="int";
+  document.getElementById("lv-int").hidden=v!=="int";document.getElementById("lv-rep").hidden=v!=="rep";
   document.querySelectorAll(".ltab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
-  try{localStorage.setItem(KEY+".lview",v)}catch(e){} if(v==="ins")renderIns(); else if(v==="int")renderInt(); else renderHosts()}
+  try{localStorage.setItem(KEY+".lview",v)}catch(e){} if(v==="ins")renderIns(); else if(v==="int")renderInt(); else if(v==="rep")renderRep(); else renderHosts()}
 document.querySelectorAll(".ltab").forEach(b=>b.onclick=()=>setLView(b.dataset.v));
 let startPage=(location.hash||"").slice(1); if(!PAGES.includes(startPage)){try{startPage=localStorage.getItem(KEY+".page")||"carte"}catch(e){startPage="carte"}}
 showPage(startPage);
