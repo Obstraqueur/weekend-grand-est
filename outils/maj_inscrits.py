@@ -22,6 +22,8 @@ La page montre le détail complet des réponses (nom complet, allergies, covoitu
 mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
 paiements_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": {"p": "oui", "note": "Payé par un don"}}
 fixe le statut payé à la main (la note s'affiche sur le bouton « Payé »).
+groupes_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": "Nom du groupe (code)"} remplace
+le groupe donné à l'inscription (personnes rattachées à un groupe à la main).
 inscrits_exclus.json (à côté de ce script, facultatif) : {"<id inscription>": "qui / pourquoi"} retire ces inscriptions
 de la page (désinscriptions), même si elles restent dans Jotform.
 Si une personne s'est inscrite deux fois (même prénom + nom), seule la soumission la plus récente compte.
@@ -49,6 +51,11 @@ _f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logement_metz.jso
 LOGES = {norm(n) for n in json.load(open(_f, encoding="utf-8"))} if os.path.exists(_f) else set()
 _e = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inscrits_exclus.json")
 EXCLUS = {k for k in json.load(open(_e, encoding="utf-8")) if not k.startswith("_")} if os.path.exists(_e) else set()
+_g = os.path.join(os.path.dirname(os.path.abspath(__file__)), "groupes_manuels.json")
+GMAN = {k: v for k, v in json.load(open(_g, encoding="utf-8")).items() if not k.startswith("_")} if os.path.exists(_g) else {}
+for s in subs:
+    if str(s.get("id")) in GMAN:
+        s["groupe"] = GMAN[str(s.get("id"))]
 latest = {}
 for s in subs:
     if str(s.get("id")) in EXCLUS:
