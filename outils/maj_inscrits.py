@@ -21,7 +21,8 @@ Champs facultatifs en plus : "covoiturage", "places_proposees", "don", "remarque
 La page montre le détail complet des réponses (nom complet, allergies, covoiturage, don, remarque),
 mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
 paiements_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": {"p": "oui", "note": "Payé par un don"}}
-fixe le statut payé à la main (la note s'affiche sur le bouton « Payé »).
+fixe le statut payé à la main (la note s'affiche sur le bouton « Payé »). Avec "pl": 10, l'inscription passe en prix libre
+à ce montant (sans "p", le statut payé reste celui du formulaire / de la case « Payé »).
 groupes_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": "Nom du groupe (code)"} remplace
 le groupe donné à l'inscription (personnes rattachées à un groupe à la main).
 inscrits_exclus.json (à côté de ce script, facultatif) : {"<id inscription>": "qui / pourquoi"} retire ces inscriptions
@@ -115,10 +116,15 @@ _m = os.path.join(os.path.dirname(os.path.abspath(__file__)), "paiements_manuels
 MANU = {k: v for k, v in json.load(open(_m, encoding="utf-8")).items() if not k.startswith("_")} if os.path.exists(_m) else {}
 for r in rows:
     x = MANU.get(r["id"])
-    if x:
+    if x and x.get("p"):
         r["p"] = "oui" if str(x.get("p", "oui")).lower().startswith("oui") else "non"
         if x.get("note"):
             r["pn"] = x["note"]
+    # « pl » : passe l'inscription en prix libre avec ce montant (en €), à la place du tarif étudiant / vie active / groupe.
+    if x and x.get("pl") not in (None, ""):
+        r["pl"] = float(str(x["pl"]).replace(",", "."))
+        if r["pl"] == int(r["pl"]):
+            r["pl"] = int(r["pl"])
 
 # Un groupe saisi sans code (ex. « Metz » → alias « Metzc'estmieux ») reprend le code du groupe du même nom.
 codes = {}
