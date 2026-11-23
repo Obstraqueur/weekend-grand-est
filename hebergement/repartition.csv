@@ -1,23 +1,23 @@
-Foyer,Prénom et nom,Fille / garçon,GBU / ville,Nuits,Remarque
-Romuald,Naomi Nardi,F,Louange · Metz,ven + sam,
-Romuald,Inna Halych,F,Metz,sam,arrive samedi : nuit de samedi seulement
-Romuald,Noé Erin,G,Louange · Metz,ven + sam,
-Emma,Romane Leuba,F,Metz,ven + sam,
-Emma,Louise Leuba,F,Metz,ven + sam,a indiqué un logement sur Metz ; placée chez Emma avec sa sœur
-Emma,Johanna Ollier,F,GBU Strasbourg,ven + sam,
-Emma,Yael Metzger,F,GBU Strasbourg,ven + sam,
-Emma,Qetoura Brinkert,F,GBU Strasbourg,ven + sam,
-Agirla,Narmina Khalilova,F,GBU Strasbourg,ven + sam,
-Agirla,Miriam Del,F,GBU Strasbourg,ven + sam,
-Agirla,Salomé Willegger,F,GBU Strasbourg,ven + sam,
-Agirla,Jeanne Winkelsass,F,GBU Strasbourg,ven + sam,
-Agirla,Justine Courderot,F,GBU Strasbourg,ven + sam,
-Agirla,Elisa Clolot,F,Strasbourg,ven + sam,
-Agirla,Stephanie Egeler,F,Strasbourg,ven + sam,
-Aline,Elea Robin,F,GBU Strasbourg,ven + sam,
-Aline,Elisa Souille,F,GBU Strasbourg,ven + sam,
-Mattias,Etienne Del,G,GBU Strasbourg,ven + sam,
-Mattias,Léo Gosselin,G,GBU Strasbourg,ven + sam,
-Mattias,Josh Dixon,G,GBU Strasbourg,ven + sam,
-Mattias,Jaïck Luder,G,Nancy,ven + sam,
-Mattias,Ami de Mattias,G,—,ven + sam,pas inscrit sur le formulaire
+Foyer,Prénom et nom,Fille / garçon,Ville,GBU / groupe,Nuits,Remarque
+Romuald,Naomi Nardi,F,Metz,Louange · Metz,ven + sam,
+Romuald,Inna Halych,F,Metz,Metz,sam,arrive samedi : nuit de samedi seulement
+Romuald,Noé Erin,G,Metz,Louange · Metz,ven + sam,
+Emma,Romane Leuba,F,Metz,Metz,ven + sam,
+Emma,Louise Leuba,F,Metz,Metz,ven + sam,a indiqué un logement sur Metz ; placée chez Emma avec sa sœur
+Emma,Johanna Ollier,F,Strasbourg,GBU Strasbourg,ven + sam,
+Emma,Yael Metzger,F,Strasbourg,GBU Strasbourg,ven + sam,
+Emma,Qetoura Brinkert,F,Strasbourg,GBU Strasbourg,ven + sam,
+Agirla,Narmina Khalilova,F,Strasbourg,GBU Strasbourg,ven + sam,
+Agirla,Miriam Del,F,Strasbourg,GBU Strasbourg,ven + sam,
+Agirla,Salomé Willegger,F,Strasbourg,GBU Strasbourg,ven + sam,
+Agirla,Jeanne Winkelsass,F,Strasbourg,GBU Strasbourg,ven + sam,
+Agirla,Justine Courderot,F,Strasbourg,GBU Strasbourg,ven + sam,
+Agirla,Elisa Clolot,F,Strasbourg,Strasbourg,ven + sam,
+Agirla,Stephanie Egeler,F,Strasbourg,Strasbourg,ven + sam,
+Aline,Elea Robin,F,Strasbourg,GBU Strasbourg,ven + sam,
+Aline,Elisa Souille,F,Strasbourg,GBU Strasbourg,ven + sam,
+Mattias,Etienne Del,G,Strasbourg,GBU Strasbourg,ven + sam,
+Mattias,Léo Gosselin,G,Strasbourg,GBU Strasbourg,ven + sam,
+Mattias,Josh Dixon,G,Strasbourg,GBU Strasbourg,ven + sam,
+Mattias,Jaïck Luder,G,Nancy,Nancy,ven + sam,
+Mattias,Ami de Mattias,G,?,—,ven + sam,pas inscrit sur le formulaire
