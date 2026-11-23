@@ -311,7 +311,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <p class="sub">Rencontrer Jésus aujourd’hui ? · 27–29 novembre 2026 · Metz</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <div class="legend"><span><i class="dot"></i>Notes prises</span></div>
+      <div class="legend"><span><i class="dot"></i>Notes prises</span><span id="syncSt" title="Partage des modifications avec toute l'équipe">…</span></div>
       <a class="btn" href="https://docs.google.com/document/d/1ntG6a4A_rttuhnUmzK9e3NXFyzt8jvlUx2x_z3K-r5Y/edit?usp=sharing" target="_blank" rel="noopener" style="background:var(--accent);border-color:var(--accent);color:#1b2433;text-decoration:none">Commenter le planning</a>
       <button class="btn" id="copyAll" type="button">Copier toutes les notes</button>
     </div>
@@ -527,7 +527,42 @@ const N = [
 
 const KEY="weRegional.v1"; let S={};
 try{S=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){S={}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} syncQueue()}
+/* ---------- Partage en direct via Google Sheet (Apps Script, voir outils/sync_apps_script.gs) ----------
+   Chaque valeur de S (notes, tâches, budget, hébergement, ateliers…) est une ligne « chemin → valeur ».
+   Une modification est envoyée ~1 s après, et la page récupère celles des autres toutes les 10 s. */
+const SYNC_URL="";
+const SYNC_SKIP=new Set(["_pay","_v2"]);
+let syncSent={}, syncPending={}, syncMax=0, syncTimer=null, syncReady=false, syncOk=null;
+const syncBy=(()=>{try{let b=localStorage.getItem(KEY+".by");if(!b){b=Math.random().toString(36).slice(2,8);localStorage.setItem(KEY+".by",b)}return b}catch(e){return "?"}})();
+function syncFlat(o,p,out){for(const k of Object.keys(o||{})){if(!p&&SYNC_SKIP.has(k))continue;const v=o[k],q=p?p+"\u0001"+k:k;
+  if(v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).length)syncFlat(v,q,out);else out[q]=JSON.stringify(v===undefined?null:v)}return out}
+function syncSet(path,val){const ks=path.split("\u0001");let o=S;for(let i=0;i<ks.length-1;i++){if(!o[ks[i]]||typeof o[ks[i]]!=="object"||Array.isArray(o[ks[i]]))o[ks[i]]={};o=o[ks[i]]}
+  const last=ks[ks.length-1];if(val===null)delete o[last];else o[last]=val}
+function syncStatus(){const e=document.getElementById("syncSt");if(!e)return;
+  e.textContent=!SYNC_URL?"Modifs enregistrées dans ce navigateur seulement":syncOk===false?"⚠ Hors ligne : modifs gardées ici, envoyées au retour":"● Partagé avec l'équipe";
+  e.style.color=!SYNC_URL||syncOk===false?"#c0392b":"var(--new)"}
+function syncQueue(){if(!SYNC_URL||!syncReady)return;const now=syncFlat(S,"",{});
+  for(const k in now)if(syncSent[k]!==now[k])syncPending[k]=now[k];
+  for(const k in syncSent)if(!(k in now))syncPending[k]=null;
+  clearTimeout(syncTimer);syncTimer=setTimeout(syncPush,900)}
+function syncPush(){const ks=Object.keys(syncPending);if(!ks.length)return;const set=ks.map(k=>[k,syncPending[k]]);const sent=Object.assign({},syncPending);syncPending={};
+  fetch(SYNC_URL,{method:"POST",body:JSON.stringify({by:syncBy,set})}).then(r=>r.json()).then(d=>{
+    for(const k in sent){if(sent[k]===null)delete syncSent[k];else syncSent[k]=sent[k]}syncOk=true;syncStatus()})
+  .catch(()=>{for(const k in sent)if(!(k in syncPending))syncPending[k]=sent[k];syncOk=false;syncStatus();clearTimeout(syncTimer);syncTimer=setTimeout(syncPush,15000)})}
+function syncBusy(){const a=document.activeElement;return a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=="checkbox"&&a.type!=="radio"}
+function syncPull(first){if(!SYNC_URL)return Promise.resolve();if(!first&&syncBusy())return Promise.resolve();
+  return fetch(SYNC_URL+"?since="+(first?0:syncMax)).then(r=>r.json()).then(d=>{syncOk=true;let changed=false;
+    for(const [k,v,t] of d.rows){if(k in syncPending)continue;const val=v===""?null:JSON.parse(v);
+      const cur=syncFlat(S,"",{})[k];if(cur!==(val===null?undefined:v)){syncSet(k,val);changed=true}
+      if(val===null)delete syncSent[k];else syncSent[k]=v;if(t>syncMax)syncMax=t}
+    if(d.max>syncMax)syncMax=d.max;
+    if(first){syncReady=true;const now=syncFlat(S,"",{});for(const k in now)if(!(k in syncSent))syncPending[k]=now[k];if(Object.keys(syncPending).length)syncPush()}
+    if(changed){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}syncRerender()}
+    syncStatus()}).catch(()=>{syncOk=false;syncStatus()})}
+function syncRerender(){try{refreshDots();if(curPage==="carte"&&typeof active!=="undefined"&&active)open(active);else showPage(curPage)}catch(e){}}
+let curPage="carte";
+setTimeout(()=>{syncStatus();if(SYNC_URL)syncPull(true).finally(()=>setInterval(()=>syncPull(false),10000))},0);
 if(!S._v2){Object.keys(S).forEach(k=>{if(S[k]&&S[k].c)S[k].c={}});S._todo={};S._v2=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const st=id=>(S[id]=S[id]||{n:"",c:{}});
 
@@ -563,7 +598,7 @@ function open(id){
   panel.querySelectorAll(".qs input").forEach(cb=>cb.onchange=()=>{s.c[cb.dataset.i]=cb.checked;save();
     document.getElementById("cnt").textContent=n.q.filter((_,i)=>s.c[i]).length+"/"+n.q.length});
   const ta=panel.querySelector("textarea"); let t;
-  ta.oninput=()=>{s.n=ta.value;save();refreshDots();clearTimeout(t);document.getElementById("saved").textContent="Enregistré dans ce navigateur";t=setTimeout(()=>document.getElementById("saved").textContent="",1500)};
+  ta.oninput=()=>{s.n=ta.value;save();refreshDots();clearTimeout(t);document.getElementById("saved").textContent=SYNC_URL?"Enregistré pour toute l'équipe":"Enregistré dans ce navigateur";t=setTimeout(()=>document.getElementById("saved").textContent="",1500)};
   try{localStorage.setItem(KEY+".last",id)}catch(e){}
   if(window.innerWidth<=960) panel.scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -652,7 +687,7 @@ document.querySelectorAll(".atab").forEach(b=>b.onclick=()=>setAView(b.dataset.v
 const PAGES=["appel","carte","planning","taches","logement","budget","ateliers"];
 window.addEventListener("message",e=>{const h=e.data&&e.data.wePlanningHeight;if(h){const f=document.getElementById("planFrame");if(f&&e.source===f.contentWindow)f.style.height=Math.max(600,h+8)+"px"}});
 function showPage(id){
-  if(!PAGES.includes(id)) id="carte";
+  if(!PAGES.includes(id)) id="carte"; curPage=id;
   PAGES.forEach(p=>{document.getElementById("p-"+p).hidden=p!==id;const t=document.getElementById("t-"+p);t.classList.toggle("on",p===id);t.setAttribute("aria-selected",p===id)});
   try{localStorage.setItem(KEY+".page",id)}catch(e){}
   if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")setLView(lView); if(id==="budget")renderBudget(); if(id==="ateliers")setAView(aView); if(id==="appel")renderAppel();
