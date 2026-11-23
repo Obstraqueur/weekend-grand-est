@@ -22,6 +22,8 @@ La page montre le détail complet des réponses (nom complet, allergies, covoitu
 mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
 paiements_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": {"p": "oui", "note": "Payé par un don"}}
 fixe le statut payé à la main (la note s'affiche sur le bouton « Payé »).
+inscrits_exclus.json (à côté de ce script, facultatif) : {"<id inscription>": "qui / pourquoi"} retire ces inscriptions
+de la page (désinscriptions), même si elles restent dans Jotform.
 Si une personne s'est inscrite deux fois (même prénom + nom), seule la soumission la plus récente compte.
 """
 import json, re, sys, unicodedata, datetime
@@ -45,8 +47,12 @@ PAGES = args[1:]
 import os
 _f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logement_metz.json")
 LOGES = {norm(n) for n in json.load(open(_f, encoding="utf-8"))} if os.path.exists(_f) else set()
+_e = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inscrits_exclus.json")
+EXCLUS = {k for k in json.load(open(_e, encoding="utf-8")) if not k.startswith("_")} if os.path.exists(_e) else set()
 latest = {}
 for s in subs:
+    if str(s.get("id")) in EXCLUS:
+        continue
     if "TEST" in (s.get("prenom", "") + s.get("nom", "")).upper():
         continue
     k = norm(s.get("prenom", "") + " " + s.get("nom", ""))
