@@ -206,7 +206,7 @@ form.ed h2{margin:0;font-family:var(--display);font-weight:850;font-stretch:80%;
   <section id="v-detail" hidden>
     <div class="dhead">
       <div><h2 class="dtitle">Planning détaillé</h2><p class="hint">Le déroulé minute par minute pour l'équipe : quoi, qui, et les détails à ne pas oublier. Tout se modifie directement dans le tableau.</p></div>
-      <div class="toolbar"><button class="btn" type="button" id="dCopy">Copier pour Google Sheets</button></div>
+      <div class="toolbar"><button class="btn" type="button" id="dCopy">Copier pour Google Sheets</button><button class="btn" type="button" id="dAll" title="Copie les 4 programmes tels qu'ils sont dans ce navigateur, pour les remettre en ligne">Copier tout (pour mise en ligne)</button></div>
     </div>
     <label class="dnote"><span>À préparer</span><input id="dNote" placeholder="Ex. feuille d'urgence pour l'équipe" maxlength="300"></label>
     <div id="det"></div>
@@ -662,6 +662,11 @@ document.getElementById('dCopy').addEventListener('click',async()=>{
   let out='WE régional GBU Grand Est 2026 · Programme '+PROG_L[prog]+'\n'+(prog==='part'&&detail.note?'\t\t\t'+clean(detail.note)+'\n':'');
   dayNames().forEach((dn,di)=>{const d=detail.days[di];out+=`\n${dn}\tQuoi ?\tQui ?\t${prog==='cuisine'||prog==='menage'?'Lieu':'Détails'}\n`;if(d.pres)out+=`\tPrésidence\t${clean(d.pres)}\n`;d.rows.forEach(r=>{out+=`${clean(r.h)}\t${clean(r.q)}\t${clean(r.w)}\t${clean(r.d)}\n`})});
   try{await navigator.clipboard.writeText(out);toast('Copié : colle-le dans Google Sheets')}
+  catch(_){const ta=document.createElement('textarea');ta.value=out;ta.style.cssText='position:fixed;inset:20px;height:60vh;z-index:60';document.body.appendChild(ta);ta.select();toast('Sélectionné : copie avec Ctrl+C, puis clique ailleurs');ta.addEventListener('blur',()=>ta.remove())}
+});
+document.getElementById('dAll').addEventListener('click',async()=>{
+  const out='PLANNING-WE-JSON '+JSON.stringify(progs);
+  try{await navigator.clipboard.writeText(out);toast('Copié : colle-le dans la conversation avec Claude')}
   catch(_){const ta=document.createElement('textarea');ta.value=out;ta.style.cssText='position:fixed;inset:20px;height:60vh;z-index:60';document.body.appendChild(ta);ta.select();toast('Sélectionné : copie avec Ctrl+C, puis clique ailleurs');ta.addEventListener('blur',()=>ta.remove())}
 });
 /* ---------- démarrage ---------- */
