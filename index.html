@@ -301,6 +301,18 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
 .paybtn.on{color:var(--new);border-color:var(--new);background:var(--new-soft)}
 .paybtn:hover{border-color:var(--accent)}.paybtn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 #insTable small{display:block;color:var(--muted);font-size:12px}
+.brgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;align-items:start}
+.brc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px 8px}
+.brc h4{font-family:var(--display);font-weight:800;font-size:1rem;margin:0 0 6px;display:flex;justify-content:space-between;gap:8px}
+.brc h4 small{font-family:var(--body);font-weight:600;color:var(--muted)}
+.brc ul{list-style:none;margin:0;padding:0}
+.brc li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--line);font-size:14px}
+.brc li:first-child{border-top:0}
+.brc li.done span{color:var(--muted);text-decoration:line-through}
+.brc li.new{animation:brnew 1.2s ease}@keyframes brnew{from{background:var(--accent-soft)}to{background:transparent}}
+.bcw{position:relative;display:inline-block;width:18px;text-align:center;color:var(--muted);font-size:13px}.bcw select{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.brc .x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0 2px}
+.brc .x:hover{color:#c0392b}
 .gl{display:grid;gap:6px}.gl div{display:flex;justify-content:space-between;gap:10px;font-size:14px;border-top:1px solid var(--line);padding-top:6px}.gl div:first-child{border-top:0;padding-top:0}
 </style>
 
@@ -318,6 +330,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Pages">
+    <button type="button" class="tab" role="tab" id="t-brain" data-p="brain">Call 24/11</button>
     <button type="button" class="tab" role="tab" id="t-appel" data-p="appel">Appel 26/10</button>
     <button type="button" class="tab" role="tab" id="t-carte" data-p="carte">Carte</button>
     <button type="button" class="tab" role="tab" id="t-planning" data-p="planning">Planning</button>
@@ -327,6 +340,13 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <button type="button" class="tab" role="tab" id="t-ateliers" data-p="ateliers">Ateliers</button>
   </nav>
 
+  <section id="p-brain" class="page" hidden>
+    <div class="phead"><div><h2>Call 24/11 · brainstorming de dernière minute</h2><p class="muted">Écris une chose à ne pas oublier et appuie sur Entrée : elle se range toute seule dans sa catégorie. Tu peux en écrire plusieurs d'un coup en les séparant par des virgules.</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="brCopy">Copier la liste</button></div></div>
+    <input type="text" id="brIn" class="asearch" style="font-size:18px;padding:14px 16px" placeholder="Ex. : papier toilette, micros, saladiers, étiquettes prénom, caisse avec du liquide…" aria-label="Ajouter une chose à ne pas oublier" autocomplete="off">
+    <p class="muted" id="brSub" style="font-size:13px;margin:-4px 0 14px"></p>
+    <div id="brCats" class="brgrid"></div>
+  </section>
   <section id="p-appel" class="page" hidden>
     <div class="phead"><div><h2>Appel du lundi 26 octobre · 20h</h2><p class="muted">Le pitch du début en diapos, puis le déroulé sujet par sujet avec un lien vers chaque page de soutien.</p></div></div>
     <div class="stage" id="stage" tabindex="0" aria-roledescription="présentation" aria-label="Diapos du pitch">
@@ -380,8 +400,8 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     <nav class="subtabs" role="tablist" aria-label="Vues du logement" style="margin-top:0">
       <button type="button" class="ltab" role="tab" id="lt-ins" data-v="ins">Inscriptions</button>
       <button type="button" class="ltab" role="tab" id="lt-int" data-v="int">Intervenants</button>
-      <button type="button" class="ltab" role="tab" id="lt-heb" data-v="heb">Hébergement</button>
-      <button type="button" class="ltab" role="tab" id="lt-rep" data-v="rep">Répartition</button>
+      <button type="button" class="ltab" role="tab" id="lt-rep" data-v="rep">Hébergement</button>
+      <button type="button" class="ltab" role="tab" id="lt-heb" data-v="heb" hidden>Foyers (ancien)</button>
     </nav>
     <div id="lv-ins" hidden>
       <div class="phead" style="margin-top:12px"><div><h2>Inscriptions</h2><p class="muted" id="insSub"></p></div>
@@ -404,7 +424,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <div class="phead" style="margin-top:12px"><div><h2>Répartition chez l'habitant</h2><p class="muted" id="repSub"></p></div>
         <a class="btn" href="https://github.com/Obstraqueur/weekend-grand-est/blob/main/hebergement/repartition.csv" target="_blank" rel="noopener">Fichier CSV ↗</a></div>
       <div class="kpis" id="repKpi"></div>
-      <div class="alist" id="repList"></div>
+      <div class="brgrid" id="repList" style="grid-template-columns:repeat(auto-fill,minmax(340px,1fr))"></div>
     </div>
     <div id="lv-heb" hidden>
     <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Change les places avec les jauges, ajoute ou retire un foyer, et fais varier le nombre de personnes par ville.</p></div>
@@ -692,18 +712,64 @@ function setAView(v){aView=v;document.getElementById("av-main").hidden=v!=="main
 document.querySelectorAll(".atab").forEach(b=>b.onclick=()=>setAView(b.dataset.v));
 
 /* Répartition chez l'habitant (fichier hebergement/repartition.csv) */
-const REPART={"updated": "23 nov. 2026", "places": {"Romuald": "2 filles + 1 garçon", "Emma": "7 filles", "Agirla": "5 filles", "Mattias": "7 garçons", "Aline": "2 filles"}, "list": [{"f": "Romuald", "n": "Naomi Nardi", "s": "F", "g": "Louange · Metz", "nu": "ven + sam", "rq": "", "v": "Metz"}, {"f": "Romuald", "n": "Inna Halych", "s": "F", "g": "Metz", "nu": "sam", "rq": "arrive samedi : nuit de samedi seulement", "v": "Metz"}, {"f": "Romuald", "n": "Noé Erin", "s": "G", "g": "Louange · Metz", "nu": "ven + sam", "rq": "", "v": "Metz"}, {"f": "Emma", "n": "Qetoura Brinkert", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Emma", "n": "Romane Leuba", "s": "F", "g": "Metz", "nu": "sam", "rq": "seulement la nuit de samedi", "v": "Metz"}, {"f": "Emma", "n": "Louise Leuba", "s": "F", "g": "Metz", "nu": "sam", "rq": "seulement la nuit de samedi", "v": "Metz"}, {"f": "Emma", "n": "Johanna Ollier", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Emma", "n": "Jeanne Winkelsass", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Emma", "n": "Justine Courderot", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Emma", "n": "Narmina Khalilova", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Agirla", "n": "Elisa Clolot", "s": "F", "g": "Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Agirla", "n": "Salomé Willegger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Agirla", "n": "Yael Metzger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Agirla", "n": "Firlande Claudius Clegbaza", "s": "F", "g": "Metzc'estmieux", "v": "Metz", "nu": "ven + sam", "rq": "a indiqué un logement sur Metz ; placée chez Agirla"}, {"f": "Agirla", "n": "Miriam Del", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "a une voiture 5 places", "v": "Strasbourg"}, {"f": "Aline", "n": "Elea Robin", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Aline", "n": "Elisa Souille", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Mattias", "n": "Etienne Del", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Mattias", "n": "Léo Gosselin", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Mattias", "n": "Josh Dixon", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg"}, {"f": "Mattias", "n": "Jaïck Luder", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": "", "v": "Nancy"}, {"f": "Mattias", "n": "Matthieu Scheins", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": "ami de Mattias · a sa voiture (+4 places)", "v": "Nancy"}]};
+const REPART={"updated": "23 nov. 2026", "places": {"Romuald": "2 filles + 1 garçon", "Emma": "7 filles", "Agirla": "5 filles", "Mattias": "7 garçons", "Aline": "2 filles"}, "list": [{"f": "Romuald", "n": "Naomi Nardi", "s": "F", "g": "Louange · Metz", "nu": "ven + sam", "rq": "", "v": "Metz", "car": 2}, {"f": "Romuald", "n": "Inna Halych", "s": "F", "g": "Metz", "nu": "sam", "rq": "arrive samedi : nuit de samedi seulement", "v": "Metz", "car": 0}, {"f": "Romuald", "n": "Noé Erin", "s": "G", "g": "Louange · Metz", "nu": "ven + sam", "rq": "", "v": "Metz", "car": 0}, {"f": "Emma", "n": "Qetoura Brinkert", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Romane Leuba", "s": "F", "g": "Metz", "nu": "sam", "rq": "seulement la nuit de samedi", "v": "Metz", "car": 0}, {"f": "Emma", "n": "Louise Leuba", "s": "F", "g": "Metz", "nu": "sam", "rq": "seulement la nuit de samedi", "v": "Metz", "car": 0}, {"f": "Emma", "n": "Johanna Ollier", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Jeanne Winkelsass", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Justine Courderot", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Narmina Khalilova", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Agirla", "n": "Elisa Clolot", "s": "F", "g": "Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 3}, {"f": "Agirla", "n": "Salomé Willegger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Agirla", "n": "Yael Metzger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Agirla", "n": "Firlande Claudius Clegbaza", "s": "F", "g": "Metzc'estmieux", "v": "Metz", "nu": "ven + sam", "rq": "a indiqué un logement sur Metz ; placée chez Agirla", "car": 0}, {"f": "Agirla", "n": "Miriam Del", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "a une voiture 5 places", "v": "Strasbourg", "car": 4}, {"f": "Aline", "n": "Elea Robin", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Aline", "n": "Elisa Souille", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Mattias", "n": "Etienne Del", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Mattias", "n": "Léo Gosselin", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 3}, {"f": "Mattias", "n": "Josh Dixon", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Mattias", "n": "Jaïck Luder", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": "", "v": "Nancy", "car": 0}, {"f": "Mattias", "n": "Matthieu Scheins", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": "ami de Mattias · a sa voiture (+4 places)", "v": "Nancy", "car": 4}], "hostcar": {"Romuald": 1, "Aline": 4, "Mattias": 2, "Emma": null, "Agirla": null}};
 function renderRep(){const L=REPART.list,F=[...new Set(L.map(r=>r.f))];const out=L.filter(r=>r.f==="À placer").length;
-  document.getElementById("repSub").textContent=`Participants inscrits qui n'ont pas de logement sur Metz · mis à jour le ${REPART.updated}`;
-  document.getElementById("repKpi").innerHTML=`<div class="kpi"><span>À loger</span><b>${L.length}</b></div><div class="kpi"><span>Filles</span><b>${L.filter(r=>r.s==="F").length}</b></div><div class="kpi"><span>Garçons</span><b>${L.filter(r=>r.s==="G").length}</b></div><div class="kpi${out?" bad":" good"}"><span>Encore à placer</span><b>${out}</b></div>`;
-  document.getElementById("repList").innerHTML=F.map(f=>{const g=L.filter(r=>r.f===f);const vm={};g.forEach(r=>vm[r.v]=(vm[r.v]||0)+1);const mix=Object.entries(vm).sort((x,y)=>y[1]-x[1]).map(([v,n])=>`<span class="owner" style="margin-left:0">${esc(v)} ${n}</span>`).join(" ");return `<div class="acat"><h4>${esc(f)} <small>${g.length} personne${g.length>1?"s":""}${REPART.places[f]?" · prévu : "+esc(REPART.places[f]):""}</small></h4><div style="display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 8px">${mix}</div><ul>${g.map(r=>`<li><span>${esc(r.n)}<small>${esc(r.g)}${r.rq?" · "+esc(r.rq):""}</small></span><span class="vc">${esc(r.v)} · ${r.s==="F"?"fille":"garçon"} · ${esc(r.nu)}</span></li>`).join("")}</ul></div>`}).join("")}
-const PAGES=["appel","carte","planning","taches","logement","budget","ateliers"];
+  document.getElementById("repSub").textContent=`Participants logés chez l'habitant, voitures et places pour aller à Borny · mis à jour le ${REPART.updated}`;
+  const sam=L.filter(r=>/sam/.test(r.nu)).length, ven=L.filter(r=>/ven/.test(r.nu)).length;
+  document.getElementById("repKpi").innerHTML=`<div class="kpi"><span>Logés</span><b>${L.length}</b><small>${L.filter(r=>r.s==="F").length} filles · ${L.filter(r=>r.s==="G").length} garçons</small></div><div class="kpi"><span>Vendredi soir</span><b>${ven}</b></div><div class="kpi"><span>Samedi soir</span><b>${sam}</b></div><div class="kpi${out?" bad":" good"}"><span>Encore à placer</span><b>${out}</b></div>`;
+  document.getElementById("repList").innerHTML=F.map(f=>{const g=L.filter(r=>r.f===f);const vm={};g.forEach(r=>vm[r.v]=(vm[r.v]||0)+1);
+    const mix=Object.entries(vm).sort((x,y)=>y[1]-x[1]).map(([v,n])=>`<span class="owner" style="margin-left:0">${esc(v)} ${n}</span>`).join(" ");
+    const drivers=g.filter(r=>r.car>0), hc=(REPART.hostcar||{})[f];
+    const seats=drivers.reduce((a,r)=>a+r.car,0)+(hc||0), pass=g.length-drivers.length;
+    const nf=g.filter(r=>r.s==="F").length, ng=g.length-nf;
+    let cls,txt;const who=[...drivers.map(r=>`${esc(r.n.split(" ")[0])} : ${r.car} place${r.car>1?"s":""}`),...(hc?[`${esc(f)} : ${hc} place${hc>1?"s":""}`]:[])].join(" + ");
+    if(seats>=pass){cls="good";txt=`<b>${who}</b> pour ${pass} passager${pass>1?"s":""}. OK.`}
+    else if(hc===null){cls="mid";txt=`${who?"<b>"+who+"</b> pour ":""}${pass} passager${pass>1?"s":""}${who?"":" sans voiture"}. Il manque ${pass-seats} place${pass-seats>1?"s":""} si ${esc(f)} n'a pas de voiture.`}
+    else{cls="bad";txt=`${who?"<b>"+who+"</b> : ":""}il manque ${pass-seats} place${pass-seats>1?"s":""}.`}
+    const col={good:"background:var(--new-soft);color:var(--new)",mid:"background:var(--accent-soft);color:var(--ink)",bad:"background:#f8dada;color:#8e2121"}[cls];
+    return `<div class="acat"><h4>${esc(f)} <small>${nf?nf+" fille"+(nf>1?"s":""):""}${nf&&ng?" + ":""}${ng?ng+" garçon"+(ng>1?"s":""):""}</small></h4><div style="display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 8px">${mix}</div><ul>${g.map(r=>`<li><span>${esc(r.n)}${r.car>0?" 🚗":""}<small>${esc(r.g)}${r.rq?" · "+esc(r.rq):""}</small></span><span class="vc">${esc(r.v)} · ${r.s==="F"?"fille":"garçon"} · ${esc(r.nu)}</span></li>`).join("")}</ul>${f==="À placer"?"":`<div style="margin-top:8px;border-radius:10px;padding:8px 12px;font-size:14px;${col}">🚗 ${txt}</div>`}</div>`}).join("")}
+/* ---------- Call 24/11 : brainstorming, rangé automatiquement par catégorie ---------- */
+const BR_CATS=[
+ ["Hygiène & sanitaires","🧻",["papier toilette","pq","savon","gel hydro","essuie main","serviette hygien","protection","poubelle sanitaire","brosse a dent","dentifrice","douche","toilette","wc","mouchoir"]],
+ ["Cuisine & repas","🍽️",["saladier","assiette","couvert","fourchette","couteau","cuillere","verre","gobelet","tasse","bol","plat","casserole","marmite","poele","crepiere","louche","spatule","thermomix","mixeur","bouilloire","cafetiere","thermos","glaciere","frigo","four","micro onde","nappe","sopalin","essuie tout","aluminium","film","sac congelation","boite","tupperware","eau","bouteille","carafe","cafe","the","sucre","sel","huile","epice","courses","pain","boulangerie","nourriture","repas","gouter","crepe","dessert","allergie","vegetarien","sans porc","sous vide","rechauff","plaque","torchon","eponge","liquide vaisselle","vaisselle","tablier","charlotte","gant","traiteuse","metro","lidl"]],
+ ["Son, image & louange","🎤",["micro","sono","enceinte","retour","table de mixage","mixage","cable","xlr","jack","di","pied de micro","pile","batterie","projecteur","videoprojecteur","ecran","hdmi","adaptateur","rallonge","multiprise","ordinateur","pc","laptop","clavier","piano","guitare","cajon","ampli","partition","paroles","chant","louange","musique","playlist","jingle","video","diapo","slides","powerpoint","telecommande","pupitre","lumiere","spot"]],
+ ["Accueil & inscriptions","🏷️",["etiquette","badge","prenom","liste des inscrits","liste","accueil","feuille","emargement","stylo","feutre","marqueur","scotch","pate a fix","ciseaux","agrafeuse","punaise","fleche","panneau","signaletique","affiche","plan","programme","livret","flyer","qr code","table d accueil","bienvenue","chaise","table"]],
+ ["Argent & paiements","💶",["caisse","liquide","monnaie","espece","especes","cheque","virement","sumup","tpe","carte bancaire","rib","iban","recu","facture","ticket","remboursement","don","quete","prix libre","paiement","payer","budget","tirelire","enveloppe"]],
+ ["Couchage & logement","🛏️",["matelas","sac de couchage","duvet","drap","oreiller","couverture","lit","logement","heberg","habitant","cle","clef","adresse","dormir","nuit"]],
+ ["Transport & trajets","🚗",["voiture","covoiturage","parking","essence","peage","mettis","bus","train","gare","navette","trajet","itineraire","gps","chauffeur"]],
+ ["Programme & animation","🎲",["jeu","grand jeu","brise glace","atelier","dab","message","predication","bible","sketch","temoignage","priere","intercession","culte","animateur","orateur","intervenant","questionnaire","sondage","quiz","lot","cadeau","goodies","photo","appareil photo","horaire","timing","planning","chrono","minuteur","sifflet","dossard","ballon","feuille de route"]],
+ ["Lieux & ménage","🧹",["balai","serpilliere","aspirateur","seau","nettoyage","menage","produit","javel","sac poubelle","poubelle","tri","etat des lieux","convention","assurance","attestation","salle","local","rangement","chauffage","lumiere","ampoule","clefs"]],
+ ["Santé & sécurité","⛑️",["trousse","secours","pansement","doliprane","paracetamol","medicament","urgence","numero","pompier","samu","extincteur","securite","sortie de secours","defibrillateur","contact","allergique","epipen"]],
+ ["Communication","📣",["message","whatsapp","mail","groupe","relance","rappel","annonce","instagram","story","publication","com","sms","appel","telephone","info pratique","infos pratiques"]],
+];
+const BR_OTHER=["À trier","📝"];
+function brNorm(s){return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}
+function brCat(t){const n=" "+brNorm(t)+" ";let best=-1,score=0;
+  BR_CATS.forEach(([,,kw],i)=>kw.forEach(k=>{const kk=brNorm(k);const hit=n.includes(" "+kk+" ")||n.includes(" "+kk+"s ")||n.includes(" "+kk+"x ")||(kk.length>=5&&n.includes(" "+kk));if(hit&&kk.length>score){score=kk.length;best=i}}));
+  return best<0?BR_OTHER[0]:BR_CATS[best][0]}
+let brLast=null;
+function brAdd(raw){const parts=raw.split(/[,;\n]+/).map(s=>s.trim()).filter(Boolean);if(!parts.length)return;S._brain=S._brain||{};
+  parts.forEach((t,i)=>{const id="b"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5);S._brain[id]={t:t.slice(0,140),c:brCat(t),d:0,at:Date.now()+i};brLast=id});save();renderBrain()}
+function renderBrain(){const B=S._brain||{};const items=Object.entries(B).filter(([,v])=>v&&v.t).sort((a,b)=>a[1].at-b[1].at);
+  const cats=[...BR_CATS.map(c=>c[0]),BR_OTHER[0]];const ico=Object.fromEntries([...BR_CATS.map(c=>[c[0],c[1]]),BR_OTHER]);
+  const done=items.filter(([,v])=>v.d).length;
+  document.getElementById("brSub").textContent=items.length?`${items.length} idée${items.length>1?"s":""} · ${done} réglée${done>1?"s":""} · coche quand c'est prévu, change la catégorie avec ▾ si elle est mal rangée`:"Rien pour l'instant : lance-toi !";
+  document.getElementById("brCats").innerHTML=cats.map(c=>{const g=items.filter(([,v])=>v.c===c);if(!g.length)return"";
+    return `<div class="brc"><h4><span>${ico[c]||""} ${esc(c)}</span><small>${g.length}</small></h4><ul>${g.map(([id,v])=>`<li class="${v.d?"done":""}${id===brLast?" new":""}"><input type="checkbox" data-bd="${id}" ${v.d?"checked":""} aria-label="Réglé"><span>${esc(v.t)}</span><span style="display:flex;align-items:center"><span class="bcw" title="Changer de catégorie">▾<select data-bc="${id}" title="Changer de catégorie" aria-label="Catégorie">${cats.map(x=>`<option${x===c?" selected":""}>${esc(x)}</option>`).join("")}</select></span><button class="x" type="button" data-bx="${id}" aria-label="Supprimer">×</button></span></li>`).join("")}</ul></div>`}).join("");
+  document.querySelectorAll("[data-bd]").forEach(e=>e.onchange=()=>{B[e.dataset.bd].d=e.checked?1:0;save();renderBrain()});
+  document.querySelectorAll("[data-bc]").forEach(e=>e.onchange=()=>{B[e.dataset.bc].c=e.value;brLast=e.dataset.bc;save();renderBrain()});
+  document.querySelectorAll("[data-bx]").forEach(e=>e.onclick=()=>{delete B[e.dataset.bx];save();renderBrain()});
+  brLast=null}
+(function(){const i=document.getElementById("brIn");i.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();brAdd(i.value);i.value=""}});
+  document.getElementById("brCopy").onclick=()=>{const B=S._brain||{};const by={};Object.values(B).forEach(v=>{(by[v.c]=by[v.c]||[]).push((v.d?"✓ ":"• ")+v.t)});
+    const txt="Brainstorming call 24/11\n\n"+Object.entries(by).map(([c,l])=>c+"\n"+l.join("\n")).join("\n\n");navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toastB("Liste copiée"),()=>{})}})();
+const PAGES=["brain","appel","carte","planning","taches","logement","budget","ateliers"];
 window.addEventListener("message",e=>{const h=e.data&&e.data.wePlanningHeight;if(h){const f=document.getElementById("planFrame");if(f&&e.source===f.contentWindow)f.style.height=Math.max(600,h+8)+"px"}});
 function showPage(id){
   if(!PAGES.includes(id)) id="carte"; curPage=id;
   PAGES.forEach(p=>{document.getElementById("p-"+p).hidden=p!==id;const t=document.getElementById("t-"+p);t.classList.toggle("on",p===id);t.setAttribute("aria-selected",p===id)});
   try{localStorage.setItem(KEY+".page",id)}catch(e){}
-  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")setLView(lView); if(id==="budget")renderBudget(); if(id==="ateliers")setAView(aView); if(id==="appel")renderAppel();
+  if(id==="planning"){const f=document.getElementById("planFrame");if(!f.src)f.src=f.dataset.src} if(id==="taches")renderTasks(); if(id==="logement")setLView(lView); if(id==="budget")renderBudget(); if(id==="ateliers")setAView(aView); if(id==="appel")renderAppel(); if(id==="brain"){renderBrain();setTimeout(()=>document.getElementById("brIn").focus(),50)}
 }
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>showPage(t.dataset.p));
 
@@ -1260,7 +1326,7 @@ function renderInt(){
     L.slice().reverse().map(r=>`<tr><td><b>${esc(r.n)}</b>${r.e?`<small>${esc(r.e)}</small>`:""}${r.al?`<small>allergie ou régime</small>`:""}</td><td>${tag(r.r[0],"Prédication")}${tag(r.r[1],"Atelier")}${tag(r.r[2],"Témoignage")}${r.at?`<small>${esc(r.at)}</small>`:""}</td><td>${MOM_COURT.filter((_,i)=>r.pr[i]).join(" · ")||'<span class="muted">non précisé</span>'}${r.nt?`<small>${esc(r.nt)}</small>`:""}</td><td>${r.lg?"A un logement":"À loger"}</td><td>${esc(r.mat)}</td></tr>`).join("")+"</tbody>"
     :`<tbody><tr><td style="padding:18px"><b>Aucun intervenant inscrit pour l'instant.</b><br><span class="muted">Envoie-leur la page intervenants : leurs réponses s'afficheront ici chaque matin.</span></td></tr></tbody>`;
 }
-let lView="ins"; try{lView=localStorage.getItem(KEY+".lview")||"ins"}catch(e){}
+let lView="ins"; try{lView=localStorage.getItem(KEY+".lview")||"ins"}catch(e){} if(lView==="heb")lView="rep";
 function setLView(v){lView=v;document.getElementById("lv-ins").hidden=v!=="ins";document.getElementById("lv-heb").hidden=v!=="heb";
   document.getElementById("lv-int").hidden=v!=="int";document.getElementById("lv-rep").hidden=v!=="rep";
   document.querySelectorAll(".ltab").forEach(b=>{const on=b.dataset.v===v;b.classList.toggle("on",on);b.setAttribute("aria-selected",on)});
