@@ -475,7 +475,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
   </section>
   <section id="p-budget" class="page" hidden>
-    <div class="phead"><div><h2>Budget</h2><p class="muted">Repris du Google Sheet « Budget WER EST 2026 » (prévisionnel et réalisé au 24 nov.). Bouge un curseur ou change un montant : la simulation et le budget comptable se recalculent ensemble.</p></div>
+    <div class="phead"><div><h2>Budget</h2><p class="muted">Prévisionnel recalé sur la liste précise des inscrits (42) et des intervenants (10) au 24 nov. ; réalisé repris du Google Sheet. Bouge un curseur ou change un montant : la simulation et le budget comptable se recalculent ensemble.</p></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="https://obstraqueur.github.io/weekend-grand-est/inscription/#infos" target="_blank" rel="noopener">Site d'inscription</a><button class="btn" type="button" id="bXlsx" style="background:var(--accent);border-color:var(--accent);color:#1b2433">Télécharger le budget (Excel)</button><span id="bResetZone"><button class="btn" type="button" id="bReset">Revenir aux valeurs de départ</button></span></div></div>
     <div class="kpis" id="bKpi"></div>
     <nav class="subtabs" role="tablist" aria-label="Vues du budget">
@@ -915,12 +915,14 @@ document.getElementById("hResetZone").onclick=e=>{const z=document.getElementByI
 const BDEF={eff:{Metz:14,Nancy:9,Strasbourg:12,Belfort:4,Mulhouse:2,Externes:3,"Équipe cuisine":4,Orateur:2}};
 S._b=Object.assign({},S._b||{}); S._b.eff=Object.assign({},BDEF.eff,S._b.eff||{});
 /* Hypothèses = Google Sheet « Budget WER EST 2026 », onglets Prévisionnel 2026 et Réalisé 2026 (24 nov.) */
-const BV=3;
+const BV=4, RV=3;
 const r4=x=>Math.round(x*10000)/10000;
-const PDEF={v:BV,t:{plein:35,groupe:30,active:40,soutien:0,charge:0},n:{plein:1,groupe:35,active:3,libre:0,soutien:6,charge:6},libreTot:0,dons:100,
-  c:{x5:r4(22.24/51),sp:r4(95.42/51),sd:r4(124.19/51),sg:r4(30.80/51),ss:r4(108.02/51),dd:r4(209.92/55)},inv:4,divers:40,
-  donOrateur:150,donCuisine:50,donLieu:100,entretien:25,cad:7,nCuis:4,imprevus:100,meals:{}};
-const RDEF={v:BV,n:{plein:1,groupe:21,active:7,libre:2,soutien:0,charge:7},dons:80,libreTot:null,dep:{}};
+const PDEF={v:BV,t:{plein:35,groupe:30,active:40,soutien:0,charge:0},n:{plein:1,groupe:30,active:7,libre:4,soutien:0,charge:10},libreTot:20,dons:100,
+  c:{x5:r4(22.24/51),sp:r4(95.42/51),sd:r4(124.19/51),sg:r4(30.80/51),ss:r4(108.02/51),dd:r4(209.92/55)},inv:3,divers:40,
+  donOrateur:150,donCuisine:50,donLieu:100,entretien:25,cad:7,nCuis:4,imprevus:100,
+  /* couverts = 42 inscrits (Inna arrive samedi) + présence déclarée des 10 intervenants (+ 3 cuisiniers au repas qu'ils servent samedi midi, + 3 invités Metz-Sud dimanche) */
+  meals:{x5:43,sp:47,sd:47,sg:48,ss:44,dd:49}};
+const RDEF={v:RV,n:{plein:1,groupe:21,active:7,libre:2,soutien:0,charge:7},dons:80,libreTot:null,dep:{}};
 const MEALS=[["x5","Vendredi soir · « 5e » (gâteaux, sirop, tisane)"],["sp","Samedi · petit-déjeuner"],["sd","Samedi · déjeuner (hachis parmentier, CASSIS)"],["sg","Samedi · goûter"],["ss","Samedi · soirée crêpes"],["dd","Dimanche · déjeuner (poulet curry, Grains de Blé)"]];
 const mealDef=(p,N,k)=>N+(k==="dd"?(+p.inv||0):0);
 const mealN=(p,N,k)=>{const v=p.meals&&p.meals[k];return v===null||v===undefined||v===""?mealDef(p,N,k):+v};
@@ -928,10 +930,10 @@ const CATP=[["plein","Étudiants tarif plein"],["groupe","Étudiants tarif group
 const LIEUX=[["donOrateur","Don orateur (église Metz-Sud)"],["donCuisine","Don cuisine (église Les Grains de Blé)","seulement s'il reste de la marge"],["donLieu","Don lieu (église de Borny)"]];
 const DEPK=[...MEALS.map(m=>m[0]),"divers","donOrateur","donCuisine","donLieu","entretien","cadeau","imprevus"];
 const clone=o=>JSON.parse(JSON.stringify(o));
-if(!S._p||S._p.v!==BV){S._p=clone(PDEF);S._r=clone(RDEF)}
+if(!S._p||S._p.v!==BV){S._p=clone(PDEF)}
 else S._p=Object.assign(clone(PDEF),S._p,{t:Object.assign({},PDEF.t,S._p.t||{}),n:Object.assign({},PDEF.n,S._p.n||{}),c:Object.assign({},PDEF.c,S._p.c||{})});
 S._p.meals=Object.assign({},S._p.meals||{});
-if(!S._r||S._r.v!==BV)S._r=clone(RDEF); S._r.n=S._r.n||{}; S._r.dep=S._r.dep||{};
+if(!S._r||S._r.v!==RV)S._r=clone(RDEF); S._r.n=S._r.n||{}; S._r.dep=S._r.dep||{};
 const eur=(x,d=0)=>(Math.round(x*100)/100).toLocaleString("fr-FR",{minimumFractionDigits:d,maximumFractionDigits:d})+" €";
 function prev(p=S._p){
   const N=CATP.reduce((a,[k])=>a+(+p.n[k]||0),0);
