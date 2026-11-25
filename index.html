@@ -36,6 +36,19 @@ h1{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3.2vw,2.2re
 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
 .btn{font:600 14px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
 .btn:hover{border-color:var(--accent)}
+.repx{border:0;background:none;cursor:pointer;font-size:14px;padding:2px 6px;margin-left:6px;border-radius:6px;color:var(--accent)}
+.repx:hover{background:var(--accent-soft)}
+.repdlg{border:1px solid var(--line);border-radius:14px;padding:0;max-width:440px;width:calc(100% - 32px);background:var(--surface);color:var(--ink)}
+.repdlg::backdrop{background:rgba(0,0,0,.35)}
+.repf{display:flex;flex-direction:column;gap:10px;padding:18px}
+.repf h3{margin:0 0 2px}
+.repf label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}
+.repf input,.repf select{font:400 15px var(--body);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.repf .r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.repf .ra{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.del{color:#8e2121;border-color:#e3b3b3}
+
 .btn:focus-visible,.node:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
 .map{position:relative;width:100%;aspect-ratio:1.25/1;max-width:100%}
@@ -422,9 +435,10 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
     </div>
     <div id="lv-rep" hidden>
       <div class="phead" style="margin-top:12px"><div><h2>Répartition chez l'habitant</h2><p class="muted" id="repSub"></p></div>
-        <a class="btn" href="https://github.com/Obstraqueur/weekend-grand-est/blob/main/hebergement/repartition.csv" target="_blank" rel="noopener">Fichier CSV ↗</a></div>
+        <div id="repTools" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div></div>
       <div class="kpis" id="repKpi"></div>
       <div class="brgrid" id="repList" style="grid-template-columns:repeat(auto-fill,minmax(340px,1fr))"></div>
+      <dialog id="repDlg" class="repdlg"></dialog>
     </div>
     <div id="lv-heb" hidden>
     <div class="phead"><div><h2>Logement chez l'habitant</h2><p class="muted">Plan B : les foyers qui peuvent accueillir. Change les places avec les jauges, ajoute ou retire un foyer, et fais varier le nombre de personnes par ville.</p></div>
@@ -713,21 +727,69 @@ document.querySelectorAll(".atab").forEach(b=>b.onclick=()=>setAView(b.dataset.v
 
 /* Répartition chez l'habitant (fichier hebergement/repartition.csv) */
 const REPART={"updated": "24 nov. 2026", "places": {"Romuald": "2 filles + 1 garçon", "Emma": "7 filles", "Agirla": "5 filles", "Mattias": "7 garçons", "Aline": "2 filles"}, "list": [{"f": "Romuald", "n": "Naomi Nardi", "s": "F", "g": "Louange · Metz", "nu": "ven + sam", "rq": "", "v": "Metz", "car": 2}, {"f": "Romuald", "n": "Inna Halych", "s": "F", "g": "Metz", "nu": "sam", "rq": "arrive samedi : nuit de samedi seulement", "v": "Metz", "car": 0}, {"f": "Romuald", "n": "Noé Erin", "s": "G", "g": "Louange · Metz", "nu": "ven + sam", "rq": "", "v": "Metz", "car": 0}, {"f": "Emma", "n": "Qetoura Brinkert", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Romane Leuba", "s": "F", "g": "Metz", "nu": "sam", "rq": "seulement la nuit de samedi", "v": "Metz", "car": 0}, {"f": "Emma", "n": "Louise Leuba", "s": "F", "g": "Metz", "nu": "sam", "rq": "seulement la nuit de samedi", "v": "Metz", "car": 0}, {"f": "Emma", "n": "Johanna Ollier", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Jeanne Winkelsass", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Justine Courderot", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Emma", "n": "Narmina Khalilova", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Agirla", "n": "Elisa Clolot", "s": "F", "g": "Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 3}, {"f": "Agirla", "n": "Salomé Willegger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Agirla", "n": "Yael Metzger", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Agirla", "n": "Firlande Claudius Clegbaza", "s": "F", "g": "Metzc'estmieux", "v": "Metz", "nu": "ven + sam", "rq": "a indiqué un logement sur Metz ; placée chez Agirla", "car": 0}, {"f": "Agirla", "n": "Miriam Del", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "a une voiture 5 places", "v": "Strasbourg", "car": 4}, {"f": "Aline", "n": "Elea Robin", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Aline", "n": "Elisa Souille", "s": "F", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Mattias", "n": "Etienne Del", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Mattias", "n": "Léo Gosselin", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 3}, {"f": "Mattias", "n": "Josh Dixon", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "", "v": "Strasbourg", "car": 0}, {"f": "Mattias", "n": "Jaïck Luder", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": "", "v": "Nancy", "car": 0}, {"f": "Mattias", "n": "Matthieu Scheins", "s": "G", "g": "Nancy", "nu": "ven + sam", "rq": "ami de Mattias · a sa voiture (+4 places)", "v": "Nancy", "car": 4}, {"f": "Mattias", "n": "Maxence Jehl", "s": "G", "g": "GBU Strasbourg", "nu": "ven + sam", "rq": "inscrit le 24 nov.", "v": "Strasbourg", "car": 0}], "hostcar": {"Romuald": 1, "Aline": 4, "Mattias": 2, "Emma": null, "Agirla": null}};
-function renderRep(){const L=REPART.list,F=[...new Set(L.map(r=>r.f))];const out=L.filter(r=>r.f==="À placer").length;
-  document.getElementById("repSub").textContent=`Participants logés chez l'habitant, voitures et places pour aller à Borny · mis à jour le ${REPART.updated}`;
+/* Hébergement modifiable : les changements sont gardés dans S._rep (ce navigateur, puis la synchro quand elle sera active) */
+let repEdit=false;
+const repL=()=>S._rep&&S._rep.list?S._rep.list:REPART.list;
+const repHC=()=>S._rep&&S._rep.hostcar?S._rep.hostcar:(REPART.hostcar||{});
+function repEnsure(){if(!S._rep||!S._rep.list)S._rep={base:REPART.updated,list:JSON.parse(JSON.stringify(REPART.list)),hostcar:JSON.parse(JSON.stringify(REPART.hostcar||{}))}}
+function repSave(m){S._rep.at=new Date().toLocaleString("fr-FR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});save();renderRep();if(m)toastB(m)}
+function repFoyers(){const F=[...new Set(repL().map(r=>r.f))];Object.keys(repHC()).forEach(f=>{if(!F.includes(f))F.push(f)});if(!F.includes("À placer"))F.push("À placer");return F}
+function repForm(i,foyer){const L=repL(),r=i>=0?L[i]:{f:foyer||"À placer",n:"",s:"F",g:"",v:"",nu:"ven + sam",rq:"",car:0};
+  const d=document.getElementById("repDlg");
+  d.innerHTML=`<form method="dialog" class="repf"><h3>${i>=0?"Modifier":"Ajouter une personne"}</h3>
+   <label>Nom<input name="n" required value="${esc(r.n)}"></label>
+   <label>Foyer<select name="f">${repFoyers().map(f=>`<option${f===r.f?" selected":""}>${esc(f)}</option>`).join("")}<option value="__new">+ Nouveau foyer…</option></select></label>
+   <label class="nf" hidden>Nom du nouveau foyer<input name="nf"></label>
+   <div class="r2"><label>Fille / garçon<select name="s"><option value="F"${r.s==="F"?" selected":""}>Fille</option><option value="G"${r.s==="G"?" selected":""}>Garçon</option></select></label>
+   <label>Nuits<select name="nu">${["ven + sam","ven","sam"].map(x=>`<option${x===r.nu?" selected":""}>${x}</option>`).join("")}</select></label></div>
+   <div class="r2"><label>Ville<input name="v" value="${esc(r.v)}"></label><label>Places dans sa voiture<input name="car" type="number" min="0" step="1" value="${+r.car||0}"></label></div>
+   <label>Groupe<input name="g" value="${esc(r.g)}"></label>
+   <label>Remarque<input name="rq" value="${esc(r.rq)}"></label>
+   <div class="ra">${i>=0?`<button type="button" class="btn del">Retirer de la liste</button>`:"<span></span>"}<span><button value="cancel" class="btn" formnovalidate>Annuler</button> <button value="ok" class="btn pri">Enregistrer</button></span></div></form>`;
+  const fm=d.querySelector("form");
+  fm.f.onchange=()=>{d.querySelector(".nf").hidden=fm.f.value!=="__new"};
+  const del=d.querySelector(".del");if(del)del.onclick=()=>{repEnsure();const x=S._rep.list.splice(i,1)[0];d.close();repSave(`${x.n} retiré(e) de l'hébergement.`)};
+  d.onclose=()=>{if(d.returnValue!=="ok")return;const v=k=>fm[k].value.trim();let f=v("f");if(f==="__new")f=v("nf")||"Nouveau foyer";
+    const o={f,n:v("n"),s:v("s"),g:v("g"),v:v("v"),nu:v("nu"),rq:v("rq"),car:Math.max(0,Math.round(+v("car")||0))};if(!o.n)return;
+    repEnsure();if(i>=0)S._rep.list[i]=Object.assign({},S._rep.list[i],o);else S._rep.list.push(o);repSave(i>=0?`${o.n} modifié(e).`:`${o.n} ajouté(e) chez ${f}.`)};
+  d.returnValue="";d.showModal();fm.n.focus()}
+function repHostCar(f){const d=document.getElementById("repDlg"),hc=repHC()[f];
+  d.innerHTML=`<form method="dialog" class="repf"><h3>Voiture de ${esc(f)}</h3><label>Places libres dans la voiture de l'hôte (vide = on ne sait pas)<input name="c" type="number" min="0" step="1" value="${hc===null||hc===undefined?"":hc}"></label>
+   <label>Renommer le foyer<input name="nm" value="${esc(f)}"></label>
+   <div class="ra"><span></span><span><button value="cancel" class="btn" formnovalidate>Annuler</button> <button value="ok" class="btn pri">Enregistrer</button></span></div></form>`;
+  const fm=d.querySelector("form");
+  d.onclose=()=>{if(d.returnValue!=="ok")return;repEnsure();const c=fm.c.value===""?null:Math.max(0,Math.round(+fm.c.value)),nm=fm.nm.value.trim()||f;
+    delete S._rep.hostcar[f];S._rep.hostcar[nm]=c;if(nm!==f)S._rep.list.forEach(r=>{if(r.f===f)r.f=nm});repSave(`Foyer ${nm} mis à jour.`)};
+  d.returnValue="";d.showModal()}
+function repCopy(){const L=repL(),out="HEBERGEMENT-JSON "+JSON.stringify({list:L,hostcar:repHC()});
+  navigator.clipboard.writeText(out).then(()=>toastB("Copié : colle-le dans la conversation avec Claude pour le mettre en ligne"),()=>{const t=document.createElement("textarea");t.value=out;t.style.cssText="position:fixed;inset:20px;height:60vh;z-index:60";document.body.appendChild(t);t.select();t.onblur=()=>t.remove();toastB("Sélectionné : copie avec Ctrl+C")})}
+function renderRep(){const L=repL(),F=repFoyers().filter(f=>f!=="À placer"||L.some(r=>r.f==="À placer")||repEdit);const out=L.filter(r=>r.f==="À placer").length;
+  const mine=!!(S._rep&&S._rep.list);
+  document.getElementById("repSub").textContent=`Participants logés chez l'habitant, voitures et places pour aller à Borny · ${mine?"modifié dans ce navigateur le "+(S._rep.at||"?"):"version en ligne du "+REPART.updated}`;
+  document.getElementById("repTools").innerHTML=`<button type="button" class="btn${repEdit?" pri":""}" id="repEd">${repEdit?"Terminer":"✎ Modifier"}</button>${repEdit?`<button type="button" class="btn" id="repAdd">+ Ajouter une personne</button>`:""}${mine?`<button type="button" class="btn" id="repCp" title="Copie la répartition de ce navigateur pour que Claude la mette en ligne">Copier pour mise en ligne</button><button type="button" class="btn" id="repRs">Revenir à la version en ligne</button>`:""}`;
+  document.getElementById("repEd").onclick=()=>{repEdit=!repEdit;renderRep()};
+  const ad=document.getElementById("repAdd");if(ad)ad.onclick=()=>repForm(-1);
+  const cp=document.getElementById("repCp");if(cp)cp.onclick=repCopy;
+  const rs=document.getElementById("repRs");if(rs)rs.onclick=()=>{if(rs.dataset.ok){delete S._rep;save();renderRep();toastB("Répartition remise comme la version en ligne.")}else{rs.dataset.ok=1;rs.textContent="Sûr ? Tes modifs seront perdues";setTimeout(()=>{if(rs.isConnected){delete rs.dataset.ok;rs.textContent="Revenir à la version en ligne"}},4000)}};
   const sam=L.filter(r=>/sam/.test(r.nu)).length, ven=L.filter(r=>/ven/.test(r.nu)).length;
   document.getElementById("repKpi").innerHTML=`<div class="kpi"><span>Logés</span><b>${L.length}</b><small>${L.filter(r=>r.s==="F").length} filles · ${L.filter(r=>r.s==="G").length} garçons</small></div><div class="kpi"><span>Vendredi soir</span><b>${ven}</b></div><div class="kpi"><span>Samedi soir</span><b>${sam}</b></div><div class="kpi${out?" bad":" good"}"><span>Encore à placer</span><b>${out}</b></div>`;
-  document.getElementById("repList").innerHTML=F.map(f=>{const g=L.filter(r=>r.f===f);const vm={};g.forEach(r=>vm[r.v]=(vm[r.v]||0)+1);
+  const HC=repHC();
+  document.getElementById("repList").innerHTML=F.map(f=>{const g=L.map((r,i)=>Object.assign({_i:i},r)).filter(r=>r.f===f);const vm={};g.forEach(r=>vm[r.v]=(vm[r.v]||0)+1);
     const mix=Object.entries(vm).sort((x,y)=>y[1]-x[1]).map(([v,n])=>`<span class="owner" style="margin-left:0">${esc(v)} ${n}</span>`).join(" ");
-    const drivers=g.filter(r=>r.car>0), hc=(REPART.hostcar||{})[f];
-    const seats=drivers.reduce((a,r)=>a+r.car,0)+(hc||0), pass=g.length-drivers.length;
+    const drivers=g.filter(r=>r.car>0), hc=HC[f];
+    const seats=drivers.reduce((a,r)=>a+(+r.car),0)+(hc||0), pass=g.length-drivers.length;
     const nf=g.filter(r=>r.s==="F").length, ng=g.length-nf;
     let cls,txt;const who=[...drivers.map(r=>`${esc(r.n.split(" ")[0])} : ${r.car} place${r.car>1?"s":""}`),...(hc?[`${esc(f)} : ${hc} place${hc>1?"s":""}`]:[])].join(" + ");
-    if(seats>=pass){cls="good";txt=`<b>${who}</b> pour ${pass} passager${pass>1?"s":""}. OK.`}
-    else if(hc===null){cls="mid";txt=`${who?"<b>"+who+"</b> pour ":""}${pass} passager${pass>1?"s":""}${who?"":" sans voiture"}. Il manque ${pass-seats} place${pass-seats>1?"s":""} si ${esc(f)} n'a pas de voiture.`}
+    if(seats>=pass){cls="good";txt=`<b>${who||"Personne"}</b> pour ${pass} passager${pass>1?"s":""}. OK.`}
+    else if(hc===null||hc===undefined){cls="mid";txt=`${who?"<b>"+who+"</b> pour ":""}${pass} passager${pass>1?"s":""}${who?"":" sans voiture"}. Il manque ${pass-seats} place${pass-seats>1?"s":""} si ${esc(f)} n'a pas de voiture.`}
     else{cls="bad";txt=`${who?"<b>"+who+"</b> : ":""}il manque ${pass-seats} place${pass-seats>1?"s":""}.`}
     const col={good:"background:var(--new-soft);color:var(--new)",mid:"background:var(--accent-soft);color:var(--ink)",bad:"background:#f8dada;color:#8e2121"}[cls];
-    return `<div class="acat"><h4>${esc(f)} <small>${nf?nf+" fille"+(nf>1?"s":""):""}${nf&&ng?" + ":""}${ng?ng+" garçon"+(ng>1?"s":""):""}</small></h4><div style="display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 8px">${mix}</div><ul>${g.map(r=>`<li><span>${esc(r.n)}${r.car>0?" 🚗":""}<small>${esc(r.g)}${r.rq?" · "+esc(r.rq):""}</small></span><span class="vc">${esc(r.v)} · ${r.s==="F"?"fille":"garçon"} · ${esc(r.nu)}</span></li>`).join("")}</ul>${f==="À placer"?"":`<div style="margin-top:8px;border-radius:10px;padding:8px 12px;font-size:14px;${col}">🚗 ${txt}</div>`}</div>`}).join("")}
+    const eb=(i)=>repEdit?`<button type="button" class="repx" data-ri="${i}" aria-label="Modifier">✎</button>`:"";
+    return `<div class="acat"><h4>${esc(f)} <small>${nf?nf+" fille"+(nf>1?"s":""):""}${nf&&ng?" + ":""}${ng?ng+" garçon"+(ng>1?"s":""):""}</small>${repEdit&&f!=="À placer"?`<button type="button" class="repx" data-hc="${esc(f)}" aria-label="Voiture et nom du foyer" title="Voiture de l'hôte, renommer">🚗✎</button>`:""}</h4><div style="display:flex;gap:6px;flex-wrap:wrap;margin:-2px 0 8px">${mix}</div><ul>${g.map(r=>`<li><span>${esc(r.n)}${r.car>0?" 🚗":""}<small>${esc(r.g)}${r.rq?" · "+esc(r.rq):""}</small></span><span class="vc">${esc(r.v)} · ${r.s==="F"?"fille":"garçon"} · ${esc(r.nu)}${eb(r._i)}</span></li>`).join("")}</ul>${repEdit?`<button type="button" class="btn repadd" data-add="${esc(f)}" style="margin-top:6px;font-size:13px;padding:5px 10px">+ Ajouter chez ${esc(f)}</button>`:""}${f==="À placer"?"":`<div style="margin-top:8px;border-radius:10px;padding:8px 12px;font-size:14px;${col}">🚗 ${txt}</div>`}</div>`}).join("");
+  document.querySelectorAll("#repList [data-ri]").forEach(b=>b.onclick=()=>repForm(+b.dataset.ri));
+  document.querySelectorAll("#repList [data-add]").forEach(b=>b.onclick=()=>repForm(-1,b.dataset.add));
+  document.querySelectorAll("#repList [data-hc]").forEach(b=>b.onclick=()=>repHostCar(b.dataset.hc));
+}
 /* ---------- Call 24/11 : brainstorming, rangé automatiquement par catégorie ---------- */
 const BR_CATS=[
  ["Hygiène & sanitaires","🧻",["papier toilette","pq","savon","gel hydro","essuie main","serviette hygien","protection","poubelle sanitaire","brosse a dent","dentifrice","douche","toilette","wc","mouchoir"]],
