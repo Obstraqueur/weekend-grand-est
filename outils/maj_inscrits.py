@@ -22,7 +22,8 @@ La page montre le détail complet des réponses (nom complet, allergies, covoitu
 mais jamais d'e-mail, de téléphone, d'adresse ni de date de naissance : ceux-là restent dans Jotform.
 paiements_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": {"p": "oui", "note": "Payé par un don"}}
 fixe le statut payé à la main (la note s'affiche sur le bouton « Payé »). Avec "pl": 10, l'inscription passe en prix libre
-à ce montant (sans "p", le statut payé reste celui du formulaire / de la case « Payé »).
+à ce montant (sans "p", le statut payé reste celui du formulaire / de la case « Payé »). Avec "tarif": 40, le montant
+de l'inscription est fixé à 40 € (au lieu du tarif calculé). Avec "don": 30, le don libre affiché devient 30 €.
 groupes_manuels.json (à côté de ce script, facultatif) : {"<id inscription>": "Nom du groupe (code)"} remplace
 le groupe donné à l'inscription (personnes rattachées à un groupe à la main).
 inscrits_exclus.json (à côté de ce script, facultatif) : {"<id inscription>": "qui / pourquoi"} retire ces inscriptions
@@ -120,6 +121,14 @@ for r in rows:
         r["p"] = "oui" if str(x.get("p", "oui")).lower().startswith("oui") else "non"
         if x.get("note"):
             r["pn"] = x["note"]
+    # « tarif » : montant de l'inscription fixé à la main (en €), à la place du tarif calculé (sans passer en prix libre).
+    if x and x.get("tarif") not in (None, ""):
+        r["t"] = float(str(x["tarif"]).replace(",", "."))
+        if r["t"] == int(r["t"]):
+            r["t"] = int(r["t"])
+    # « don » : montant du don libre fixé à la main (en €), à la place de celui du formulaire.
+    if x and x.get("don") not in (None, ""):
+        r["don"] = re.sub(r"[^0-9,.]", "", str(x["don"]))
     # « pl » : passe l'inscription en prix libre avec ce montant (en €), à la place du tarif étudiant / vie active / groupe.
     if x and x.get("pl") not in (None, ""):
         r["pl"] = float(str(x["pl"]).replace(",", "."))
