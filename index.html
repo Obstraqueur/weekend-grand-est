@@ -472,7 +472,7 @@ textarea:focus{outline:2px solid var(--accent);border-color:transparent}
       <div class="kpis" id="chKpi"></div>
       <div class="agrid">
         <div><h3 class="bh" style="margin-top:0">Choix 1 et choix 2</h3><div class="card" id="chBars"></div></div>
-        <div><h3 class="bh" style="margin-top:0">Répartition proposée</h3><p class="muted" style="margin:-4px 0 8px;font-size:13px">Chacun va dans son choix 1 ; quand un atelier est plein, on passe au choix 2. Places par atelier : <input type="number" id="chCap" min="1" max="40" style="width:56px;font:inherit"></p><div id="chGroups" class="alist"></div></div>
+        <div><h3 class="bh" style="margin-top:0">Répartition proposée</h3><p class="muted" style="margin:-4px 0 8px;font-size:13px">Par défaut, chacun va dans son choix 1. Si tu baisses le nombre de places, ceux qui dépassent passent à leur choix 2. Places par atelier : <input type="number" id="chCap" min="1" max="40" style="width:56px;font:inherit"></p><div id="chGroups" class="alist"></div></div>
       </div>
     </div>
     <div id="av-vote" hidden>
@@ -704,11 +704,11 @@ const CHOIX_AT=["Choisir le pardon pour avancer","Servir Dieu : par où ou par q
 const CHOIX={"updated": "28 nov. 12h26", "list": [{"id": "6716713378117862338", "n": "Salomé", "c1": 1, "c2": 5}, {"id": "6716713550315723507", "n": "Etienne", "c1": 1, "c2": 5}, {"id": "6716713978113825484", "n": "Elisa", "c1": 4, "c2": 3}, {"id": "6716714118773703707", "n": "Yaël Metzger", "c1": 3, "c2": 4}, {"id": "6716714158126086838", "n": "Firlande", "c1": 6, "c2": 5}, {"id": "6716714300321104004", "n": "Luiza", "c1": 1, "c2": 3}, {"id": "6716714446022850494", "n": "Inna", "c1": 2, "c2": 2}, {"id": "6716714609311483314", "n": "Josh", "c1": 2, "c2": 5}, {"id": "6716714614518550039", "n": "Matthias", "c1": 1, "c2": 2}, {"id": "6716714721942236722", "n": "Léo", "c1": 1, "c2": 2}, {"id": "6716714727118192508", "n": "Elea", "c1": 3, "c2": 6}, {"id": "6716714805552631853", "n": "Jeanne", "c1": 1, "c2": 4}, {"id": "6716714834756673981", "n": "Yassine", "c1": 2, "c2": 6}, {"id": "6716714864226727652", "n": "Noé", "c1": 5, "c2": 4}, {"id": "6716714917119212560", "n": "Luul", "c1": 6, "c2": 3}, {"id": "6716714952613525134", "n": "Léa", "c1": 3, "c2": 2}, {"id": "6716714964118052595", "n": "Johan", "c1": 3, "c2": 4}, {"id": "6716715069577618127", "n": "Elisaaaaa", "c1": 2, "c2": 3}, {"id": "6716715273111366501", "n": "Qetoura", "c1": 1, "c2": 2}, {"id": "6716715307115557740", "n": "Victoire", "c1": 3, "c2": 1}, {"id": "6716715366771550965", "n": "Tim", "c1": 2, "c2": 5}, {"id": "6716715407121276737", "n": "Narmina", "c1": 1, "c2": 3}, {"id": "6716715413012416966", "n": "Romane", "c1": 3, "c2": 5}, {"id": "6716715443013795856", "n": "Louise", "c1": 5, "c2": 2}, {"id": "6716715473362988783", "n": "Jaïck", "c1": 2, "c2": 5}, {"id": "6716715754619242124", "n": "Tigran", "c1": 2, "c2": 3}, {"id": "6716715823211479221", "n": "Justine", "c1": 3, "c2": 4}, {"id": "6716716166912060102", "n": "Terence", "c1": 3, "c2": 4}, {"id": "6716716214516747863", "n": "Maxence", "c1": 2, "c2": 5}, {"id": "6716717202111144889", "n": "Edmond", "c1": 3, "c2": 1}, {"id": "6716735144933693002", "n": "Johanna", "c1": 3, "c2": 1}]};
 function renderChoix(){
   const L=CHOIX.list, N=L.length, K=CHOIX_AT.length;
-  const capIn=document.getElementById("chCap"); const defCap=Math.max(1,Math.ceil(N/K)+2);
-  const cap=+(S._chCap||0)||defCap; capIn.value=cap; capIn.placeholder=defCap;
-  capIn.onchange=()=>{S._chCap=+capIn.value||0;save();renderChoix()};
   document.getElementById("chSub").textContent=N?`${N} réponse${N>1?"s":""} · mis à jour le ${CHOIX.updated}`:"Pas encore de réponse. Les choix s'affichent ici dès que la mise à jour est lancée.";
   const c1=Array(K).fill(0),c2=Array(K).fill(0); L.forEach(r=>{if(r.c1)c1[r.c1-1]++;if(r.c2)c2[r.c2-1]++});
+  const capIn=document.getElementById("chCap"); const defCap=Math.max(1,...c1); /* par défaut : tout le monde a son choix 1 */
+  const cap=+(S._chCap2||0)||defCap; capIn.value=cap; capIn.placeholder=defCap;
+  capIn.onchange=()=>{S._chCap2=+capIn.value||0;save();renderChoix()};
   const max=Math.max(1,...c1.map((v,i)=>v+c2[i]));
   // répartition : choix 1 tant qu'il reste de la place, sinon choix 2, sinon l'atelier le moins rempli
   const grp=CHOIX_AT.map(()=>[]); const order=L.slice().sort((a,b)=>String(a.id).localeCompare(String(b.id)));
